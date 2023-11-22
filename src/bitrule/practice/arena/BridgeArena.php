@@ -6,25 +6,27 @@ namespace bitrule\practice\arena;
 
 use pocketmine\math\Vector3;
 
-final class BridgeArena extends NormalArena {
+final class BridgeArena extends AbstractArena {
 
     /**
      * @param string  $name
+     * @param string  $schematic
      * @param Vector3 $firstPosition
      * @param Vector3 $secondPosition
      * @param Vector3 $firstPortal
      * @param Vector3 $secondPortal
-     * @param array   $duelTypes
+     * @param string[]   $duelTypes
      */
     public function __construct(
         string $name,
+        string $schematic,
         Vector3 $firstPosition,
         Vector3 $secondPosition,
         private Vector3 $firstPortal,
         private Vector3 $secondPortal,
         array $duelTypes
     ) {
-        parent::__construct($name, $firstPosition, $secondPosition, $duelTypes);
+        parent::__construct($name, $schematic, $firstPosition, $secondPosition, $duelTypes);
     }
 
     /**
@@ -53,5 +55,9 @@ final class BridgeArena extends NormalArena {
      */
     public function setSecondPortal(Vector3 $secondPortal): void {
         $this->secondPortal = $secondPortal;
+    }
+
+    public function addDuelType(string $duelType): void {
+        throw new \RuntimeException('This arena type cannot have duel types.');
     }
 }

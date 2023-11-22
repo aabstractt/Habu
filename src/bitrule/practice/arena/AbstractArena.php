@@ -7,21 +7,21 @@ namespace bitrule\practice\arena;
 use pocketmine\math\Vector3;
 use RuntimeException;
 
-class NormalArena {
+abstract class AbstractArena {
 
     /**
      * @param string  $name
-     * @param string  $schematicName
+     * @param string  $schematic
      * @param Vector3 $firstPosition
      * @param Vector3 $secondPosition
-     * @param array   $duelTypes
+     * @param string[]   $duelTypes
      */
     public function __construct(
         private readonly string $name,
-        private readonly string $schematicName,
-        private Vector3 $firstPosition,
-        private Vector3 $secondPosition,
-        private array $duelTypes
+        private readonly string $schematic,
+        private Vector3         $firstPosition,
+        private Vector3         $secondPosition,
+        private array           $duelTypes
     ) {}
 
     /**
@@ -34,8 +34,8 @@ class NormalArena {
     /**
      * @return string
      */
-    public function getSchematicName(): string {
-        return $this->schematicName;
+    public function getSchematic(): string {
+        return $this->schematic;
     }
 
     /**
@@ -74,37 +74,27 @@ class NormalArena {
     }
 
     /**
-     * @param string $type
+     * @param string $duelType
      *
      * @return bool
      */
-    public function isDuel(string $type): bool {
-        return in_array($type, $this->duelTypes, true);
+    public function hasDuelType(string $duelType): bool {
+        return in_array($duelType, $this->duelTypes, true);
     }
 
     /**
      * @param string $name
      * @param array  $data
      *
-     * @return NormalArena
+     * @return AbstractArena
      */
-    protected static function parseArena(string $name, array $data): NormalArena {
-        throw new RuntimeException('');
-    }
-
-    /**
-     * @param string $name
-     * @param array  $data
-     *
-     * @return NormalArena
-     */
-    public static function createFromArray(string $name, array $data): NormalArena {
+    public static function createFromArray(string $name, array $data): AbstractArena {
         if (!isset($data['type'])) {
             throw new RuntimeException('Invalid offset "type"');
         }
 
         return match ($data['type']) {
-            'normal' => NormalArena::parseArena($name, $data),
+            'normal' => DefaultArena::parse($name, $data),
             default => throw new RuntimeException('Invalid arena type'),
         };
     }
