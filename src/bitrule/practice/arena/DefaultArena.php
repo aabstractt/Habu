@@ -12,9 +12,9 @@ final class DefaultArena extends AbstractArena {
      * @param string $name
      * @param array  $data
      *
-     * @return AbstractArena
+     * @return DefaultArena
      */
-    protected static function parse(string $name, array $data): AbstractArena {
+    protected static function parse(string $name, array $data): DefaultArena {
         throw new RuntimeException('Not implemented');
     }
 }

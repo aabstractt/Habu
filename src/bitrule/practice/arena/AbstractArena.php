@@ -95,6 +95,7 @@ abstract class AbstractArena {
 
         return match ($data['type']) {
             'normal' => DefaultArena::parse($name, $data),
+            'bridge' => BridgeArena::parse($name, $data),
             default => throw new RuntimeException('Invalid arena type'),
         };
     }
