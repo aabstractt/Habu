@@ -1,0 +1,26 @@
+{
+  "name": "abstract/plugin_name",
+  "description": "Description",
+  "minimum-stability": "dev",
+  "license": "Apache-2.0",
+
+  "require": {
+    "php": "^8.0",
+    "ext-yaml": "*",
+    "ext-pthreads": "*",
+    "ext-json": "*",
+    "ext-mysqli": "*",
+    "ext-curl": "*"
+  },
+
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^v3.12.0",
+    "phpstan/phpstan": "^1.2.0",
+    "phpstan/phpstan-strict-rules": "^1.1.0",
+    "pocketmine/pocketmine-mp": "^4.2.4"
+  },
+
+  "autoload": {
+    "psr-4": {"": ["src"]}
+  }
+}
