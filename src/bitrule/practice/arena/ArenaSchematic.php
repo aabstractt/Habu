@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace bitrule\practice\arena;
 
 use pocketmine\math\Vector3;
+use RuntimeException;
 
 final class ArenaSchematic {
 
+    /** @var int[] */
     private array $gridsUsed = [];
 
     /**
      * @param string  $name
+     * @param int     $gridIndex
      * @param int     $spacingX
      * @param int     $spacingZ
      * @param Vector3 $startGridPoint
@@ -84,7 +87,7 @@ final class ArenaSchematic {
      */
     public function pasteModelArena(int $index): void {
         if (in_array($index, $this->gridsUsed, true)) {
-            throw new \RuntimeException('Grid ' . $index . ' is already used');
+            throw new RuntimeException('Grid ' . $index . ' is already used');
         }
 
         $this->gridsUsed[] = $index;
@@ -95,7 +98,7 @@ final class ArenaSchematic {
      */
     public function resetModelArena(int $index): void {
         if (!in_array($index, $this->gridsUsed, true)) {
-            throw new \RuntimeException('Grid ' . $index . ' is not used');
+            throw new RuntimeException('Grid ' . $index . ' is not used');
         }
 
         unset($this->gridsUsed[array_search($index, $this->gridsUsed, true)]);

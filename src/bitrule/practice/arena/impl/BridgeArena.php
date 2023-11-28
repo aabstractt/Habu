@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\arena;
+namespace bitrule\practice\arena\impl;
 
+use bitrule\practice\arena\AbstractArena;
 use pocketmine\math\Vector3;
 
 final class BridgeArena extends AbstractArena {

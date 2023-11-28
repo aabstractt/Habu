@@ -10,8 +10,6 @@ use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\task\ScaleArenaCopiesTask;
 use Closure;
 use Exception;
-use pocketmine\scheduler\CancelTaskException;
-use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
@@ -80,22 +78,17 @@ final class ArenaManager {
     }
 
     /**
-     * @param ArenaSchematic     $schematic
-     * @param int                $desiredCopies
-     * @param Closure(int): void $closure
+     * @param ArenaSchematic $schematic
+     * @param int            $desiredCopies
      */
-    public function scaleCopies(ArenaSchematic $schematic, int $desiredCopies, Closure $closure): void {
+    public function scaleCopies(ArenaSchematic $schematic, int $desiredCopies): void {
         if ($this->gridsBusy) {
-            $closure(-2);
-
-            return;
+            throw new RuntimeException('Grid building is busy');
         }
 
         $currentCopies = $schematic->getGridIndex();
         if ($currentCopies === $desiredCopies) {
-            $closure(-1);
-
-            return;
+            throw new RuntimeException('Grids are already scaled');
         }
 
         $this->gridsBusy = true;

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena;
 
+use bitrule\practice\arena\impl\BridgeArena;
+use bitrule\practice\arena\impl\DefaultArena;
 use pocketmine\math\Vector3;
-use pocketmine\promise\Promise;
-use pocketmine\promise\PromiseResolver;
 use RuntimeException;
 
 abstract class AbstractArena {
