@@ -5,23 +5,26 @@ declare(strict_types=1);
 namespace bitrule\practice\arena;
 
 use pocketmine\math\Vector3;
+use pocketmine\promise\Promise;
 use RuntimeException;
 
 abstract class AbstractArena {
 
     /**
-     * @param string  $name
-     * @param string  $schematic
-     * @param Vector3 $firstPosition
-     * @param Vector3 $secondPosition
-     * @param string[]   $duelTypes
+     * @param string   $name
+     * @param string   $schematic
+     * @param Vector3  $firstPosition
+     * @param Vector3  $secondPosition
+     * @param string[] $duelTypes
+     * @param array    $grids
      */
     public function __construct(
         private readonly string $name,
         private readonly string $schematic,
         private Vector3         $firstPosition,
         private Vector3         $secondPosition,
-        private array           $duelTypes
+        private array           $duelTypes,
+        private array $grids
     ) {}
 
     /**
@@ -67,6 +70,13 @@ abstract class AbstractArena {
     }
 
     /**
+     * @return array
+     */
+    public function getDuelTypes(): array {
+        return $this->duelTypes;
+    }
+
+    /**
      * @param string $duelType
      */
     public function addDuelType(string $duelType): void {
@@ -80,6 +90,23 @@ abstract class AbstractArena {
      */
     public function hasDuelType(string $duelType): bool {
         return in_array($duelType, $this->duelTypes, true);
+    }
+
+    public function scaleCopies(int $desiredCopies, Promise $promise): void {
+        $copies = count($this->grids);
+        if ($copies === $desiredCopies) {
+            $promise->
+        }
+
+        if ($copies > $desiredCopies) {
+            for ($i = $desiredCopies; $i < $copies; ++$i) {
+                $closure($this->grids[$i]);
+            }
+        } else {
+            for ($i = $copies; $i < $desiredCopies; ++$i) {
+                $this->grids[] = $closure();
+            }
+        }
     }
 
     /**
