@@ -12,32 +12,30 @@ use RuntimeException;
 abstract class AbstractArena {
 
     /**
-     * @param string         $name
      * @param ArenaSchematic $schematic
      * @param Vector3        $firstPosition
      * @param Vector3        $secondPosition
      * @param string[]       $duelTypes
      */
     public function __construct(
-        private readonly string $name,
-        private readonly ArenaSchematic $schematic,
+        private ArenaSchematic $schematic,
         private Vector3         $firstPosition,
         private Vector3         $secondPosition,
         private array           $duelTypes
     ) {}
 
     /**
-     * @return string
-     */
-    public function getName(): string {
-        return $this->name;
-    }
-
-    /**
      * @return ArenaSchematic
      */
     public function getSchematic(): ArenaSchematic {
         return $this->schematic;
+    }
+
+    /**
+     * @param ArenaSchematic $schematic
+     */
+    public function setSchematic(ArenaSchematic $schematic): void {
+        $this->schematic = $schematic;
     }
 
     /**
@@ -107,5 +105,32 @@ abstract class AbstractArena {
             'bridge' => BridgeArena::parse($schematicName, $data),
             default => throw new RuntimeException('Invalid arena type'),
         };
+    }
+
+    /**
+     * @param string $schematicName
+     * @param string $type
+     *
+     * @return AbstractArena
+     */
+    public static function createEmpty(string $schematicName, string $type): AbstractArena {
+        return match ($type) {
+            'normal' => DefaultArena::parseEmpty($schematicName),
+            'bridge' => BridgeArena::parseEmpty($schematicName),
+            default => throw new RuntimeException('Invalid arena type'),
+        };
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return Vector3
+     */
+    public static function deserializeVector(array $data): Vector3 {
+        if (count($data) !== 3) {
+            throw new RuntimeException('Invalid vector data');
+        }
+
+        return new Vector3($data[0], $data[1], $data[2]);
     }
 }

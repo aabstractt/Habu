@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\impl;
 
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\ArenaSchematic;
+use pocketmine\math\Vector3;
 use RuntimeException;
 
 final class DefaultArena extends AbstractArena {
@@ -16,6 +18,25 @@ final class DefaultArena extends AbstractArena {
      * @return DefaultArena
      */
     protected static function parse(string $schematicName, array $data): DefaultArena {
-        throw new RuntimeException('Not implemented');
+        return new DefaultArena(
+            ArenaSchematic::deserialize($schematicName, $data['schematic']),
+            self::deserializeVector($data['firstPosition']),
+            self::deserializeVector($data['secondPosition']),
+            $data['duelTypes']
+        );
+    }
+
+    /**
+     * @param string $schematicName
+     *
+     * @return DefaultArena
+     */
+    protected static function parseEmpty(string $schematicName): DefaultArena {
+        return new DefaultArena(
+            new ArenaSchematic($schematicName, 0, 0, 0, Vector3::zero()),
+            Vector3::zero(),
+            Vector3::zero(),
+            []
+        );
     }
 }

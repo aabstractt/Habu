@@ -103,4 +103,20 @@ final class ArenaSchematic {
 
         unset($this->gridsUsed[array_search($index, $this->gridsUsed, true)]);
     }
+
+    /**
+     * @param string $name
+     * @param array  $data
+     *
+     * @return ArenaSchematic
+     */
+    public static function deserialize(string $name, array $data): ArenaSchematic {
+        return new ArenaSchematic(
+            $name,
+            $data['gridIndex'],
+            $data['spacingX'],
+            $data['spacingZ'],
+            AbstractArena::deserializeVector($data['startGridPoint'])
+        );
+    }
 }

@@ -41,7 +41,7 @@ final class ArenaManager {
      * @param AbstractArena $arena
      */
     public function createArena(AbstractArena $arena): void {
-        $this->arenas[$arena->getName()] = $arena;
+        $this->arenas[$arena->getSchematic()->getName()] = $arena;
     }
 
     /**

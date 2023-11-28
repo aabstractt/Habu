@@ -8,6 +8,7 @@ use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\manager\ArenaManager;
+use Exception;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
@@ -20,16 +21,25 @@ final class ArenaCreateArgument extends Argument {
      * @param array  $args
      */
     public function onPlayerExecute(Player $sender, string $label, array $args): void {
-        if (count($args) < 3) {
-            $sender->sendMessage(TextFormat::RED . 'Usage: /' . $label . ' create <type>');
+        if (count($args) < 2) {
+            $sender->sendMessage(TextFormat::RED . 'Usage: /' . $label . ' create <type> <schematic>');
 
             return;
         }
 
-        if (ArenaManager::getInstance()->getArena($args[0]) !== null) {
+        if (ArenaManager::getInstance()->getArena($args[1]) !== null) {
             $sender->sendMessage(TextFormat::RED . 'An arena with that name already exists.');
 
             return;
+        }
+
+        try {
+            $arena = AbstractArena::createEmpty($args[1], $args[0]);
+            ArenaManager::getInstance()->createArena($arena);
+
+            $sender->sendMessage(TextFormat::GREEN . 'Arena ' . $arena->getSchematic()->getName() . ' created.');
+        } catch (Exception $e) {
+            $sender->sendMessage(TextFormat::RED . 'Failed to create arena: ' . $e->getMessage());
         }
     }
 }
