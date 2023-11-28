@@ -10,12 +10,12 @@ use RuntimeException;
 final class DefaultArena extends AbstractArena {
 
     /**
-     * @param string $name
+     * @param string $schematicName
      * @param array  $data
      *
      * @return DefaultArena
      */
-    protected static function parse(string $name, array $data): DefaultArena {
+    protected static function parse(string $schematicName, array $data): DefaultArena {
         throw new RuntimeException('Not implemented');
     }
 }

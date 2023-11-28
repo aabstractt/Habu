@@ -62,7 +62,7 @@ final class BridgeArena extends AbstractArena {
         throw new \RuntimeException('This arena type cannot have duel types.');
     }
 
-    public static function parse(string $name, array $data): BridgeArena {
+    public static function parse(string $schematicName, array $data): BridgeArena {
         throw new \RuntimeException('This arena type cannot be parsed.');
     }
 }

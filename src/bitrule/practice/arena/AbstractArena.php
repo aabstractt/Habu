@@ -92,19 +92,19 @@ abstract class AbstractArena {
     }
 
     /**
-     * @param string $name
+     * @param string $schematicName
      * @param array  $data
      *
      * @return AbstractArena
      */
-    public static function createFromArray(string $name, array $data): AbstractArena {
+    public static function createFromArray(string $schematicName, array $data): AbstractArena {
         if (!isset($data['type'])) {
             throw new RuntimeException('Invalid offset "type"');
         }
 
         return match ($data['type']) {
-            'normal' => DefaultArena::parse($name, $data),
-            'bridge' => BridgeArena::parse($name, $data),
+            'normal' => DefaultArena::parse($schematicName, $data),
+            'bridge' => BridgeArena::parse($schematicName, $data),
             default => throw new RuntimeException('Invalid arena type'),
         };
     }
