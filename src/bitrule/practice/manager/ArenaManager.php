@@ -7,6 +7,7 @@ namespace bitrule\practice\manager;
 use bitrule\practice\arena\ArenaSchematic;
 use bitrule\practice\Practice;
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\task\ScaleArenaCopiesTask;
 use Closure;
 use Exception;
 use pocketmine\scheduler\CancelTaskException;
@@ -119,19 +120,12 @@ final class ArenaManager {
     public function createGrids(ArenaSchematic $schematic, int $currentCopies, int $amount, Closure $closure): void {
         $schematic->setGridIndex($schematic->getGridIndex() + $amount);
 
-        $pasted = 0;
         Practice::getInstance()->getScheduler()->scheduleDelayedRepeatingTask(
-            new ClosureTask(function () use (&$pasted, $currentCopies, $closure, $schematic, $amount): void {
-                $pasted++;
-
-                if ($pasted > $amount) {
-                    $closure();
-
-                    throw new CancelTaskException();
-                }
-
-                $schematic->pasteModelArena($currentCopies + $pasted);
-            }),
+            new ScaleArenaCopiesTask(
+                $amount,
+                fn (int $progressCount) => $schematic->pasteModelArena($currentCopies + $progressCount),
+                $closure
+            ),
             40,
             40
         );
@@ -146,6 +140,14 @@ final class ArenaManager {
     public function deleteGrids(ArenaSchematic $schematic, int $currentCopies, int $amount, Closure $closure): void {
         $schematic->setGridIndex($schematic->getGridIndex() - $amount);
 
-        $closure();
+        Practice::getInstance()->getScheduler()->scheduleDelayedRepeatingTask(
+            new ScaleArenaCopiesTask(
+                $amount,
+                fn (int $progressCount) => $schematic->resetModelArena($currentCopies - $progressCount),
+                $closure
+            ),
+            40,
+            40
+        );
     }
 }
