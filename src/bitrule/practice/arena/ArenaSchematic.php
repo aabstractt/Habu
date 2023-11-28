@@ -21,10 +21,10 @@ final class ArenaSchematic {
      */
     public function __construct(
         private readonly string $name,
-        private int $gridIndex,
-        private readonly int $spacingX,
-        private readonly int $spacingZ,
-        private readonly Vector3 $startGridPoint
+        private readonly Vector3 $startGridPoint,
+        private int $gridIndex = 0,
+        private readonly int $spacingX = 0,
+        private readonly int $spacingZ = 0
     ) {}
 
     /**
@@ -111,12 +111,16 @@ final class ArenaSchematic {
      * @return ArenaSchematic
      */
     public static function deserialize(string $name, array $data): ArenaSchematic {
+        if (!isset($data['gridIndex'], $data['spacingX'], $data['spacingZ'], $data['startGridPoint'])) {
+            throw new RuntimeException('Invalid offset');
+        }
+
         return new ArenaSchematic(
             $name,
+            AbstractArena::deserializeVector($data['startGridPoint']),
             $data['gridIndex'],
             $data['spacingX'],
-            $data['spacingZ'],
-            AbstractArena::deserializeVector($data['startGridPoint'])
+            $data['spacingZ']
         );
     }
 }

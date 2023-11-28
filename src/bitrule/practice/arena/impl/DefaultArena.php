@@ -19,10 +19,10 @@ final class DefaultArena extends AbstractArena {
      */
     protected static function parse(string $schematicName, array $data): DefaultArena {
         return new DefaultArena(
-            ArenaSchematic::deserialize($schematicName, $data['schematic']),
-            self::deserializeVector($data['firstPosition']),
-            self::deserializeVector($data['secondPosition']),
-            $data['duelTypes']
+            ArenaSchematic::deserialize($schematicName, $data['schematic'] ?? []),
+            self::deserializeVector($data['firstPosition'] ?? []),
+            self::deserializeVector($data['secondPosition'] ?? []),
+            $data['duelTypes'] ?? []
         );
     }
 
@@ -33,7 +33,7 @@ final class DefaultArena extends AbstractArena {
      */
     protected static function parseEmpty(string $schematicName): DefaultArena {
         return new DefaultArena(
-            new ArenaSchematic($schematicName, 0, 0, 0, Vector3::zero()),
+            new ArenaSchematic($schematicName, Vector3::zero()),
             Vector3::zero(),
             Vector3::zero(),
             []

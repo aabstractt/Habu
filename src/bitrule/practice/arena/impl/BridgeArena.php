@@ -7,6 +7,7 @@ namespace bitrule\practice\arena\impl;
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\ArenaSchematic;
 use pocketmine\math\Vector3;
+use RuntimeException;
 
 final class BridgeArena extends AbstractArena {
 
@@ -61,7 +62,7 @@ final class BridgeArena extends AbstractArena {
      * @param string $duelType
      */
     public function addDuelType(string $duelType): void {
-        throw new \RuntimeException('This arena type cannot have duel types.');
+        throw new RuntimeException('This arena type cannot have duel types.');
     }
 
     /**
@@ -72,12 +73,12 @@ final class BridgeArena extends AbstractArena {
      */
     public static function parse(string $schematicName, array $data): BridgeArena {
         return new BridgeArena(
-            ArenaSchematic::deserialize($schematicName, $data['schematic']),
-            self::deserializeVector($data['firstPosition']),
-            self::deserializeVector($data['secondPosition']),
-            self::deserializeVector($data['firstPortal']),
-            self::deserializeVector($data['secondPortal']),
-            $data['duelTypes']
+            ArenaSchematic::deserialize($schematicName, $data['schematic'] ?? []),
+            self::deserializeVector($data['firstPosition'] ?? []),
+            self::deserializeVector($data['secondPosition'] ?? []),
+            self::deserializeVector($data['firstPortal'] ?? []),
+            self::deserializeVector($data['secondPortal'] ?? []),
+            $data['duelTypes'] ?? []
         );
     }
 
@@ -88,7 +89,7 @@ final class BridgeArena extends AbstractArena {
      */
     protected static function parseEmpty(string $schematicName): BridgeArena {
         return new BridgeArena(
-            new ArenaSchematic($schematicName, 0, 0, 0, Vector3::zero()),
+            new ArenaSchematic($schematicName, Vector3::zero()),
             Vector3::zero(),
             Vector3::zero(),
             Vector3::zero(),
