@@ -6,6 +6,7 @@ namespace bitrule\practice\arena;
 
 use pocketmine\math\Vector3;
 use pocketmine\promise\Promise;
+use pocketmine\promise\PromiseResolver;
 use RuntimeException;
 
 abstract class AbstractArena {
@@ -92,21 +93,11 @@ abstract class AbstractArena {
         return in_array($duelType, $this->duelTypes, true);
     }
 
-    public function scaleCopies(int $desiredCopies, Promise $promise): void {
-        $copies = count($this->grids);
-        if ($copies === $desiredCopies) {
-            $promise->
-        }
-
-        if ($copies > $desiredCopies) {
-            for ($i = $desiredCopies; $i < $copies; ++$i) {
-                $closure($this->grids[$i]);
-            }
-        } else {
-            for ($i = $copies; $i < $desiredCopies; ++$i) {
-                $this->grids[] = $closure();
-            }
-        }
+    /**
+     * @return array
+     */
+    public function getGrids(): array {
+        return $this->grids;
     }
 
     /**

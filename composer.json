@@ -7,7 +7,6 @@
   "require": {
     "php": "^8.1",
     "ext-yaml": "*",
-    "ext-pthreads": "*",
     "ext-json": "*",
     "ext-mysqli": "*",
     "ext-curl": "*"

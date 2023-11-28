@@ -6,6 +6,7 @@ namespace bitrule\practice\manager;
 
 use bitrule\practice\Practice;
 use bitrule\practice\arena\AbstractArena;
+use Closure;
 use Exception;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Config;
@@ -15,14 +16,12 @@ use RuntimeException;
 final class ArenaManager {
     use SingletonTrait;
 
-    public static ?Vector3 $STARTING_VECTOR = null;
-
     /** @var array<string, AbstractArena> */
     private array $arenas = [];
 
-    public function init(): void {
-        self::$STARTING_VECTOR = new Vector3(100, 80, 100);
+    private bool $gridsBusy = false;
 
+    public function init(): void {
         $config = new Config(Practice::getInstance()->getDataFolder() . 'arenas.yml', Config::YAML);
         foreach ($config->getAll() as $arenaName => $arenaData) {
             if (!is_string($arenaName) || !is_array($arenaData)) {
@@ -64,5 +63,55 @@ final class ArenaManager {
         }
 
         return $arenas[array_rand($arenas)] ?? null;
+    }
+
+    /**
+     * @param AbstractArena      $arena
+     * @param int                $desiredCopies
+     * @param Closure(int): void $closure
+     */
+    public function scaleCopies(AbstractArena $arena, int $desiredCopies, Closure $closure): void {
+        if ($this->gridsBusy) {
+            $closure(-2);
+
+            return;
+        }
+
+        $currentCopies = count($arena->getGrids());
+        if ($currentCopies === $desiredCopies) {
+            $closure(-1);
+
+            return;
+        }
+
+        $this->gridsBusy = true;
+
+        $saveWrapper = function (): void {
+            $this->gridsBusy = false;
+        };
+
+        if ($currentCopies > $desiredCopies) {
+            $this->deleteGrids($arena, $currentCopies - $desiredCopies, $saveWrapper);
+        } else {
+            $this->createGrids($arena, $desiredCopies - $currentCopies, $saveWrapper);
+        }
+    }
+
+    /**
+     * @param AbstractArena $arena
+     * @param int           $amount
+     * @param Closure(): void       $closure
+     */
+    public function createGrids(AbstractArena $arena, int $amount, Closure $closure): void {
+
+    }
+
+    /**
+     * @param AbstractArena $arena
+     * @param int           $amount
+     * @param Closure(): void       $closure
+     */
+    public function deleteGrids(AbstractArena $arena, int $amount, Closure $closure): void {
+
     }
 }
