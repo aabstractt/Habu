@@ -12,20 +12,18 @@ use RuntimeException;
 abstract class AbstractArena {
 
     /**
-     * @param string   $name
-     * @param string   $schematic
-     * @param Vector3  $firstPosition
-     * @param Vector3  $secondPosition
-     * @param string[] $duelTypes
-     * @param array    $grids
+     * @param string         $name
+     * @param ArenaSchematic $schematic
+     * @param Vector3        $firstPosition
+     * @param Vector3        $secondPosition
+     * @param string[]       $duelTypes
      */
     public function __construct(
         private readonly string $name,
-        private readonly string $schematic,
+        private readonly ArenaSchematic $schematic,
         private Vector3         $firstPosition,
         private Vector3         $secondPosition,
-        private array           $duelTypes,
-        private array $grids
+        private array           $duelTypes
     ) {}
 
     /**
@@ -36,9 +34,9 @@ abstract class AbstractArena {
     }
 
     /**
-     * @return string
+     * @return ArenaSchematic
      */
-    public function getSchematic(): string {
+    public function getSchematic(): ArenaSchematic {
         return $this->schematic;
     }
 
@@ -91,13 +89,6 @@ abstract class AbstractArena {
      */
     public function hasDuelType(string $duelType): bool {
         return in_array($duelType, $this->duelTypes, true);
-    }
-
-    /**
-     * @return array
-     */
-    public function getGrids(): array {
-        return $this->grids;
     }
 
     /**

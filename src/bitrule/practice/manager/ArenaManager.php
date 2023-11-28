@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
+use bitrule\practice\arena\ArenaSchematic;
 use bitrule\practice\Practice;
 use bitrule\practice\arena\AbstractArena;
 use Closure;
 use Exception;
-use pocketmine\math\Vector3;
+use pocketmine\scheduler\CancelTaskException;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
@@ -36,14 +38,25 @@ final class ArenaManager {
         }
     }
 
+    /**
+     * @param AbstractArena $arena
+     */
     public function createArena(AbstractArena $arena): void {
         $this->arenas[$arena->getName()] = $arena;
     }
 
+    /**
+     * @param string $name
+     */
     public function removeArena(string $name): void {
         unset($this->arenas[$name]);
     }
 
+    /**
+     * @param string $name
+     *
+     * @return AbstractArena|null
+     */
     public function getArena(string $name): ?AbstractArena {
         return $this->arenas[$name] ?? null;
     }
@@ -66,18 +79,18 @@ final class ArenaManager {
     }
 
     /**
-     * @param AbstractArena      $arena
+     * @param ArenaSchematic     $schematic
      * @param int                $desiredCopies
      * @param Closure(int): void $closure
      */
-    public function scaleCopies(AbstractArena $arena, int $desiredCopies, Closure $closure): void {
+    public function scaleCopies(ArenaSchematic $schematic, int $desiredCopies, Closure $closure): void {
         if ($this->gridsBusy) {
             $closure(-2);
 
             return;
         }
 
-        $currentCopies = count($arena->getGrids());
+        $currentCopies = $schematic->getGridIndex();
         if ($currentCopies === $desiredCopies) {
             $closure(-1);
 
@@ -91,27 +104,48 @@ final class ArenaManager {
         };
 
         if ($currentCopies > $desiredCopies) {
-            $this->deleteGrids($arena, $currentCopies - $desiredCopies, $saveWrapper);
+            $this->deleteGrids($schematic, $currentCopies, $currentCopies - $desiredCopies, $saveWrapper);
         } else {
-            $this->createGrids($arena, $desiredCopies - $currentCopies, $saveWrapper);
+            $this->createGrids($schematic, $currentCopies, $desiredCopies - $currentCopies, $saveWrapper);
         }
     }
 
     /**
-     * @param AbstractArena $arena
-     * @param int           $amount
-     * @param Closure(): void       $closure
+     * @param ArenaSchematic  $schematic
+     * @param int             $currentCopies
+     * @param int             $amount
+     * @param Closure(): void $closure
      */
-    public function createGrids(AbstractArena $arena, int $amount, Closure $closure): void {
+    public function createGrids(ArenaSchematic $schematic, int $currentCopies, int $amount, Closure $closure): void {
+        $schematic->setGridIndex($schematic->getGridIndex() + $amount);
 
+        $pasted = 0;
+        Practice::getInstance()->getScheduler()->scheduleDelayedRepeatingTask(
+            new ClosureTask(function () use (&$pasted, $currentCopies, $closure, $schematic, $amount): void {
+                $pasted++;
+
+                if ($pasted > $amount) {
+                    $closure();
+
+                    throw new CancelTaskException();
+                }
+
+                $schematic->pasteModelArena($currentCopies + $pasted);
+            }),
+            40,
+            40
+        );
     }
 
     /**
-     * @param AbstractArena $arena
-     * @param int           $amount
-     * @param Closure(): void       $closure
+     * @param ArenaSchematic  $schematic
+     * @param int             $currentCopies
+     * @param int             $amount
+     * @param Closure(): void $closure
      */
-    public function deleteGrids(AbstractArena $arena, int $amount, Closure $closure): void {
+    public function deleteGrids(ArenaSchematic $schematic, int $currentCopies, int $amount, Closure $closure): void {
+        $schematic->setGridIndex($schematic->getGridIndex() - $amount);
 
+        $closure();
     }
 }
