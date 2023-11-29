@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
+use bitrule\practice\kit\Kit;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\match\impl\SingleMatchImpl;
 use bitrule\practice\match\impl\TeamMatchImpl;
@@ -19,20 +20,15 @@ final class MatchManager {
     private array $matches = [];
 
     /**
-     * @param string $duelType
-     * @param array  $totalPlayers
-     * @param bool   $team
-     * @param bool   $ranked
+     * @param Player[] $totalPlayers
+     * @param Kit      $kit
+     * @param bool     $team
+     * @param bool     $ranked
      */
-    public function createMatch(string $duelType, array $totalPlayers, bool $team, bool $ranked): void {
-        $kit = KitManager::getInstance()->getKit($duelType);
-        if ($kit === null) {
-            throw new InvalidArgumentException('Invalid duel type: ' . $duelType);
-        }
-
-        $arena = ArenaManager::getInstance()->getRandomArena($duelType);
+    public function createMatch(array $totalPlayers, Kit $kit, bool $team, bool $ranked): void {
+        $arena = ArenaManager::getInstance()->getRandomArena($kit);
         if ($arena === null) {
-            throw new RuntimeException('No arenas available for duel type: ' . $duelType);
+            throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
 
         $gridIndex = $arena->getSchematic()->getAvailableGrid();

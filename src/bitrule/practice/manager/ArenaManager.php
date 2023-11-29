@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\manager;
 
 use bitrule\practice\arena\ArenaSchematic;
+use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\task\ScaleArenaCopiesTask;
@@ -61,15 +62,15 @@ final class ArenaManager {
     }
 
     /**
-     * @param string $duelType
+     * @param Kit $kit
      *
      * @return AbstractArena|null
      */
-    public function getRandomArena(string $duelType): ?AbstractArena {
+    public function getRandomArena(Kit $kit): ?AbstractArena {
         $arenas = [];
 
         foreach ($this->arenas as $arena) {
-            if (!in_array($duelType, $arena->getDuelTypes(), true)) continue;
+            if (!in_array($kit->getName(), $arena->getDuelTypes(), true)) continue;
             if (!$arena->getSchematic()->hasAvailableGrid()) continue;
 
             $arenas[] = $arena;
