@@ -37,7 +37,7 @@ final class ArenaCreateArgument extends Argument {
             $arena = AbstractArena::createEmpty($args[1], $args[0]);
             ArenaManager::getInstance()->createArena($arena);
 
-            $sender->sendMessage(TextFormat::GREEN . 'Arena ' . $arena->getSchematic()->getName() . ' created.');
+            $sender->sendMessage(TextFormat::GREEN . 'Arena ' . $arena->getName() . ' created.');
         } catch (Exception $e) {
             $sender->sendMessage(TextFormat::RED . 'Failed to create arena: ' . $e->getMessage());
         }

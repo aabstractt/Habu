@@ -25,7 +25,7 @@ abstract class AbstractMatch {
      * @return string
      */
     public function getFullName(): string {
-        return $this->arena->getSchematic()->getName() . '-' . $this->gridIndex;
+        return $this->arena->getName() . '-' . $this->gridIndex;
     }
 
     /**
@@ -79,8 +79,14 @@ abstract class AbstractMatch {
         return $spectators;
     }
 
-    public function broadcastMessage(string $message): void {
+    /**
+     * @param string $message
+     * @param bool   $includeSpectators
+     */
+    public function broadcastMessage(string $message, bool $includeSpectators = true): void {
         foreach ($this->getEveryone() as $duelPlayer) {
+            if (!$duelPlayer->isAlive() && !$includeSpectators) continue;
+
             $duelPlayer->sendMessage($message);
         }
     }

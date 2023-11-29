@@ -4,30 +4,29 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\impl;
 
-use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\arena\ArenaSchematic;
+use bitrule\practice\arena\ScalableArena;
 use pocketmine\math\Vector3;
 use RuntimeException;
 
-final class BridgeArena extends AbstractArena {
+final class BridgeArena extends ScalableArena {
 
     /**
-     * @param ArenaSchematic $schematic
-     * @param Vector3        $firstPosition
-     * @param Vector3        $secondPosition
-     * @param Vector3        $firstPortal
-     * @param Vector3        $secondPortal
-     * @param string[]       $duelTypes
+     * @param string   $name
+     * @param Vector3  $firstPosition
+     * @param Vector3  $secondPosition
+     * @param Vector3  $firstPortal
+     * @param Vector3  $secondPortal
+     * @param string[] $duelTypes
      */
     public function __construct(
-        ArenaSchematic $schematic,
+        string $name,
         Vector3 $firstPosition,
         Vector3 $secondPosition,
         private Vector3 $firstPortal,
         private Vector3 $secondPortal,
         array $duelTypes
     ) {
-        parent::__construct($schematic, $firstPosition, $secondPosition, $duelTypes);
+        parent::__construct($name, $firstPosition, $secondPosition, $duelTypes);
     }
 
     /**
@@ -66,14 +65,14 @@ final class BridgeArena extends AbstractArena {
     }
 
     /**
-     * @param string $schematicName
+     * @param string $name
      * @param array  $data
      *
      * @return BridgeArena
      */
-    public static function parse(string $schematicName, array $data): BridgeArena {
+    public static function parse(string $name, array $data): BridgeArena {
         return new BridgeArena(
-            ArenaSchematic::deserialize($schematicName, $data['schematic'] ?? []),
+            $name,
             self::deserializeVector($data['firstPosition'] ?? []),
             self::deserializeVector($data['secondPosition'] ?? []),
             self::deserializeVector($data['firstPortal'] ?? []),
@@ -83,13 +82,13 @@ final class BridgeArena extends AbstractArena {
     }
 
     /**
-     * @param string $schematicName
+     * @param string $name
      *
      * @return BridgeArena
      */
-    protected static function parseEmpty(string $schematicName): BridgeArena {
+    protected static function parseEmpty(string $name): BridgeArena {
         return new BridgeArena(
-            new ArenaSchematic($schematicName, Vector3::zero()),
+            $name,
             Vector3::zero(),
             Vector3::zero(),
             Vector3::zero(),

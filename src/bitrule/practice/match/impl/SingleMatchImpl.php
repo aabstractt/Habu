@@ -23,4 +23,11 @@ final class SingleMatchImpl extends AbstractMatch {
     public function getEveryone(): array {
         // TODO: Implement getEveryone() method.
     }
+
+    /**
+     * @param Player[] $totalPlayers
+     */
+    public function setup(array $totalPlayers): void {
+        // TODO: Implement setup() method.
+    }
 }

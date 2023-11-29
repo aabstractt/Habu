@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\impl;
 
-use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\arena\ArenaSchematic;
+use bitrule\practice\arena\ScalableArena;
 use pocketmine\math\Vector3;
-use RuntimeException;
 
-final class DefaultArena extends AbstractArena {
+final class DefaultArena extends ScalableArena {
 
     /**
-     * @param string $schematicName
+     * @param string $name
      * @param array  $data
      *
      * @return DefaultArena
      */
-    protected static function parse(string $schematicName, array $data): DefaultArena {
+    protected static function parse(string $name, array $data): DefaultArena {
         return new DefaultArena(
-            ArenaSchematic::deserialize($schematicName, $data['schematic'] ?? []),
+            $name,
             self::deserializeVector($data['firstPosition'] ?? []),
             self::deserializeVector($data['secondPosition'] ?? []),
             $data['duelTypes'] ?? []
@@ -27,13 +25,13 @@ final class DefaultArena extends AbstractArena {
     }
 
     /**
-     * @param string $schematicName
+     * @param string $name
      *
      * @return DefaultArena
      */
-    protected static function parseEmpty(string $schematicName): DefaultArena {
+    protected static function parseEmpty(string $name): DefaultArena {
         return new DefaultArena(
-            new ArenaSchematic($schematicName, Vector3::zero()),
+            $name,
             Vector3::zero(),
             Vector3::zero(),
             []

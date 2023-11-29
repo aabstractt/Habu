@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
+use bitrule\practice\arena\ScalableArena;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\match\impl\SingleMatchImpl;
 use bitrule\practice\match\impl\TeamMatchImpl;
-use InvalidArgumentException;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
@@ -31,12 +31,16 @@ final class MatchManager {
             throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
 
-        $gridIndex = $arena->getSchematic()->getAvailableGrid();
-        if ($gridIndex <= 0) {
-            throw new RuntimeException('No grids available for arena: ' . $arena->getSchematic()->getName());
+        if (!$arena instanceof ScalableArena) {
+            throw new RuntimeException('Arena is not scalable: ' . $arena->getName());
         }
 
-        $arena->getSchematic()->removeAvailableGrid($gridIndex);
+        $gridIndex = $arena->getAvailableGrid();
+        if ($gridIndex <= 0) {
+            throw new RuntimeException('No grids available for arena: ' . $arena->getName());
+        }
+
+        $arena->removeAvailableGrid($gridIndex);
 
         if ($team) {
             $match = new TeamMatchImpl($gridIndex, $arena, $ranked);

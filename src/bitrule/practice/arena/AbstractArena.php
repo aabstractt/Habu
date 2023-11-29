@@ -12,30 +12,23 @@ use RuntimeException;
 abstract class AbstractArena {
 
     /**
-     * @param ArenaSchematic $schematic
-     * @param Vector3        $firstPosition
-     * @param Vector3        $secondPosition
-     * @param string[]       $duelTypes
+     * @param string   $name
+     * @param Vector3  $firstPosition
+     * @param Vector3  $secondPosition
+     * @param string[] $duelTypes
      */
     public function __construct(
-        private ArenaSchematic $schematic,
+        protected readonly string $name,
         private Vector3         $firstPosition,
         private Vector3         $secondPosition,
         private array           $duelTypes
     ) {}
 
     /**
-     * @return ArenaSchematic
+     * @return string
      */
-    public function getSchematic(): ArenaSchematic {
-        return $this->schematic;
-    }
-
-    /**
-     * @param ArenaSchematic $schematic
-     */
-    public function setSchematic(ArenaSchematic $schematic): void {
-        $this->schematic = $schematic;
+    public function getName(): string {
+        return $this->name;
     }
 
     /**
@@ -90,35 +83,41 @@ abstract class AbstractArena {
     }
 
     /**
-     * @param string $schematicName
+     * @param string $name
      * @param array  $data
      *
      * @return AbstractArena
      */
-    public static function createFromArray(string $schematicName, array $data): AbstractArena {
+    public static function createFromArray(string $name, array $data): AbstractArena {
         if (!isset($data['type'])) {
             throw new RuntimeException('Invalid offset "type"');
         }
 
-        return match ($data['type']) {
-            'normal' => DefaultArena::parse($schematicName, $data),
-            'bridge' => BridgeArena::parse($schematicName, $data),
+        $arena = match ($data['type']) {
+            'normal' => DefaultArena::parse($name, $data),
+            'bridge' => BridgeArena::parse($name, $data),
             default => throw new RuntimeException('Invalid arena type'),
         };
+        $arena->setup($data);
+
+        return $arena;
     }
 
     /**
-     * @param string $schematicName
+     * @param string $name
      * @param string $type
      *
      * @return AbstractArena
      */
-    public static function createEmpty(string $schematicName, string $type): AbstractArena {
-        return match ($type) {
-            'normal' => DefaultArena::parseEmpty($schematicName),
-            'bridge' => BridgeArena::parseEmpty($schematicName),
+    public static function createEmpty(string $name, string $type): AbstractArena {
+        $arena = match ($type) {
+            'normal' => DefaultArena::parseEmpty($name),
+            'bridge' => BridgeArena::parseEmpty($name),
             default => throw new RuntimeException('Invalid arena type'),
         };
+        $arena->empty();
+
+        return $arena;
     }
 
     /**

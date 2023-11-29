@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\manager;
 
 use bitrule\practice\arena\ArenaSchematic;
+use bitrule\practice\arena\ScalableArena;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
 use bitrule\practice\arena\AbstractArena;
@@ -42,7 +43,7 @@ final class ArenaManager {
      * @param AbstractArena $arena
      */
     public function createArena(AbstractArena $arena): void {
-        $this->arenas[$arena->getSchematic()->getName()] = $arena;
+        $this->arenas[$arena->getName()] = $arena;
     }
 
     /**
@@ -71,7 +72,7 @@ final class ArenaManager {
 
         foreach ($this->arenas as $arena) {
             if (!in_array($kit->getName(), $arena->getDuelTypes(), true)) continue;
-            if (!$arena->getSchematic()->hasAvailableGrid()) continue;
+            if ($arena instanceof ScalableArena && !$arena->hasAvailableGrid()) continue;
 
             $arenas[] = $arena;
         }
@@ -80,15 +81,15 @@ final class ArenaManager {
     }
 
     /**
-     * @param ArenaSchematic $schematic
-     * @param int            $desiredCopies
+     * @param ScalableArena $arena
+     * @param int           $desiredCopies
      */
-    public function scaleCopies(ArenaSchematic $schematic, int $desiredCopies): void {
+    public function scaleCopies(ScalableArena $arena, int $desiredCopies): void {
         if ($this->gridsBusy) {
             throw new RuntimeException('Grid building is busy');
         }
 
-        $currentCopies = $schematic->getGridIndex();
+        $currentCopies = $arena->getGridIndex();
         if ($currentCopies === $desiredCopies) {
             throw new RuntimeException('Grids are already scaled');
         }
@@ -100,25 +101,25 @@ final class ArenaManager {
         };
 
         if ($currentCopies > $desiredCopies) {
-            $this->deleteGrids($schematic, $currentCopies, $currentCopies - $desiredCopies, $saveWrapper);
+            $this->deleteGrids($arena, $currentCopies, $currentCopies - $desiredCopies, $saveWrapper);
         } else {
-            $this->createGrids($schematic, $currentCopies, $desiredCopies - $currentCopies, $saveWrapper);
+            $this->createGrids($arena, $currentCopies, $desiredCopies - $currentCopies, $saveWrapper);
         }
     }
 
     /**
-     * @param ArenaSchematic  $schematic
+     * @param ScalableArena   $arena
      * @param int             $currentCopies
      * @param int             $amount
      * @param Closure(): void $closure
      */
-    public function createGrids(ArenaSchematic $schematic, int $currentCopies, int $amount, Closure $closure): void {
-        $schematic->setGridIndex($schematic->getGridIndex() + $amount);
+    public function createGrids(ScalableArena $arena, int $currentCopies, int $amount, Closure $closure): void {
+        $arena->setGridIndex($arena->getGridIndex() + $amount);
 
         Practice::getInstance()->getScheduler()->scheduleDelayedRepeatingTask(
             new ScaleArenaCopiesTask(
                 $amount,
-                fn (int $progressCount) => $schematic->pasteModelArena($currentCopies + $progressCount),
+                fn (int $progressCount) => $arena->pasteModelArena($currentCopies + $progressCount),
                 $closure
             ),
             40,
@@ -127,18 +128,18 @@ final class ArenaManager {
     }
 
     /**
-     * @param ArenaSchematic  $schematic
+     * @param ScalableArena   $arena
      * @param int             $currentCopies
      * @param int             $amount
      * @param Closure(): void $closure
      */
-    public function deleteGrids(ArenaSchematic $schematic, int $currentCopies, int $amount, Closure $closure): void {
-        $schematic->setGridIndex($schematic->getGridIndex() - $amount);
+    public function deleteGrids(ScalableArena $arena, int $currentCopies, int $amount, Closure $closure): void {
+        $arena->setGridIndex($arena->getGridIndex() - $amount);
 
         Practice::getInstance()->getScheduler()->scheduleDelayedRepeatingTask(
             new ScaleArenaCopiesTask(
                 $amount,
-                fn (int $progressCount) => $schematic->resetModelArena($currentCopies - $progressCount),
+                fn (int $progressCount) => $arena->resetModelArena($currentCopies - $progressCount),
                 $closure
             ),
             40,
