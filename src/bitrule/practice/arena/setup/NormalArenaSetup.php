@@ -17,20 +17,6 @@ class NormalArenaSetup {
     private ?Vector3 $secondPosition = null;
 
     /**
-     * @param string $schematic
-     */
-    public function __construct(
-        private readonly string $schematic
-    ) {}
-
-    /**
-     * @return string
-     */
-    public function getSchematic(): string {
-        return $this->schematic;
-    }
-
-    /**
      * @return string|null
      */
     public function getName(): ?string {
@@ -71,4 +57,6 @@ class NormalArenaSetup {
     public function setSecondPosition(?Vector3 $secondPosition): void {
         $this->secondPosition = $secondPosition;
     }
+
+    public function submit(): void {}
 }
