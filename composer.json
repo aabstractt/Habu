@@ -10,7 +10,8 @@
     "ext-json": "*",
     "ext-mysqli": "*",
     "ext-curl": "*",
-    "abstract/command-framework": "^0.3"
+    "abstract/command-framework": "^0.3",
+    "bitrule/forms": "dev-master"
   },
 
   "require-dev": {
@@ -21,7 +22,8 @@
   },
 
   "repositories": [
-    {"type": "vcs", "url": "git@github.com:Abstract-Resources/command-framework"}
+    {"type": "vcs", "url": "git@github.com:Abstract-Resources/command-framework"},
+    {"type": "vcs", "url": "git@github.com:aabstractt/PMMP-Forms"}
   ],
 
   "autoload": {

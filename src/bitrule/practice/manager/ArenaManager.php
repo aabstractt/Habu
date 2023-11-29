@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
-use bitrule\practice\arena\ArenaSchematic;
 use bitrule\practice\arena\ScalableArena;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
@@ -37,6 +36,19 @@ final class ArenaManager {
                 Practice::getInstance()->getLogger()->error('Failed to load arena ' . $arenaName . ': ' . $e->getMessage());
             }
         }
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function saveAll(): void {
+        $config = new Config(Practice::getInstance()->getDataFolder() . 'arenas.yml');
+
+        foreach ($this->arenas as $arena) {
+            $config->set($arena->getName(), $arena->serialize());
+        }
+
+        $config->save();
     }
 
     /**

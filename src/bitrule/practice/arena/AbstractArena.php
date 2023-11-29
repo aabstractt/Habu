@@ -6,7 +6,9 @@ namespace bitrule\practice\arena;
 
 use bitrule\practice\arena\impl\BridgeArena;
 use bitrule\practice\arena\impl\DefaultArena;
+use bitrule\practice\Practice;
 use pocketmine\math\Vector3;
+use pocketmine\utils\Config;
 use RuntimeException;
 
 abstract class AbstractArena {
@@ -83,6 +85,18 @@ abstract class AbstractArena {
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    public function serialize(): array {
+        return [
+            'type' => 'normal',
+            'first_position' => self::serializeVector($this->firstPosition),
+            'second_position' => self::serializeVector($this->secondPosition),
+            'duel_types' => $this->duelTypes
+        ];
+    }
+
+    /**
      * @param string $name
      * @param array  $data
      *
@@ -131,5 +145,14 @@ abstract class AbstractArena {
         }
 
         return new Vector3($data[0], $data[1], $data[2]);
+    }
+
+    /**
+     * @param Vector3 $vector
+     *
+     * @return int[]
+     */
+    public static function serializeVector(Vector3 $vector): array {
+        return [$vector->getX(), $vector->getY(), $vector->getZ()];
     }
 }

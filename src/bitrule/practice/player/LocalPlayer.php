@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace bitrule\practice\player;
 
-use bitrule\practice\arena\setup\NormalArenaSetup;
+use bitrule\practice\arena\setup\AbstractArenaSetup;
 
 final class LocalPlayer {
 
-    /** @var NormalArenaSetup|null */
-    private ?NormalArenaSetup $arenaSetup = null;
+    /** @var AbstractArenaSetup|null */
+    private ?AbstractArenaSetup $arenaSetup = null;
 
     public function __construct(
         private readonly string $xuid,
@@ -31,16 +31,16 @@ final class LocalPlayer {
     }
 
     /**
-     * @return NormalArenaSetup|null
+     * @return AbstractArenaSetup|null
      */
-    public function getArenaSetup(): ?NormalArenaSetup {
+    public function getArenaSetup(): ?AbstractArenaSetup {
         return $this->arenaSetup;
     }
 
     /**
-     * @param NormalArenaSetup|null $arenaSetup
+     * @param AbstractArenaSetup|null $arenaSetup
      */
-    public function setArenaSetup(?NormalArenaSetup $arenaSetup): void {
+    public function setArenaSetup(?AbstractArenaSetup $arenaSetup): void {
         $this->arenaSetup = $arenaSetup;
     }
 }

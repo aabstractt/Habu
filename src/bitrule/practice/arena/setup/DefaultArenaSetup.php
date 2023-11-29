@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\setup;
 
-final class BridgeArenaSetup extends AbstractArenaSetup {
+final class DefaultArenaSetup extends AbstractArenaSetup {
 
     /**
      * Returns the type of arena setup.
@@ -12,6 +12,6 @@ final class BridgeArenaSetup extends AbstractArenaSetup {
      * @return string
      */
     public function getType(): string {
-        return 'bridge';
+        return 'normal';
     }
 }

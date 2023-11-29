@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\manager;
 
 use bitrule\practice\player\DuelPlayer;
+use bitrule\practice\player\LocalPlayer;
 use pocketmine\player\Player;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
@@ -12,8 +13,31 @@ use RuntimeException;
 final class PlayerManager {
     use SingletonTrait;
 
+    /** @var array<string, LocalPlayer> */
+    private array $localPlayers = [];
+
     /** @var array<string, DuelPlayer> */
     private array $duelPlayers = [];
+
+    /**
+     * @param string $xuid
+     *
+     * @return LocalPlayer|null
+     */
+    public function getLocalPlayer(string $xuid): ?LocalPlayer {
+        return $this->localPlayers[$xuid] ?? null;
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function addLocalPlayer(Player $player): void {
+        if (isset($this->localPlayers[$player->getXuid()])) {
+            throw new RuntimeException('Player already exists in local players list');
+        }
+
+        $this->localPlayers[$player->getXuid()] = new LocalPlayer($player->getXuid(), $player->getName());
+    }
 
     /**
      * @param string $xuid

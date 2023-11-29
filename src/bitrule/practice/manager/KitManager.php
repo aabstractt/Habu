@@ -10,6 +10,9 @@ use pocketmine\utils\SingletonTrait;
 final class KitManager {
     use SingletonTrait;
 
+    /** @var array<string, Kit> */
+    private array $kits = [];
+
     /**
      * @param string $name
      *
@@ -17,5 +20,12 @@ final class KitManager {
      */
     public function getKit(string $name): ?Kit {
         return null;
+    }
+
+    /**
+     * @return array<string, Kit>
+     */
+    public function getKits(): array {
+        return $this->kits;
     }
 }

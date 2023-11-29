@@ -6,9 +6,8 @@ namespace bitrule\practice\commands\arena;
 
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
-use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\manager\ArenaManager;
-use Exception;
+use bitrule\practice\form\arena\ArenaSetupForm;
+use bitrule\practice\manager\PlayerManager;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
@@ -22,24 +21,27 @@ final class ArenaCreateArgument extends Argument {
      */
     public function onPlayerExecute(Player $sender, string $label, array $args): void {
         if (count($args) < 2) {
-            $sender->sendMessage(TextFormat::RED . 'Usage: /' . $label . ' create <type> <schematic>');
+            $sender->sendMessage(TextFormat::RED . 'Usage: /' . $label . ' create <type>');
 
             return;
         }
 
-        if (ArenaManager::getInstance()->getArena($args[1]) !== null) {
-            $sender->sendMessage(TextFormat::RED . 'An arena with that name already exists.');
+        $localPlayer = PlayerManager::getInstance()->getLocalPlayer($sender->getXuid());
+        if ($localPlayer === null) {
+            $sender->sendMessage(TextFormat::RED . 'Error code 1');
 
             return;
         }
 
-        try {
-            $arena = AbstractArena::createEmpty($args[1], $args[0]);
-            ArenaManager::getInstance()->createArena($arena);
+        if ($localPlayer->getArenaSetup() !== null) {
+            $sender->sendMessage(TextFormat::RED . 'Error code 2');
 
-            $sender->sendMessage(TextFormat::GREEN . 'Arena ' . $arena->getName() . ' created.');
-        } catch (Exception $e) {
-            $sender->sendMessage(TextFormat::RED . 'Failed to create arena: ' . $e->getMessage());
+            return;
         }
+
+        $form = new ArenaSetupForm();
+        $form->init();
+
+        $sender->sendForm($form);
     }
 }

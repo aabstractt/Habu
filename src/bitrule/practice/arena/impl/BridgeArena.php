@@ -65,6 +65,20 @@ final class BridgeArena extends ScalableArena {
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    public function serialize(): array {
+        return array_merge(
+            parent::serialize(),
+            [
+                'type' => 'bridge',
+                'first_portal' => self::serializeVector($this->firstPortal),
+                'second_portal' => self::serializeVector($this->secondPortal)
+            ]
+        );
+    }
+
+    /**
      * @param string $name
      * @param array  $data
      *

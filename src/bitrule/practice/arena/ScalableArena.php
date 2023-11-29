@@ -137,28 +137,43 @@ abstract class ScalableArena extends AbstractArena {
      * @param array $data
      */
     public function setup(array $data): void {
-        if (!isset($data['startGridPoint'])) {
-            throw new RuntimeException('Missing startGridPoint in ' . $this->name);
+        if (!isset($data['start_point'])) {
+            throw new RuntimeException('Missing start_point in ' . $this->name);
         }
 
         $this->startGridPoint = AbstractArena::deserializeVector($data['startGridPoint']);
 
-        if (!isset($data['spacingX'])) {
-            throw new RuntimeException('Missing spacingX in ' . $this->name);
+        if (!isset($data['spacing_x'])) {
+            throw new RuntimeException('Missing spacing_x in ' . $this->name);
         }
 
-        $this->spacingX = intval($data['spacingX']);
+        $this->spacingX = intval($data['spacing_x']);
 
-        if (!isset($data['spacingZ'])) {
-            throw new RuntimeException('Missing spacingZ in ' . $this->name);
+        if (!isset($data['spacing_z'])) {
+            throw new RuntimeException('Missing spacing_z in ' . $this->name);
         }
 
-        $this->spacingZ = intval($data['spacingZ']);
+        $this->spacingZ = intval($data['spacing_z']);
 
-        if (!isset($data['grid-index'])) {
-            throw new RuntimeException('Missing grid-index in ' . $this->name);
+        if (!isset($data['grid_index'])) {
+            throw new RuntimeException('Missing grid_index in ' . $this->name);
         }
 
-        $this->gridIndex = intval($data['grid-index']);
+        $this->gridIndex = intval($data['grid_index']);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function serialize(): array {
+        return array_merge(
+            parent::serialize(),
+            [
+                'start_point' => $this->startGridPoint !== null ? self::serializeVector($this->startGridPoint) : [],
+                'spacing_x' => $this->spacingX,
+                'spacing_z' => $this->spacingZ,
+                'grid_index' => $this->gridIndex
+            ]
+        );
     }
 }
