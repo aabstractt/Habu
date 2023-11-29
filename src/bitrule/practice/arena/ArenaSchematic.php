@@ -10,7 +10,7 @@ use RuntimeException;
 final class ArenaSchematic {
 
     /** @var int[] */
-    private array $gridsUsed = [];
+    private array $availableGrids = [];
 
     /**
      * @param string  $name
@@ -83,25 +83,60 @@ final class ArenaSchematic {
     }
 
     /**
-     * @param int $index
+     * @param int  $index
+     * @param bool $force
      */
-    public function pasteModelArena(int $index): void {
-        if (in_array($index, $this->gridsUsed, true)) {
-            throw new RuntimeException('Grid ' . $index . ' is already used');
+    public function pasteModelArena(int $index, bool $force = false): void {
+        if (in_array($index, $this->availableGrids, true)) {
+            throw new RuntimeException('Grid ' . $index . ' is already available');
         }
 
-        $this->gridsUsed[] = $index;
+        $this->availableGrids[] = $index;
+
+        // TODO: Paste the schematic here
     }
 
     /**
      * @param int $index
      */
     public function resetModelArena(int $index): void {
-        if (!in_array($index, $this->gridsUsed, true)) {
-            throw new RuntimeException('Grid ' . $index . ' is not used');
+        // TODO: Implement resetModelArena() method.
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasAvailableGrid(): bool {
+        return count($this->availableGrids) > 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAvailableGrid(): int {
+        return $this->availableGrids[array_rand($this->availableGrids)];
+    }
+
+    /**
+     * @param int $index
+     */
+    public function removeAvailableGrid(int $index): void {
+        $key = array_search($index, $this->availableGrids, true);
+        if ($key === false) {
+            throw new RuntimeException('Grid ' . $index . ' is not available');
         }
 
-        unset($this->gridsUsed[array_search($index, $this->gridsUsed, true)]);
+        unset($this->availableGrids[$key]);
+    }
+
+    /**
+     * This method is called when the arena is loaded.
+     * It should be used to load the schematic.
+     * Load the available grids.
+     * And paste all model arenas.
+     */
+    public function setup(): void {
+        throw new RuntimeException('Not implemented');
     }
 
     /**

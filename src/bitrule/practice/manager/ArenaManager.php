@@ -70,6 +70,7 @@ final class ArenaManager {
 
         foreach ($this->arenas as $arena) {
             if (!in_array($duelType, $arena->getDuelTypes(), true)) continue;
+            if (!$arena->getSchematic()->hasAvailableGrid()) continue;
 
             $arenas[] = $arena;
         }

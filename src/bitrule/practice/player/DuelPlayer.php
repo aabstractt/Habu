@@ -14,10 +14,12 @@ final class DuelPlayer {
     /**
      * @param string $xuid
      * @param string $name
+     * @param string $matchFullName
      */
     public function __construct(
         private readonly string $xuid,
-        private readonly string $name
+        private readonly string $name,
+        private readonly string $matchFullName
     ) {}
 
     /**
@@ -32,6 +34,13 @@ final class DuelPlayer {
      */
     public function getName(): string {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMatchFullName(): string {
+        return $this->matchFullName;
     }
 
     /**

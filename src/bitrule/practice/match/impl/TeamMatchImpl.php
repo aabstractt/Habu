@@ -39,10 +39,9 @@ final class TeamMatchImpl extends AbstractMatch {
     }
 
     /**
-     * @param TeamMatchImpl $match
-     * @param array         $totalPlayers
+     * @param Player[] $totalPlayers
      */
-    public static function setup(TeamMatchImpl $match, array $totalPlayers): void {
+    public function setup(array $totalPlayers): void {
         $teams = [];
         $teamSize = (int) ceil(count($totalPlayers) / 2);
         $teamId = 0;
@@ -52,13 +51,13 @@ final class TeamMatchImpl extends AbstractMatch {
                 $teams[$teamId] = $team = new Team($teamId, []);
             }
 
-            $team->addPlayer($player);
+            $team->addPlayer($player->getXuid());
 
-            if (count($teams[$teamId]->getPlayers()) < $teamSize) continue;
+            if (count($team->getPlayers()) < $teamSize) continue;
 
             $teamId++;
         }
 
-        $match->teams = $teams;
+        $this->teams = $teams;
     }
 }

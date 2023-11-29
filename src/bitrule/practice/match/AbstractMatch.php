@@ -11,21 +11,28 @@ use pocketmine\player\Player;
 abstract class AbstractMatch {
 
     /**
-     * @param int           $id
+     * @param int           $gridIndex
      * @param AbstractArena $arena
      * @param bool          $ranked
      */
     public function __construct(
-        private readonly int           $id,
+        private readonly int           $gridIndex,
         private readonly AbstractArena $arena,
         private readonly bool          $ranked
     ) {}
 
     /**
+     * @return string
+     */
+    public function getFullName(): string {
+        return $this->arena->getSchematic()->getName() . '-' . $this->gridIndex;
+    }
+
+    /**
      * @return int
      */
-    public function getId(): int {
-        return $this->id;
+    public function getGridIndex(): int {
+        return $this->gridIndex;
     }
 
     /**
@@ -41,6 +48,11 @@ abstract class AbstractMatch {
     public function isRanked(): bool {
         return $this->ranked;
     }
+
+    /**
+     * @param Player[] $totalPlayers
+     */
+    abstract public function setup(array $totalPlayers): void;
 
     /**
      * @param Player $player
