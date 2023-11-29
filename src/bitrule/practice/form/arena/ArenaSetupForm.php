@@ -117,6 +117,7 @@ final class ArenaSetupForm extends CustomForm {
 
         $arenaSetup = AbstractArenaSetup::from($this->type);
         $arenaSetup->setName($this->schematicName);
+        $arenaSetup->init($player);
 
         $localPlayer->setArenaSetup($arenaSetup);
 
