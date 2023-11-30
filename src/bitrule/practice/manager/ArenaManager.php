@@ -101,7 +101,7 @@ final class ArenaManager {
             throw new RuntimeException('Grid building is busy');
         }
 
-        $currentCopies = $arena->getGridIndex();
+        $currentCopies = $arena->getTotalGrids();
         if ($currentCopies === $desiredCopies) {
             throw new RuntimeException('Grids are already scaled');
         }
@@ -112,10 +112,11 @@ final class ArenaManager {
             $this->gridsBusy = false;
         };
 
-        if ($currentCopies > $desiredCopies) {
-            $this->deleteGrids($arena, $currentCopies, $currentCopies - $desiredCopies, $saveWrapper);
+        $amount = $desiredCopies - $currentCopies;
+        if ($amount > 0) {
+            $this->createGrids($arena, $currentCopies, $amount, $saveWrapper);
         } else {
-            $this->createGrids($arena, $currentCopies, $desiredCopies - $currentCopies, $saveWrapper);
+            $this->deleteGrids($arena, $currentCopies, abs($amount), $saveWrapper);
         }
     }
 
@@ -126,7 +127,7 @@ final class ArenaManager {
      * @param Closure(): void $closure
      */
     public function createGrids(ScalableArena $arena, int $currentCopies, int $amount, Closure $closure): void {
-        $arena->setGridIndex($arena->getGridIndex() + $amount);
+        $arena->setTotalGrids($arena->getTotalGrids() + $amount);
 
         Practice::getInstance()->getScheduler()->scheduleDelayedRepeatingTask(
             new ScaleArenaCopiesTask(
@@ -135,7 +136,7 @@ final class ArenaManager {
                 $closure
             ),
             40,
-            40
+            30
         );
     }
 
@@ -146,7 +147,7 @@ final class ArenaManager {
      * @param Closure(): void $closure
      */
     public function deleteGrids(ScalableArena $arena, int $currentCopies, int $amount, Closure $closure): void {
-        $arena->setGridIndex($arena->getGridIndex() - $amount);
+        $arena->setTotalGrids($arena->getTotalGrids() - $amount);
 
         Practice::getInstance()->getScheduler()->scheduleDelayedRepeatingTask(
             new ScaleArenaCopiesTask(

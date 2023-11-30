@@ -32,7 +32,7 @@ abstract class ScalableArena extends AbstractArena {
      * Grid index of the schematic.
      * @var int
      */
-    protected int $gridIndex = 0;
+    protected int $totalGrids = 0;
     /**
      * Available grids of the schematic.
      * @var int[]
@@ -84,15 +84,15 @@ abstract class ScalableArena extends AbstractArena {
     /**
      * @return int
      */
-    public function getGridIndex(): int {
-        return $this->gridIndex;
+    public function getTotalGrids(): int {
+        return $this->totalGrids;
     }
 
     /**
-     * @param int $gridIndex
+     * @param int $totalGrids
      */
-    public function setGridIndex(int $gridIndex): void {
-        $this->gridIndex = $gridIndex;
+    public function setTotalGrids(int $totalGrids): void {
+        $this->totalGrids = $totalGrids;
     }
 
     /**
@@ -188,11 +188,11 @@ abstract class ScalableArena extends AbstractArena {
 
         $this->spacingZ = intval($data['spacing_z']);
 
-        if (!isset($data['grid_index'])) {
-            throw new RuntimeException('Missing grid_index in ' . $this->name);
+        if (!isset($data['total_grids'])) {
+            throw new RuntimeException('Missing total_grids in ' . $this->name);
         }
 
-        $this->gridIndex = intval($data['grid_index']);
+        $this->totalGrids = intval($data['total_grids']);
     }
 
     /**
@@ -205,7 +205,7 @@ abstract class ScalableArena extends AbstractArena {
                 'start_point' => $this->startGridPoint !== null ? self::serializeVector($this->startGridPoint) : [],
                 'spacing_x' => $this->spacingX,
                 'spacing_z' => $this->spacingZ,
-                'grid_index' => $this->gridIndex
+                'total_grids' => $this->totalGrids
             ]
         );
     }
