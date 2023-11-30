@@ -146,7 +146,12 @@ abstract class ScalableArena extends AbstractArena {
      * @return int
      */
     public function getAvailableGrid(): int {
-        return $this->availableGrids[array_rand($this->availableGrids)];
+        $available = $this->availableGrids[array_rand($this->availableGrids)];
+        if ($available === null || $available <= 0) {
+            throw new RuntimeException('No grids available');
+        }
+
+        return $available;
     }
 
     /**

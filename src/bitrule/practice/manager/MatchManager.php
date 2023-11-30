@@ -35,17 +35,12 @@ final class MatchManager {
             throw new RuntimeException('Arena is not scalable: ' . $arena->getName());
         }
 
-        $gridIndex = $arena->getAvailableGrid();
-        if ($gridIndex <= 0) {
-            throw new RuntimeException('No grids available for arena: ' . $arena->getName());
-        }
-
-        $arena->removeAvailableGrid($gridIndex);
+        $arena->removeAvailableGrid($availableGrid = $arena->getAvailableGrid());
 
         if ($team) {
-            $match = new TeamMatchImpl($gridIndex, $arena, $ranked);
+            $match = new TeamMatchImpl($availableGrid, $arena, $ranked);
         } else {
-            $match = new SingleMatchImpl($gridIndex, $arena, $ranked);
+            $match = new SingleMatchImpl($availableGrid, $arena, $ranked);
         }
 
         $match->setup($totalPlayers);
