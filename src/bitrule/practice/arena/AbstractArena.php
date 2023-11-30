@@ -124,14 +124,11 @@ abstract class AbstractArena {
      * @return AbstractArena
      */
     public static function createEmpty(string $name, string $type): AbstractArena {
-        $arena = match ($type) {
+        return match ($type) {
             'normal' => DefaultArena::parseEmpty($name),
             'bridge' => BridgeArena::parseEmpty($name),
             default => throw new RuntimeException('Invalid arena type'),
         };
-        $arena->empty();
-
-        return $arena;
     }
 
     /**

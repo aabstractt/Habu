@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\player;
+namespace bitrule\practice\profile;
 
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 
-final class LocalPlayer {
+final class LocalProfile {
 
     /** @var AbstractArenaSetup|null */
     private ?AbstractArenaSetup $arenaSetup = null;

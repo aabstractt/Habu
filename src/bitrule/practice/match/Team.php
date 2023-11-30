@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\match;
 
-use bitrule\practice\manager\PlayerManager;
-use bitrule\practice\player\DuelPlayer;
+use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\profile\DuelProfile;
 
 final class Team {
 
@@ -48,15 +48,15 @@ final class Team {
     }
 
     /**
-     * @return DuelPlayer[]
+     * @return DuelProfile[]
      */
     public function getPlayers(): array {
         return array_filter(
             array_map(
-                fn (string $xuid) => PlayerManager::getInstance()->getDuelPlayer($xuid),
+                fn (string $xuid) => ProfileManager::getInstance()->getDuelProfile($xuid),
                 $this->players
             ),
-            fn (?DuelPlayer $duelPlayer) => $duelPlayer !== null
+            fn (?DuelProfile $duelProfile) => $duelProfile !== null
         );
     }
 }

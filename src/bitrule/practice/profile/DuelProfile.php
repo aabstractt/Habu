@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\player;
+namespace bitrule\practice\profile;
 
 use pocketmine\player\Player;
 use pocketmine\Server;
 
-final class DuelPlayer {
+final class DuelProfile {
 
     private bool $alive = true;
 

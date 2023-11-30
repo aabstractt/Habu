@@ -5,15 +5,20 @@ declare(strict_types=1);
 namespace bitrule\practice\form\arena;
 
 use bitrule\practice\arena\setup\AbstractArenaSetup;
+use bitrule\practice\arena\setup\ScalableArenaSetup;
 use bitrule\practice\manager\ArenaManager;
 use bitrule\practice\manager\KitManager;
-use bitrule\practice\manager\PlayerManager;
+use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\Practice;
 use cosmicpe\form\CustomForm;
 use cosmicpe\form\entries\custom\CustomFormEntry;
 use cosmicpe\form\entries\custom\DropdownEntry;
 use cosmicpe\form\entries\custom\InputEntry;
+use Exception;
 use pocketmine\form\FormValidationException;
 use pocketmine\player\Player;
+use pocketmine\scheduler\ClosureTask;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use RuntimeException;
 
@@ -46,7 +51,7 @@ final class ArenaSetupForm extends CustomForm {
      * This method is called when the form is initialized.
      * This is where you should add all the form entries.
      */
-    public function init(): void {
+    public function setup(): void {
         $this->addEntry(
             new DropdownEntry(TextFormat::GRAY . 'Arena Type', $options = ['Normal', 'Bridge']),
             function (Player $player, CustomFormEntry $entry, $value) use ($options): void {
@@ -110,17 +115,36 @@ final class ArenaSetupForm extends CustomForm {
             throw new RuntimeException('Arena setup form not initialized.');
         }
 
-        $localPlayer = PlayerManager::getInstance()->getLocalPlayer($player->getXuid());
-        if ($localPlayer === null) {
+        $localProfile = ProfileManager::getInstance()->getLocalProfile($player->getXuid());
+        if ($localProfile === null) {
             throw new RuntimeException('Local player not found.');
         }
 
         $arenaSetup = AbstractArenaSetup::from($this->type);
         $arenaSetup->setName($this->schematicName);
-        $arenaSetup->init($player);
 
-        $localPlayer->setArenaSetup($arenaSetup);
+        if (!$arenaSetup instanceof ScalableArenaSetup) {
+            try {
+                $arenaSetup->setup($player);
+            } catch (Exception $e) {
+                $player->sendMessage(TextFormat::RED . 'Arena setup failed: ' . $e->getMessage());
+
+                return;
+            }
+        }
+
+        $localProfile->setArenaSetup($arenaSetup);
 
         $player->sendMessage(TextFormat::GREEN . 'Arena setup started.');
+
+        if ($arenaSetup->isStarted()) return;
+
+        $form = new ScalableArenaSetupForm();
+        $form->setup();
+
+        Practice::getInstance()->getScheduler()->scheduleDelayedTask(
+            new ClosureTask(fn() => $player->sendForm($form)),
+        10
+        );
     }
 }

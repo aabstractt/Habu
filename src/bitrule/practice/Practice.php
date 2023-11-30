@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice;
 
 use bitrule\practice\commands\ArenaMainCommand;
+use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\manager\ArenaManager;
@@ -22,6 +23,7 @@ final class Practice extends PluginBase {
         ArenaManager::getInstance()->init();
 
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerInteractListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerQuitListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [

@@ -7,7 +7,7 @@ namespace bitrule\practice\commands\arena;
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\form\arena\ArenaSetupForm;
-use bitrule\practice\manager\PlayerManager;
+use bitrule\practice\manager\ProfileManager;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
@@ -26,21 +26,21 @@ final class ArenaCreateArgument extends Argument {
             return;
         }
 
-        $localPlayer = PlayerManager::getInstance()->getLocalPlayer($sender->getXuid());
-        if ($localPlayer === null) {
+        $localProfile = ProfileManager::getInstance()->getLocalProfile($sender->getXuid());
+        if ($localProfile === null) {
             $sender->sendMessage(TextFormat::RED . 'Error code 1');
 
             return;
         }
 
-        if ($localPlayer->getArenaSetup() !== null) {
-            $sender->sendMessage(TextFormat::RED . 'Error code 2');
+        if ($localProfile->getArenaSetup() !== null) {
+            $sender->sendMessage(TextFormat::RED . 'You are already editing an arena');
 
             return;
         }
 
         $form = new ArenaSetupForm();
-        $form->init();
+        $form->setup();
 
         $sender->sendForm($form);
     }

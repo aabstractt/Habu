@@ -6,7 +6,7 @@ namespace bitrule\practice\match\impl;
 
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\match\Team;
-use bitrule\practice\player\DuelPlayer;
+use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 
 final class TeamMatchImpl extends AbstractMatch {
@@ -26,7 +26,7 @@ final class TeamMatchImpl extends AbstractMatch {
     }
 
     /**
-     * @return DuelPlayer[]
+     * @return DuelProfile[]
      */
     public function getEveryone(): array {
         $players = [];

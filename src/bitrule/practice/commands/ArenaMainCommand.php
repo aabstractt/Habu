@@ -6,6 +6,7 @@ namespace bitrule\practice\commands;
 
 use abstractplugin\command\BaseCommand;
 use bitrule\practice\commands\arena\ArenaCreateArgument;
+use bitrule\practice\commands\arena\ArenaSaveArgument;
 
 final class ArenaMainCommand extends BaseCommand {
 
@@ -13,7 +14,8 @@ final class ArenaMainCommand extends BaseCommand {
         parent::__construct('arena', 'Arena management for Practice', '/arena hep');
 
         $this->registerParent(
-            new ArenaCreateArgument('create', 'arena.command.create')
+            new ArenaCreateArgument('create', 'arena.command.create'),
+            new ArenaSaveArgument('save', 'arena.command.save')
         );
     }
 

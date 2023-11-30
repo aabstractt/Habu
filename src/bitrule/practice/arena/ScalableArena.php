@@ -47,6 +47,41 @@ abstract class ScalableArena extends AbstractArena {
     }
 
     /**
+     * @param Vector3|null $startGridPoint
+     */
+    public function setStartGridPoint(?Vector3 $startGridPoint): void {
+        $this->startGridPoint = $startGridPoint;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpacingX(): int {
+        return $this->spacingX;
+    }
+
+    /**
+     * @param int $spacingX
+     */
+    public function setSpacingX(int $spacingX): void {
+        $this->spacingX = $spacingX;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpacingZ(): int {
+        return $this->spacingZ;
+    }
+
+    /**
+     * @param int $spacingZ
+     */
+    public function setSpacingZ(int $spacingZ): void {
+        $this->spacingZ = $spacingZ;
+    }
+
+    /**
      * @return int
      */
     public function getGridIndex(): int {
@@ -124,13 +159,6 @@ abstract class ScalableArena extends AbstractArena {
         }
 
         unset($this->availableGrids[$key]);
-    }
-
-    /**
-     * Initialize the scalable options.
-     */
-    public function empty(): void {
-        $this->startGridPoint = Vector3::zero();
     }
 
     /**

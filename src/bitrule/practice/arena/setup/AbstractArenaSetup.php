@@ -27,10 +27,22 @@ abstract class AbstractArenaSetup {
     private ?Vector3 $secondPosition = null;
 
     /**
-     * @return string|null
+     * Whether the setup has started.
+     * @var bool
      */
-    public function getName(): ?string {
-        return $this->name;
+    private bool $started = false;
+
+    /**
+     * The step spawn point to set.
+     * @var int
+     */
+    protected int $spawnStep = 0;
+
+    /**
+     * @return string
+     */
+    public function getName(): string {
+        return $this->name ?? throw new RuntimeException('Arena name is not set');
     }
 
     /**
@@ -69,6 +81,39 @@ abstract class AbstractArenaSetup {
     }
 
     /**
+     * @param int     $step
+     * @param Vector3 $position
+     */
+    public function setPositionByStep(int $step, Vector3 $position): void {
+        if ($step === 0) {
+            $this->setFirstPosition($position);
+        } else {
+            $this->setSecondPosition($position);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStarted(): bool {
+        return $this->started;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpawnStep(): int {
+        return $this->spawnStep;
+    }
+
+    /**
+     * Increases the spawn step by 1.
+     */
+    public function increaseSpawnStep(): void {
+        $this->spawnStep++;
+    }
+
+    /**
      * Returns the type of arena setup.
      *
      * @return string
@@ -76,14 +121,18 @@ abstract class AbstractArenaSetup {
     abstract public function getType(): string;
 
     /**
-     * This method is called when the setup is initialized.
+     * This method is called when the setup is started.
      * This is where you should set the player's inventory, gamemode, etc.
      *
      * @param Player $player
      */
-    public function init(Player $player): void {
+    public function setup(Player $player): void {
         if ($this->name === null) {
             throw new RuntimeException('Arena name is not set');
+        }
+
+        if (ArenaManager::getInstance()->getArena($this->name) !== null) {
+            throw new RuntimeException('Arena ' . $this->name . ' already exists');
         }
 
         $worldManager = Server::getInstance()->getWorldManager();
@@ -111,10 +160,12 @@ abstract class AbstractArenaSetup {
         $player->setFlying(true);
 
         $player->teleport($world->getSpawnLocation());
+
+        $this->started = true;
     }
 
     /**
-     * This method is called when the arena is submitted to the arena manager.
+     * This method is called when the arena is created into the arena manager.
      * This is where you should set the arena's properties.
      *
      * @param AbstractArena $arena

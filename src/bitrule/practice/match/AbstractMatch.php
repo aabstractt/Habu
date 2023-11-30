@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\match;
 
 use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\player\DuelPlayer;
+use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 
 abstract class AbstractMatch {
@@ -60,20 +60,20 @@ abstract class AbstractMatch {
     abstract public function removePlayer(Player $player): void;
 
     /**
-     * @return DuelPlayer[]
+     * @return DuelProfile[]
      */
     abstract public function getEveryone(): array;
 
     /**
-     * @return DuelPlayer[]
+     * @return DuelProfile[]
      */
     public function getSpectators(): array {
         $spectators = [];
 
-        foreach ($this->getEveryone() as $duelPlayer) {
-            if ($duelPlayer->isAlive()) continue;
+        foreach ($this->getEveryone() as $duelProfile) {
+            if ($duelProfile->isAlive()) continue;
 
-            $spectators[] = $duelPlayer;
+            $spectators[] = $duelProfile;
         }
 
         return $spectators;
@@ -84,10 +84,10 @@ abstract class AbstractMatch {
      * @param bool   $includeSpectators
      */
     public function broadcastMessage(string $message, bool $includeSpectators = true): void {
-        foreach ($this->getEveryone() as $duelPlayer) {
-            if (!$duelPlayer->isAlive() && !$includeSpectators) continue;
+        foreach ($this->getEveryone() as $duelProfile) {
+            if (!$duelProfile->isAlive() && !$includeSpectators) continue;
 
-            $duelPlayer->sendMessage($message);
+            $duelProfile->sendMessage($message);
         }
     }
 }

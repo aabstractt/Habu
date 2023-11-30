@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\match\impl;
 
 use bitrule\practice\match\AbstractMatch;
-use bitrule\practice\player\DuelPlayer;
+use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 
 final class SingleMatchImpl extends AbstractMatch {
@@ -18,7 +18,7 @@ final class SingleMatchImpl extends AbstractMatch {
     }
 
     /**
-     * @return DuelPlayer[]
+     * @return DuelProfile[]
      */
     public function getEveryone(): array {
         // TODO: Implement getEveryone() method.
