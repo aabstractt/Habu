@@ -7,6 +7,7 @@ namespace bitrule\practice\arena\setup;
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\ScalableArena;
 use pocketmine\math\Vector3;
+use pocketmine\player\Player;
 use RuntimeException;
 
 abstract class ScalableArenaSetup extends AbstractArenaSetup {
@@ -68,6 +69,24 @@ abstract class ScalableArenaSetup extends AbstractArenaSetup {
      */
     public function setSpacingZ(int $spacingZ): void {
         $this->spacingZ = $spacingZ;
+    }
+
+    /**
+     * This method is called when the setup is started.
+     * This is where you should set the player's inventory, gamemode, etc.
+     *
+     * @param Player $player
+     */
+    public function setup(Player $player): void {
+        parent::setup($player);
+
+        if ($this->startGridPoint === null) {
+            throw new RuntimeException('Start grid point is not set');
+        }
+
+        // TODO: Paste schematic
+
+        $player->teleport($this->startGridPoint);
     }
 
     /**
