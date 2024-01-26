@@ -109,8 +109,10 @@ final class Practice extends PluginBase {
 
     /**
      * Replace placeholders in the text.
-     * @param Player $player
-     * @param string $identifier
+     *
+     * @param Player       $player
+     * @param LocalProfile $localProfile
+     * @param string       $identifier
      *
      * @return string|null
      */
