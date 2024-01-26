@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena;
 
+use Closure;
+use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 use RuntimeException;
 
 /**
@@ -38,6 +42,13 @@ abstract class ScalableArena extends AbstractArena {
      * @var int[]
      */
     protected array $availableGrids = [];
+
+    /**
+     * @return World
+     */
+    public function getWorld(): World {
+        throw new RuntimeException('Not implemented');
+    }
 
     /**
      * @return Vector3
@@ -113,10 +124,23 @@ abstract class ScalableArena extends AbstractArena {
     }
 
     /**
-     * @param int  $index
-     * @param bool $force
+     * @param int     $id
+     * @param Closure(): Location[] $spawnsWrapper
      */
-    public function pasteModelArena(int $index, bool $force = false): void {
+    public function loadModelArena(int $id, Closure $spawnsWrapper): void {
+        $location =
+
+        $pasteWrapper = function (): void {
+
+        };
+    }
+
+    /**
+     * @param int     $index
+     * @param Closure(): Position[] $closure
+     * @param bool    $force
+     */
+    public function pasteModelArena(int $index, Closure $closure, bool $force = false): void {
         if (in_array($index, $this->availableGrids, true)) {
             throw new RuntimeException('Grid ' . $index . ' is already available');
         }

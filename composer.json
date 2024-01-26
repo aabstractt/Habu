@@ -11,7 +11,8 @@
     "ext-mysqli": "*",
     "ext-curl": "*",
     "abstract/command-framework": "^0.3",
-    "bitrule/forms": "dev-master"
+    "bitrule/forms": "dev-master",
+    "ext-igbinary": "*"
   },
 
   "require-dev": {
