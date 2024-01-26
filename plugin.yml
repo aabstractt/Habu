@@ -1,7 +1,16 @@
 ---
 name: BitrulePractice
 author: bitrule
-version: "2023.11.28"
+version: "2023.11"
 api: 5.0.0
 main: bitrule\practice\Practice
+permissions:
+  arena.command:
+    default: op
+  arena.command.createkit:
+    default: op
+  arena.command.create:
+    default: op
+  arena.command.save:
+    default: op
 ...

@@ -18,13 +18,6 @@ final class SingleMatchImpl extends AbstractMatch {
     }
 
     /**
-     * @return DuelProfile[]
-     */
-    public function getEveryone(): array {
-        // TODO: Implement getEveryone() method.
-    }
-
-    /**
      * @param Player[] $totalPlayers
      */
     public function setup(array $totalPlayers): void {

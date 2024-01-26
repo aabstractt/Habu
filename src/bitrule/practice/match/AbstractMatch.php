@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace bitrule\practice\match;
 
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 
 abstract class AbstractMatch {
 
+    /** @var string[] */
+    protected array $everyone = [];
+
     /**
-     * @param int           $gridIndex
      * @param AbstractArena $arena
+     * @param int           $id
      * @param bool          $ranked
      */
     public function __construct(
-        private readonly int           $gridIndex,
         private readonly AbstractArena $arena,
+        private readonly int $id,
         private readonly bool          $ranked
     ) {}
 
@@ -25,14 +29,14 @@ abstract class AbstractMatch {
      * @return string
      */
     public function getFullName(): string {
-        return $this->arena->getName() . '-' . $this->gridIndex;
+        return $this->arena->getName() . '-' . $this->id;
     }
 
     /**
      * @return int
      */
-    public function getGridIndex(): int {
-        return $this->gridIndex;
+    public function getId(): int {
+        return $this->id;
     }
 
     /**
@@ -62,7 +66,17 @@ abstract class AbstractMatch {
     /**
      * @return DuelProfile[]
      */
-    abstract public function getEveryone(): array;
+    public function getEveryone(): array {
+        $everyone = [];
+
+        foreach ($this->everyone as $xuid) {
+            if (($duelProfile = ProfileManager::getInstance()->getDuelProfile($xuid)) === null) continue;
+
+            $everyone[] = $duelProfile;
+        }
+
+        return $everyone;
+    }
 
     /**
      * @return DuelProfile[]

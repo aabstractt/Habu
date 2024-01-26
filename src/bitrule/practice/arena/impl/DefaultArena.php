@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\impl;
 
-use bitrule\practice\arena\ScalableArena;
+use bitrule\practice\arena\AbstractArena;
 use pocketmine\math\Vector3;
 
-final class DefaultArena extends ScalableArena {
+final class DefaultArena extends AbstractArena {
 
     /**
      * @param string $name
@@ -20,7 +20,7 @@ final class DefaultArena extends ScalableArena {
             $name,
             self::deserializeVector($data['firstPosition'] ?? []),
             self::deserializeVector($data['secondPosition'] ?? []),
-            $data['duelTypes'] ?? []
+            $data['kits'] ?? []
         );
     }
 

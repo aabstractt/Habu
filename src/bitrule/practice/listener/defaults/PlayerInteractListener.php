@@ -25,7 +25,6 @@ final class PlayerInteractListener implements Listener {
 
         $item = $ev->getItem();
         if ($item->getTypeId() !== ItemTypeIds::STICK) return;
-
         if ($item->getNamedTag()->getTag('arena') === null) return;
 
         $localProfile = ProfileManager::getInstance()->getLocalProfile($player->getXuid());

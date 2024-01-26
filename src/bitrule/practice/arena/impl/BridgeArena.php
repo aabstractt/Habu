@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\impl;
 
-use bitrule\practice\arena\ScalableArena;
+use bitrule\practice\arena\AbstractArena;
 use pocketmine\math\Vector3;
 use RuntimeException;
 
-final class BridgeArena extends ScalableArena {
+final class BridgeArena extends AbstractArena {
 
     /**
      * @param string   $name
@@ -91,7 +91,7 @@ final class BridgeArena extends ScalableArena {
             self::deserializeVector($data['secondPosition'] ?? []),
             self::deserializeVector($data['firstPortal'] ?? []),
             self::deserializeVector($data['secondPortal'] ?? []),
-            $data['duelTypes'] ?? []
+            $data['kits'] ?? []
         );
     }
 

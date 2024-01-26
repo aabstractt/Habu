@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
-use bitrule\practice\arena\ScalableArena;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\match\impl\SingleMatchImpl;
@@ -18,6 +17,8 @@ final class MatchManager {
 
     /** @var array<string, AbstractMatch> */
     private array $matches = [];
+    /** @var int */
+    private int $matchesPlayed = 0;
 
     /**
      * @param Player[] $totalPlayers
@@ -31,16 +32,10 @@ final class MatchManager {
             throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
 
-        if (!$arena instanceof ScalableArena) {
-            throw new RuntimeException('Arena is not scalable: ' . $arena->getName());
-        }
-
-        $arena->removeAvailableGrid($availableGrid = $arena->getAvailableGrid());
-
         if ($team) {
-            $match = new TeamMatchImpl($availableGrid, $arena, $ranked);
+            $match = new TeamMatchImpl($arena, $this->matchesPlayed++, $ranked);
         } else {
-            $match = new SingleMatchImpl($availableGrid, $arena, $ranked);
+            $match = new SingleMatchImpl($arena, $this->matchesPlayed++, $ranked);
         }
 
         $match->setup($totalPlayers);
