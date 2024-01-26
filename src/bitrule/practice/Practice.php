@@ -14,6 +14,7 @@ use bitrule\practice\manager\KitManager;
 use bitrule\practice\manager\MatchManager;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\manager\QueueManager;
+use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
@@ -59,7 +60,6 @@ final class Practice extends PluginBase {
 
         $this->scoreboardLines = $scoreboardLine;
 
-        ProfileManager::getInstance()->init();
         KitManager::getInstance()->loadAll();
         ArenaManager::getInstance()->init();
 
@@ -114,13 +114,10 @@ final class Practice extends PluginBase {
      *
      * @return string|null
      */
-    public static function replacePlaceholders(Player $player, string $identifier): ?string {
+    public static function replacePlaceholders(Player $player, LocalProfile $localProfile, string $identifier): ?string {
         if ($identifier === 'total_queue_count') return strval(QueueManager::getInstance()->getQueueCount());
         if ($identifier === 'total_match_count') return strval(MatchManager::getInstance()->getMatchCount());
         if ($identifier === 'online_players') return strval(count(self::getInstance()->getServer()->getOnlinePlayers()));
-
-        $localProfile = ProfileManager::getInstance()->getLocalProfile($player->getXuid());
-        if ($localProfile === null) return null;
 
         if (str_starts_with($identifier, 'queue_')) {
             if (($matchQueue = $localProfile->getMatchQueue()) === null) return null;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\profile\scoreboard;
 
 use bitrule\practice\Practice;
+use bitrule\practice\profile\LocalProfile;
 use pocketmine\network\mcpe\protocol\RemoveObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
@@ -55,11 +56,12 @@ final class Scoreboard {
     }
 
     /**
-     * @param Player $player
+     * @param Player       $player
+     * @param LocalProfile $localProfile
      *
      * @return array
      */
-    public function update(Player $player): array {
+    public function update(Player $player, LocalProfile $localProfile): array {
         $this->show($player); // TODO: Remove this
 
         $packets = [];
@@ -68,7 +70,7 @@ final class Scoreboard {
         foreach ($this->lines as $identifier => $scoreboardLine) {
             $updateResult = $scoreboardLine->update(
                 $slot,
-                str_contains($identifier, 'nothing_') ? '' : Practice::replacePlaceholders($player, $identifier)
+                str_contains($identifier, 'nothing_') ? '' : Practice::replacePlaceholders($player, $localProfile, $identifier)
             );
 
             if ($updateResult === UpdateResult::NOT_UPDATED) {

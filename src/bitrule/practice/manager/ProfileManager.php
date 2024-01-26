@@ -30,9 +30,6 @@ final class ProfileManager {
     /** @var array<string, DuelProfile> */
     private array $duelProfiles = [];
 
-    public function init(): void {
-    }
-
     /**
      * @param string $xuid
      *
@@ -93,7 +90,7 @@ final class ProfileManager {
             $player = Server::getInstance()->getPlayerExact($localProfile->getName());
             if ($player === null || !$player->isOnline()) continue;
 
-            $packets = $scoreboard->update($player);
+            $packets = $scoreboard->update($player, $localProfile);
             if (count($packets) === 0) continue;
 
             NetworkBroadcastUtils::broadcastPackets([$player], $packets);
