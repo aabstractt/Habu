@@ -10,7 +10,9 @@ use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\manager\ArenaManager;
 use bitrule\practice\manager\KitManager;
+use bitrule\practice\manager\MatchManager;
 use pocketmine\plugin\PluginBase;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\SingletonTrait;
 
 final class Practice extends PluginBase {
@@ -40,5 +42,9 @@ final class Practice extends PluginBase {
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
             new ArenaMainCommand()
         ]);
+
+        $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
+            MatchManager::getInstance()->tickStages();
+        }), 20);
     }
 }

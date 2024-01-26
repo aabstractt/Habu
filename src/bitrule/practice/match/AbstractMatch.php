@@ -6,13 +6,21 @@ namespace bitrule\practice\match;
 
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\match\stage\AbstractStage;
+use bitrule\practice\match\stage\StartingStage;
 use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
+use pocketmine\Server;
+use pocketmine\world\World;
 
 abstract class AbstractMatch {
 
-    /** @var string[] */
-    protected array $everyone = [];
+    /**
+     * The current stage of the match.
+     *
+     * @var AbstractStage $stage
+     */
+    private AbstractStage $stage;
 
     /**
      * @param AbstractArena $arena
@@ -23,13 +31,23 @@ abstract class AbstractMatch {
         private readonly AbstractArena $arena,
         private readonly int $id,
         private readonly bool          $ranked
-    ) {}
+    ) {
+        $this->stage = new StartingStage();
+    }
 
     /**
      * @return string
      */
     public function getFullName(): string {
         return $this->arena->getName() . '-' . $this->id;
+    }
+
+    /**
+     * Gets the match's world.
+     * @return World
+     */
+    public function getWorld(): World {
+        return Server::getInstance()->getWorldManager()->getWorldByName($this->getFullName()) ?? throw new \RuntimeException('World not found.');
     }
 
     /**
@@ -47,6 +65,20 @@ abstract class AbstractMatch {
     }
 
     /**
+     * @return AbstractStage
+     */
+    public function getStage(): AbstractStage {
+        return $this->stage;
+    }
+
+    /**
+     * @param AbstractStage $stage
+     */
+    public function setStage(AbstractStage $stage): void {
+        $this->stage = $stage;
+    }
+
+    /**
      * @return bool
      */
     public function isRanked(): bool {
@@ -59,6 +91,19 @@ abstract class AbstractMatch {
     abstract public function setup(array $totalPlayers): void;
 
     /**
+     * @param Player[] $totalPlayers
+     */
+    public function postSetup(array $totalPlayers): void {
+        foreach ($totalPlayers as $player) {
+            if (!$player->isOnline()) {
+                throw new \RuntimeException('Player ' . $player->getName() . ' is not online');
+            }
+
+            ProfileManager::getInstance()->addDuelProfile($player, $this->getFullName());
+        }
+    }
+
+    /**
      * @param Player $player
      */
     abstract public function removePlayer(Player $player): void;
@@ -66,17 +111,7 @@ abstract class AbstractMatch {
     /**
      * @return DuelProfile[]
      */
-    public function getEveryone(): array {
-        $everyone = [];
-
-        foreach ($this->everyone as $xuid) {
-            if (($duelProfile = ProfileManager::getInstance()->getDuelProfile($xuid)) === null) continue;
-
-            $everyone[] = $duelProfile;
-        }
-
-        return $everyone;
-    }
+    abstract public function getEveryone(): array;
 
     /**
      * @return DuelProfile[]

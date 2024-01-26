@@ -8,7 +8,10 @@ use bitrule\practice\kit\Kit;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\match\impl\SingleMatchImpl;
 use bitrule\practice\match\impl\TeamMatchImpl;
+use bitrule\practice\match\MatchQueue;
+use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
 
@@ -19,6 +22,8 @@ final class MatchManager {
     private array $matches = [];
     /** @var int */
     private int $matchesPlayed = 0;
+    /** @var array<string, array<string, MatchQueue>> */
+    private array $matchQueues = [];
 
     /**
      * @param Player[] $totalPlayers
@@ -39,6 +44,8 @@ final class MatchManager {
         }
 
         $match->setup($totalPlayers);
+        $match->postSetup($totalPlayers);
+
         $this->matches[$match->getFullName()] = $match;
     }
 
@@ -52,5 +59,91 @@ final class MatchManager {
         if ($duelProfile === null) return null;
 
         return $this->matches[$duelProfile->getMatchFullName()] ?? null;
+    }
+
+    /**
+     * Creates a queue for a player
+     * Using their xuid, kit name, and if it's ranked
+     * Also checks if there is an opponent in the queue
+     * If there is, it will remove both players from the queue
+     *
+     * @param string $sourceXuid
+     * @param string $kitName
+     * @param bool   $ranked
+     */
+    public function createQueue(string $sourceXuid, string $kitName, bool $ranked): void {
+        if (!isset($this->matchQueues[$kitName])) $this->matchQueues[$kitName] = [];
+
+        $matchQueues = &$this->matchQueues[$kitName];
+        $matchQueues[$sourceXuid] = $matchQueue = new MatchQueue($sourceXuid, $kitName, $ranked, time());
+
+        $opponentMatchQueue = $this->lookupOpponent($matchQueue);
+        if ($opponentMatchQueue === null) return;
+
+        if (($kit = KitManager::getInstance()->getKit($kitName)) === null) {
+            throw new RuntimeException('Kit no exists.');
+        }
+
+        $this->removeQueue($sourceXuid, $kitName);
+        $this->removeQueue($opponentMatchQueue->getXuid(), $kitName);
+
+        $totalPlayers = [];
+        foreach ([$sourceXuid, $opponentMatchQueue->getXuid()] as $xuid) {
+            $localProfile = ProfileManager::getInstance()->getLocalProfile($xuid);
+            if ($localProfile === null) continue;
+
+            $player = Server::getInstance()->getPlayerExact($localProfile->getName());
+            if ($player === null) continue;
+
+            $totalPlayers[] = $player;
+        }
+
+        $this->createMatch(
+            $totalPlayers,
+            $kit,
+            false,
+            $ranked
+        );
+    }
+
+    /**
+     * Removes a player from the queue
+     * Using their xuid and kit name
+     * @param string $xuid
+     * @param string $kitName
+     */
+    private function removeQueue(string $xuid, string $kitName): void {
+        unset($this->matchQueues[$kitName][$xuid]);
+
+    }
+
+    /**
+     * Looks for an opponent for a player
+     * Using their xuid, kit name, and if it's ranked
+     *
+     * @param MatchQueue $sourceMatchQueue
+     *
+     * @return MatchQueue|null
+     */
+    public function lookupOpponent(MatchQueue $sourceMatchQueue): ?MatchQueue {
+        $matchQueues = $this->matchQueues[$sourceMatchQueue->getKitName()] ?? [];
+
+        foreach ($matchQueues as $matchQueue) {
+            if ($matchQueue->getXuid() === $sourceMatchQueue->getXuid()) continue;
+            if (!$matchQueue->isSameType($sourceMatchQueue)) continue;
+
+            return $matchQueue;
+        }
+
+        return null;
+    }
+
+    /**
+     * Tick all matches
+     */
+    public function tickStages(): void {
+        foreach ($this->matches as $match) {
+            $match->getStage()->update($match);
+        }
     }
 }
