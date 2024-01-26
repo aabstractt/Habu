@@ -72,6 +72,7 @@ final class ProfileManager {
 
         if (($scoreboard = $localProfile->getScoreboard()) !== null) {
             $scoreboard->hide($player);
+            // TODO: Fix this, the issue is fixed sending the scoreboard instantly after change that
         }
 
         $localProfile->setScoreboard($scoreboard = new Scoreboard());
