@@ -77,7 +77,12 @@ final class ProfileManager {
      * @param string $xuid
      */
     public function removeProfile(string $xuid): void {
-        unset($this->localProfiles[$xuid], $this->duelProfiles[$xuid]);
+        $localProfile = $this->localProfiles[$xuid] ?? null;
+        if ($localProfile === null) return;
+
+        QueueManager::getInstance()->removeQueue($localProfile);
+
+        unset($localProfile, $this->duelProfiles[$xuid]);
     }
 
     /**

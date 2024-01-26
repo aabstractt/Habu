@@ -95,14 +95,13 @@ final class ScoreboardLine {
     public function update(int $slot, ?string $text): UpdateResult {
         if ($slot === $this->currentSlot && $this->text === $text) return UpdateResult::NOT_UPDATED;
 
-        $oldText = $this->text;
-
         $this->oldSlot = $this->currentSlot;
         $this->currentSlot = $slot;
+        $this->oldText = $this->text;
         $this->text = $text;
 
         if ($text === null) return UpdateResult::REMOVED;
 
-        return $oldText === null ? UpdateResult::ADDED : UpdateResult::UPDATED;
+        return $this->oldText === null ? UpdateResult::ADDED : UpdateResult::UPDATED;
     }
 }

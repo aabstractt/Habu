@@ -180,6 +180,6 @@ abstract class AbstractArena {
      * @return int[]
      */
     public static function serializeVector(Vector3 $vector): array {
-        return [$vector->getX(), $vector->getY(), $vector->getZ()];
+        return [$vector->getFloorX(), $vector->getFloorY(), $vector->getFloorZ()];
     }
 }

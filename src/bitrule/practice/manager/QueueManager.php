@@ -80,7 +80,7 @@ final class QueueManager {
      *
      * @param LocalProfile $localProfile
      */
-    private function removeQueue(LocalProfile $localProfile): void {
+    public function removeQueue(LocalProfile $localProfile): void {
         unset($this->queues[$localProfile->getXuid()]);
 
         if (($player = Server::getInstance()->getPlayerExact($localProfile->getName())) === null) return;
