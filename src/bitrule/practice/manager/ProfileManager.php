@@ -19,6 +19,7 @@ final class ProfileManager {
     use SingletonTrait;
 
     public const LOBBY_SCOREBOARD = 'lobby';
+    public const QUEUE_SCOREBOARD = 'queue';
     public const MATCH_STARTING_SCOREBOARD = 'starting';
     public const MATCH_PLAYING_SCOREBOARD = 'playing';
     public const MATCH_ENDING_SCOREBOARD = 'ending';
@@ -60,8 +61,21 @@ final class ProfileManager {
 
         $this->localProfiles[$player->getXuid()] = $localProfile = new LocalProfile($player->getXuid(), $player->getName());
 
+        $this->setScoreboard($localProfile, self::LOBBY_SCOREBOARD);
+    }
+
+    public function setScoreboard(LocalProfile $localProfile, string $identifier): void {
+        $player = Server::getInstance()->getPlayerExact($localProfile->getName());
+        if ($player === null || !$player->isOnline()) {
+            throw new RuntimeException('Player not found.');
+        }
+
+        if (($scoreboard = $localProfile->getScoreboard()) !== null) {
+            $scoreboard->hide($player);
+        }
+
         $localProfile->setScoreboard($scoreboard = new Scoreboard());
-        $scoreboard->load($this->scoreboardLines[self::LOBBY_SCOREBOARD] ?? throw new RuntimeException('Invalid scoreboard.yml'));
+        $scoreboard->load($this->scoreboardLines[$identifier] ?? throw new RuntimeException('Invalid scoreboard.yml'));
     }
 
     /**

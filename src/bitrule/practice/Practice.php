@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice;
 
 use bitrule\practice\commands\ArenaMainCommand;
+use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
@@ -44,7 +45,8 @@ final class Practice extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new PlayerQuitListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
-            new ArenaMainCommand()
+            new ArenaMainCommand(),
+            new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>')
         ]);
 
         $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
@@ -82,6 +84,17 @@ final class Practice extends PluginBase {
         if ($identifier === 'total_queue_count') return strval(MatchManager::getInstance()->getQueueCount(null));
         if ($identifier === 'total_match_count') return strval(MatchManager::getInstance()->getMatchCount(null));
         if ($identifier === 'online_players') return strval(count(self::getInstance()->getServer()->getOnlinePlayers()));
+
+        $localProfile = ProfileManager::getInstance()->getLocalProfile($player->getXuid());
+        if ($localProfile === null) return null;
+
+        if (str_starts_with($identifier, 'queue_')) {
+            if (($matchQueue = $localProfile->getMatchQueue()) === null) return null;
+
+            if ($identifier === 'queue_type') return $matchQueue->isRanked() ? 'Ranked' : 'Unranked';
+            if ($identifier === 'queue_kit') return $matchQueue->getKitName() ?? 'None';
+            if ($identifier === 'queue_duration') return gmdate('i:s', time() - $matchQueue->getTimestamp());
+        }
 
         return null;
     }

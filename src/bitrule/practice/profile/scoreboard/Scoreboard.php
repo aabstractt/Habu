@@ -81,16 +81,25 @@ final class Scoreboard {
                 continue;
             }
 
-            if ($scoreboardLine->getText() === null) continue;
+            if ($text === null) continue;
 
             if ($oldText !== null) {
                 $packets[] = self::buildScorePacket($scoreboardLine->getOldSlot(), $oldText, SetScorePacket::TYPE_REMOVE);
+
+                echo 'Removed old' . PHP_EOL;
             }
 
-            $packets[] = self::buildScorePacket($slot++, $scoreboardLine->getMainText() . $scoreboardLine->getText(), SetScorePacket::TYPE_CHANGE);
+            echo 'Adding new' . PHP_EOL;
+
+            $packets[] = self::buildScorePacket($slot++, TextFormat::colorize($scoreboardLine->getMainText() . $scoreboardLine->getText()), SetScorePacket::TYPE_CHANGE);
         }
 
-        sort($packets);
+        usort($packets, fn(SetScorePacket $a, SetScorePacket $b) => $a->type > $b->type ? 0 : 1);
+        //sort($packets);
+
+        if (count($packets) > 0) {
+            var_dump($packets);
+        }
 
         return $packets;
     }

@@ -10,6 +10,7 @@ use bitrule\practice\match\impl\SingleMatchImpl;
 use bitrule\practice\match\impl\TeamMatchImpl;
 use bitrule\practice\match\MatchQueue;
 use bitrule\practice\profile\DuelProfile;
+use bitrule\practice\profile\scoreboard\Scoreboard;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
@@ -72,10 +73,17 @@ final class MatchManager {
      * @param bool   $ranked
      */
     public function createQueue(string $sourceXuid, string $kitName, bool $ranked): void {
+        if (($localProfile = ProfileManager::getInstance()->getLocalProfile($sourceXuid)) === null) {
+            throw new RuntimeException('Local profile not found.');
+        }
+
         if (!isset($this->matchQueues[$kitName])) $this->matchQueues[$kitName] = [];
 
         $matchQueues = &$this->matchQueues[$kitName];
         $matchQueues[$sourceXuid] = $matchQueue = new MatchQueue($sourceXuid, $kitName, $ranked, time());
+
+        $localProfile->setMatchQueue($matchQueue);
+        ProfileManager::getInstance()->setScoreboard($localProfile, ProfileManager::QUEUE_SCOREBOARD);
 
         $opponentMatchQueue = $this->lookupOpponent($matchQueue);
         if ($opponentMatchQueue === null) return;
@@ -86,6 +94,8 @@ final class MatchManager {
 
         $this->removeQueue($sourceXuid, $kitName);
         $this->removeQueue($opponentMatchQueue->getXuid(), $kitName);
+
+        // TODO: Remove from the queue into my profile
 
         $totalPlayers = [];
         foreach ([$sourceXuid, $opponentMatchQueue->getXuid()] as $xuid) {

@@ -13,4 +13,6 @@ permissions:
     default: op
   arena.command.save:
     default: op
+  practice.command.joinqueue:
+    default: true
 ...
