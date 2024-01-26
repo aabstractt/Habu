@@ -11,11 +11,33 @@ use pocketmine\player\Player;
 use function array_diff;
 use function array_filter;
 use function array_map;
+use function array_search;
+use function is_int;
 
 final class SingleMatchImpl extends AbstractMatch {
 
     /** @var string[] */
     private array $players = [];
+
+    /**
+     * @param DuelProfile $duelProfile
+     */
+    public function teleportSpawn(DuelProfile $duelProfile): void {
+        $spawnId = array_search($duelProfile->getXuid(), $this->players, true);
+        if (!is_int($spawnId)) {
+            throw new \RuntimeException('Player not found in match.');
+        }
+
+        if (($player = $duelProfile->toPlayer()) === null) {
+            throw new \RuntimeException('Player not found in server.');
+        }
+
+        $player->teleport(match ($spawnId) {
+            0 => $this->arena->getFirstPosition(),
+            1 => $this->arena->getSecondPosition(),
+            default => $this->getWorld()->getSpawnLocation()
+        });
+    }
 
     /**
      * @param Player $player

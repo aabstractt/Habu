@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace bitrule\practice\manager;
 
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
+use Closure;
 use Exception;
 use JsonException;
+use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
@@ -85,5 +88,18 @@ final class ArenaManager {
         if (count($arenas) === 0) return null;
 
         return $arenas[array_rand($arenas)] ?? null;
+    }
+
+    /**
+     * @param string               $arenaName
+     * @param string               $worldName
+     * @param Closure(): void $onComplete
+     */
+    public function loadWorld(string $arenaName, string $worldName, Closure $onComplete): void {
+       Server::getInstance()->getAsyncPool()->submitTask(new FileCopyAsyncTask(
+           Practice::getInstance()->getDataFolder() . 'backups/' . $arenaName,
+           Server::getInstance()->getDataPath() . 'worlds/' . $worldName,
+           $onComplete
+       ));
     }
 }

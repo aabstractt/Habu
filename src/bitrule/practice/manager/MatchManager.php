@@ -43,7 +43,12 @@ final class MatchManager {
         }
 
         $match->setup($totalPlayers);
-        $match->postSetup($totalPlayers);
+
+        ArenaManager::getInstance()->loadWorld(
+            $arena->getName(),
+            $match->getFullName(),
+            fn() => $match->postSetup($totalPlayers)
+        );
 
         $this->matches[$match->getFullName()] = $match;
     }

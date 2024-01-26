@@ -7,10 +7,13 @@ namespace bitrule\practice\commands\arena;
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
 use bitrule\practice\manager\ArenaManager;
 use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\Practice;
 use Exception;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 final class ArenaSaveArgument extends Argument {
@@ -36,15 +39,24 @@ final class ArenaSaveArgument extends Argument {
             return;
         }
 
-        try {
-            $arenaSetup->submit($arena = AbstractArena::createEmpty($arenaSetup->getName(), $arenaSetup->getType()));
+        Server::getInstance()->getAsyncPool()->submitTask(new FileCopyAsyncTask(
+            Server::getInstance()->getDataPath() . 'worlds/' . $arenaSetup->getName(),
+            Practice::getInstance()->getDataFolder() . 'backups/' . $arenaSetup->getName(),
+            function () use ($arenaSetup, $sender): void {
+                try {
+                    $arenaSetup->submit($arena = AbstractArena::createEmpty($arenaSetup->getName(), $arenaSetup->getType()));
 
-            ArenaManager::getInstance()->createArena($arena);
-            ArenaManager::getInstance()->saveAll();
+                    ArenaManager::getInstance()->createArena($arena);
+                    ArenaManager::getInstance()->saveAll();
 
-            $sender->sendMessage(TextFormat::GREEN . 'Arena saved successfully!');
-        } catch (Exception $e) {
-            $sender->sendMessage(TextFormat::RED . 'An error occurred while saving the arena: ' . $e->getMessage());
-        }
+                    $sender->sendMessage(TextFormat::GREEN . 'Arena saved successfully!');
+
+                    Server::getInstance()->getLogger()->info('Arena backup saved successfully!');
+                } catch (Exception $e) {
+                    $sender->sendMessage(TextFormat::RED . 'An error occurred while saving the arena: ' . $e->getMessage());
+                }
+            }
+        ));
+
     }
 }

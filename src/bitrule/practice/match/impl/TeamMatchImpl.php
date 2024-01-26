@@ -18,6 +18,13 @@ final class TeamMatchImpl extends AbstractMatch {
     private array $teams = [];
 
     /**
+     * @param DuelProfile $duelProfile
+     */
+    public function teleportSpawn(DuelProfile $duelProfile): void {
+        // TODO: Implement teleportSpawn() method.
+    }
+
+    /**
      * @param Player $player
      */
     public function removePlayer(Player $player): void {

@@ -30,9 +30,9 @@ abstract class AbstractMatch {
      * @param bool          $ranked
      */
     public function __construct(
-        private readonly AbstractArena $arena,
-        private readonly int $id,
-        private readonly bool          $ranked
+        protected readonly AbstractArena $arena,
+        protected readonly int $id,
+        protected readonly bool          $ranked
     ) {
         $this->stage = new StartingStage();
     }
@@ -104,8 +104,18 @@ abstract class AbstractMatch {
             ProfileManager::getInstance()->addDuelProfile($player, $this->getFullName());
         }
 
+        if (!Server::getInstance()->getWorldManager()->loadWorld($this->getFullName())) {
+            throw new RuntimeException('Failed to load world ' . $this->getFullName());
+        }
+
+        foreach ($this->getEveryone() as $duelProfile) $this->teleportSpawn($duelProfile);
         // TODO: Generate the world and teleport the players to the spawn point.
     }
+
+    /**
+     * @param DuelProfile $duelProfile
+     */
+    abstract public function teleportSpawn(DuelProfile $duelProfile): void;
 
     /**
      * @param Player $player
