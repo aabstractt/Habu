@@ -87,10 +87,10 @@ final class BridgeArena extends AbstractArena {
     public static function parse(string $name, array $data): BridgeArena {
         return new BridgeArena(
             $name,
-            self::deserializeVector($data['firstPosition'] ?? []),
-            self::deserializeVector($data['secondPosition'] ?? []),
-            self::deserializeVector($data['firstPortal'] ?? []),
-            self::deserializeVector($data['secondPortal'] ?? []),
+            self::deserializeVector($data['first_position'] ?? []),
+            self::deserializeVector($data['second_position'] ?? []),
+            self::deserializeVector($data['first_portal'] ?? []),
+            self::deserializeVector($data['second_portal'] ?? []),
             $data['kits'] ?? []
         );
     }

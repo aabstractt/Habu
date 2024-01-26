@@ -18,8 +18,8 @@ final class DefaultArena extends AbstractArena {
     protected static function parse(string $name, array $data): DefaultArena {
         return new DefaultArena(
             $name,
-            self::deserializeVector($data['firstPosition'] ?? []),
-            self::deserializeVector($data['secondPosition'] ?? []),
+            self::deserializeVector($data['first_position'] ?? []),
+            self::deserializeVector($data['second_position'] ?? []),
             $data['kits'] ?? []
         );
     }

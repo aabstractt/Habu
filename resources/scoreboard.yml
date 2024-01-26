@@ -1,0 +1,11 @@
+titles:
+  - '&d&lPRACTICE'
+
+lines:
+  lobby:
+    nothing_0: '&7&m---------------------'
+    online_players: '&dOnline: &f'
+    nothing_1: '&d'
+    total_match_count: '&dPlaying: &f'
+    total_queue_count: '&dQueuing: &f'
+    nothing_2: '&7&m---------------------'

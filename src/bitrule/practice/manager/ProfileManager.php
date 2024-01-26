@@ -4,20 +4,42 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
+use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\profile\scoreboard\Scoreboard;
+use pocketmine\network\mcpe\NetworkBroadcastUtils;
 use pocketmine\player\Player;
+use pocketmine\Server;
+use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
 
 final class ProfileManager {
     use SingletonTrait;
 
+    public const LOBBY_SCOREBOARD = 'lobby';
+    public const MATCH_STARTING_SCOREBOARD = 'starting';
+    public const MATCH_PLAYING_SCOREBOARD = 'playing';
+    public const MATCH_ENDING_SCOREBOARD = 'ending';
+
     /** @var array<string, LocalProfile> */
     private array $localProfiles = [];
 
     /** @var array<string, DuelProfile> */
     private array $duelProfiles = [];
+    /** @var array<string, array<string, string>> */
+    private array $scoreboardLines = [];
+
+    public function init(): void {
+        $config = new Config(Practice::getInstance()->getDataFolder() . 'scoreboard.yml');
+
+        if (!is_array($scoreboardLine = $config->get('lines'))) {
+            throw new RuntimeException('Invalid scoreboard.yml');
+        }
+
+        $this->scoreboardLines = $scoreboardLine;
+    }
 
     /**
      * @param string $xuid
@@ -36,7 +58,10 @@ final class ProfileManager {
             throw new RuntimeException('Player already exists in local players list');
         }
 
-        $this->localProfiles[$player->getXuid()] = new LocalProfile($player->getXuid(), $player->getName());
+        $this->localProfiles[$player->getXuid()] = $localProfile = new LocalProfile($player->getXuid(), $player->getName());
+
+        $localProfile->setScoreboard($scoreboard = new Scoreboard());
+        $scoreboard->load($this->scoreboardLines[self::LOBBY_SCOREBOARD] ?? throw new RuntimeException('Invalid scoreboard.yml'));
     }
 
     /**
@@ -65,5 +90,22 @@ final class ProfileManager {
      */
     public function removeProfile(string $xuid): void {
         unset($this->localProfiles[$xuid], $this->duelProfiles[$xuid]);
+    }
+
+    /**
+     * Tick the scoreboard for all players
+     */
+    public function tickScoreboard(): void {
+        foreach ($this->localProfiles as $localProfile) {
+            if (($scoreboard = $localProfile->getScoreboard()) === null) continue;
+
+            $player = Server::getInstance()->getPlayerExact($localProfile->getName());
+            if ($player === null || !$player->isOnline()) continue;
+
+            $packets = $scoreboard->update($player);
+            if (count($packets) === 0) continue;
+
+            NetworkBroadcastUtils::broadcastPackets([$player], $packets);
+        }
     }
 }

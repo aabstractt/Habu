@@ -116,6 +116,21 @@ abstract class AbstractMatch {
     /**
      * @return DuelProfile[]
      */
+    public function getAlive(): array {
+        $alive = [];
+
+        foreach ($this->getEveryone() as $duelProfile) {
+            if (!$duelProfile->isAlive()) continue;
+
+            $alive[] = $duelProfile;
+        }
+
+        return $alive;
+    }
+
+    /**
+     * @return DuelProfile[]
+     */
     public function getSpectators(): array {
         $spectators = [];
 

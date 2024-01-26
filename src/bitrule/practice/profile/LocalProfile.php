@@ -5,11 +5,17 @@ declare(strict_types=1);
 namespace bitrule\practice\profile;
 
 use bitrule\practice\arena\setup\AbstractArenaSetup;
+use bitrule\practice\profile\scoreboard\Scoreboard;
+use pocketmine\player\Player;
+use pocketmine\Server;
+use pocketmine\utils\TextFormat;
 
 final class LocalProfile {
 
     /** @var AbstractArenaSetup|null */
     private ?AbstractArenaSetup $arenaSetup = null;
+    /** @var Scoreboard|null */
+    private ?Scoreboard $scoreboard = null;
 
     public function __construct(
         private readonly string $xuid,
@@ -42,5 +48,19 @@ final class LocalProfile {
      */
     public function setArenaSetup(?AbstractArenaSetup $arenaSetup): void {
         $this->arenaSetup = $arenaSetup;
+    }
+
+    /**
+     * @return Scoreboard|null
+     */
+    public function getScoreboard(): ?Scoreboard {
+        return $this->scoreboard;
+    }
+
+    /**
+     * @param Scoreboard|null $scoreboard
+     */
+    public function setScoreboard(?Scoreboard $scoreboard): void {
+        $this->scoreboard = $scoreboard;
     }
 }

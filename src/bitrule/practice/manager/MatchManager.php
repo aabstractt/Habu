@@ -114,7 +114,39 @@ final class MatchManager {
      */
     private function removeQueue(string $xuid, string $kitName): void {
         unset($this->matchQueues[$kitName][$xuid]);
+    }
 
+    /**
+     * @param string|null $kitName
+     *
+     * @return int
+     */
+    public function getQueueCount(?string $kitName): int {
+        if ($kitName !== null) return count($this->matchQueues[$kitName] ?? []);
+
+        $count = 0;
+        foreach ($this->matchQueues as $matchQueue) {
+            $count += count($matchQueue);
+        }
+
+        return $count;
+    }
+
+    /**
+     * @param string|null $kitName
+     *
+     * @return int
+     */
+    public function getMatchCount(?string $kitName): int {
+        $matches = $this->matches;
+        if ($kitName !== null) {
+            $matches = array_filter($matches, fn(AbstractMatch $match) => $match->getArena()->hasKit($kitName));
+        }
+
+        return array_sum(array_map(
+                fn(AbstractMatch $match) => count($match->getAlive()),
+                $matches)
+        );
     }
 
     /**
