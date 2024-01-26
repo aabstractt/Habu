@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena;
 
-use pocketmine\block\tile\Sign;
 use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 use RuntimeException;

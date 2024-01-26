@@ -16,6 +16,8 @@ use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
 use RuntimeException;
+use function array_keys;
+use function is_int;
 
 final class ArenaSetupForm extends CustomForm {
 

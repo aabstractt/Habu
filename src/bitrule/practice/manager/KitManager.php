@@ -12,6 +12,11 @@ use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
+use function array_map;
+use function is_array;
+use function is_int;
+use function is_string;
+use function strtoupper;
 
 final class KitManager {
     use SingletonTrait;
@@ -64,9 +69,9 @@ final class KitManager {
 
         $config = new Config(Practice::getInstance()->getDataFolder() . 'kits.yml');
         $config->set($kit->getName(), [
-            'inventoryItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getInventoryItems()),
-            'armorItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getArmorItems()),
-            'kbProfile' => $kit->getKbProfile()
+        	'inventoryItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getInventoryItems()),
+        	'armorItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getArmorItems()),
+        	'kbProfile' => $kit->getKbProfile()
         ]);
         $config->save();
     }
@@ -140,13 +145,13 @@ final class KitManager {
      */
     public static function writeItem(Item $item): array {
         return [
-            'name' => $item->getName(),
-            'customName' => $item->getCustomName(),
-            'lore' => $item->getLore(),
-            'enchantments' => array_map(
-                fn(EnchantmentInstance $enchantment) => [EnchantmentIdMap::getInstance()->toId($enchantment->getType()), $enchantment->getLevel()],
-                $item->getEnchantments()
-            )
+        	'name' => $item->getName(),
+        	'customName' => $item->getCustomName(),
+        	'lore' => $item->getLore(),
+        	'enchantments' => array_map(
+        	    fn(EnchantmentInstance $enchantment) => [EnchantmentIdMap::getInstance()->toId($enchantment->getType()), $enchantment->getLevel()],
+        	    $item->getEnchantments()
+        	)
         ];
     }
 }

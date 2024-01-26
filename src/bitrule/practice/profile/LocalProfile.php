@@ -7,9 +7,6 @@ namespace bitrule\practice\profile;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\match\MatchQueue;
 use bitrule\practice\profile\scoreboard\Scoreboard;
-use pocketmine\player\Player;
-use pocketmine\Server;
-use pocketmine\utils\TextFormat;
 
 final class LocalProfile {
 

@@ -8,6 +8,8 @@ use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
+use function array_diff;
+use function array_map;
 
 final class SingleMatchImpl extends AbstractMatch {
 

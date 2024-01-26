@@ -11,6 +11,7 @@ use bitrule\practice\manager\ProfileManager;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use function count;
 
 final class ArenaCreateArgument extends Argument {
     use PlayerArgumentTrait;

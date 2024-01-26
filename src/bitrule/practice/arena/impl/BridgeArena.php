@@ -7,6 +7,7 @@ namespace bitrule\practice\arena\impl;
 use bitrule\practice\arena\AbstractArena;
 use pocketmine\math\Vector3;
 use RuntimeException;
+use function array_merge;
 
 final class BridgeArena extends AbstractArena {
 
@@ -71,9 +72,9 @@ final class BridgeArena extends AbstractArena {
         return array_merge(
             parent::serialize(),
             [
-                'type' => 'bridge',
-                'first_portal' => self::serializeVector($this->firstPortal),
-                'second_portal' => self::serializeVector($this->secondPortal)
+            	'type' => 'bridge',
+            	'first_portal' => self::serializeVector($this->firstPortal),
+            	'second_portal' => self::serializeVector($this->secondPortal)
             ]
         );
     }

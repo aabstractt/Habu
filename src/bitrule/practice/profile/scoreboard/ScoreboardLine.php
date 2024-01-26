@@ -8,17 +8,19 @@ final class ScoreboardLine {
 
     /**
      * @param string      $identifier
+     * @param string      $mainText
      * @param int         $currentSlot
      * @param int         $oldSlot
-     * @param string      $mainText
      * @param string|null $text
+     * @param string|null $oldText
      */
     public function __construct(
         private readonly string $identifier,
-        private int $currentSlot,
-        private int $oldSlot,
         private readonly string $mainText,
-        private ?string $text
+        private int $currentSlot = 0,
+        private int $oldSlot = 0,
+        private ?string $text = null,
+        private ?string $oldText = null
     ) {}
 
     /**
@@ -68,6 +70,13 @@ final class ScoreboardLine {
      */
     public function setText(?string $text): void {
         $this->text = $text;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOldText(): ?string {
+        return $this->oldText;
     }
 
     /**

@@ -10,6 +10,7 @@ use bitrule\practice\kit\Kit;
 use bitrule\practice\manager\KitManager;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use function count;
 
 final class KitCreateArgument extends Argument {
     use PlayerArgumentTrait;

@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile\scoreboard;
 
-use bitrule\practice\manager\MatchManager;
 use bitrule\practice\Practice;
+use bitrule\practice\profile\LocalProfile;
 use pocketmine\network\mcpe\protocol\RemoveObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use function str_contains;
+use function usort;
 
 final class Scoreboard {
 
@@ -25,7 +27,7 @@ final class Scoreboard {
      */
     public function load(array $defaultLines): void {
         foreach ($defaultLines as $identifier => $text) {
-            $this->lines[$identifier] = new ScoreboardLine($identifier, 0, 0, $text, null);
+            $this->lines[$identifier] = new ScoreboardLine($identifier, $text);
         }
     }
 
@@ -54,52 +56,43 @@ final class Scoreboard {
     }
 
     /**
-     * @param Player $player
+     * @param Player       $player
+     * @param LocalProfile $localProfile
      *
      * @return array
      */
-    public function update(Player $player): array {
-        $this->show($player);
+    public function update(Player $player, LocalProfile $localProfile): array {
+        $this->show($player); // TODO: Remove this
 
         $packets = [];
         $slot = 0;
 
         foreach ($this->lines as $identifier => $scoreboardLine) {
-            $text = str_contains($identifier, 'nothing_') ? '' : Practice::replacePlaceholders($player, $identifier);
-
-            $oldText = $scoreboardLine->getText();
-            $updateResult = $scoreboardLine->update($slot, $text);
-            if ($updateResult === UpdateResult::REMOVED) {
-                $packets[] = self::buildScorePacket($slot, '', SetScorePacket::TYPE_REMOVE);
-
-                continue;
-            }
+            $updateResult = $scoreboardLine->update(
+                $slot,
+                str_contains($identifier, 'nothing_') ? '' : Practice::replacePlaceholders($player, $localProfile, $identifier)
+            );
 
             if ($updateResult === UpdateResult::NOT_UPDATED) {
                 $slot++;
-
-                continue;
+            } elseif ($updateResult === UpdateResult::REMOVED || $scoreboardLine->getOldText() !== null) {
+                $packets[] = self::buildScorePacket(
+                    $updateResult === UpdateResult::REMOVED ? $slot : $scoreboardLine->getOldSlot(),
+                    '',
+                    SetScorePacket::TYPE_REMOVE
+                );
             }
 
-            if ($text === null) continue;
+            if ($updateResult === UpdateResult::REMOVED) continue;
 
-            if ($oldText !== null) {
-                $packets[] = self::buildScorePacket($scoreboardLine->getOldSlot(), $oldText, SetScorePacket::TYPE_REMOVE);
-
-                echo 'Removed old' . PHP_EOL;
-            }
-
-            echo 'Adding new' . PHP_EOL;
-
-            $packets[] = self::buildScorePacket($slot++, TextFormat::colorize($scoreboardLine->getMainText() . $scoreboardLine->getText()), SetScorePacket::TYPE_CHANGE);
+            $packets[] = self::buildScorePacket(
+                $slot++,
+                TextFormat::colorize($scoreboardLine->getMainText() . $scoreboardLine->getText()),
+                SetScorePacket::TYPE_CHANGE
+            );
         }
 
         usort($packets, fn(SetScorePacket $a, SetScorePacket $b) => $a->type > $b->type ? 0 : 1);
-        //sort($packets);
-
-        if (count($packets) > 0) {
-            var_dump($packets);
-        }
 
         return $packets;
     }
