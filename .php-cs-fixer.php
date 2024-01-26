@@ -12,9 +12,38 @@ return (new PhpCsFixer\Config)
 			'comment_type' => 'phpdocs_only'
 		],
 		'array_indentation' => true,
+        'array_push' => true,
+        'no_multiple_statements_per_line' => true,
+        'numeric_literal_separator' => [
+            'strategy' => 'use_separator',
+            'override_existing' => true
+        ],
+        'modernize_types_casting' => true,
+        'final_class' => true,
+        'no_null_property_initialization' => true,
+        'self_accessor' => true,
+        'comment_to_phpdoc' => [
+            'ignored_tags' => ['TODO']
+        ],
+        'no_superfluous_elseif' => true,
+        'no_unneeded_braces' => true,
+        'no_useless_else' => true,
+        'simplified_if_return' => true,
+        'nullable_type_declaration_for_default_null_value' => true,
+        'phpdoc_to_param_type' => true,
+        'phpdoc_to_property_type' => true,
+        'void_return' => true,
+        'lowercase_keywords' => true,
 		'array_syntax' => [
 			'syntax' => 'short'
 		],
+        'is_null' => true,
+        'nullable_type_declaration' => [
+            'syntax' => 'question_mark'
+        ],
+        'assign_null_coalescing_to_coalesce_equal' => true,
+        'long_to_shorthand_operator' => true,
+        'ternary_to_elvis_operator' => true,
 		'binary_operator_spaces' => [
 			'default' => 'single_space'
 		],

@@ -207,7 +207,7 @@ abstract class AbstractArenaSetup {
      *
      * @return AbstractArenaSetup
      */
-    public static function from(string $type): AbstractArenaSetup {
+    public static function from(string $type): self {
         return match (strtolower($type)) {
             'normal' => new DefaultArenaSetup(),
             'bridge' => new BridgeArenaSetup(),

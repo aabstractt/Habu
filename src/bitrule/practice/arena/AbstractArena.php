@@ -132,7 +132,7 @@ abstract class AbstractArena {
      *
      * @return AbstractArena
      */
-    public static function createFromArray(string $name, array $data): AbstractArena {
+    public static function createFromArray(string $name, array $data): self {
         if (!isset($data['type'])) {
             throw new RuntimeException('Invalid offset "type"');
         }
@@ -153,7 +153,7 @@ abstract class AbstractArena {
      *
      * @return AbstractArena
      */
-    public static function createEmpty(string $name, string $type): AbstractArena {
+    public static function createEmpty(string $name, string $type): self {
         return match ($type) {
             'normal' => DefaultArena::parseEmpty($name),
             'bridge' => BridgeArena::parseEmpty($name),

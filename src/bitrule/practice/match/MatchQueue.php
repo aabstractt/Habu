@@ -58,7 +58,7 @@ final class MatchQueue {
      *
      * @return bool
      */
-    public function isSameType(MatchQueue $matchQueue): bool {
+    public function isSameType(self $matchQueue): bool {
         return $this->ranked === $matchQueue->ranked && $this->kitName === $matchQueue->kitName;
     }
 }

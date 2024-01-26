@@ -28,7 +28,6 @@ use function is_array;
 use function is_file;
 use function is_string;
 use function str_starts_with;
-use function strval;
 use function time;
 
 final class Practice extends PluginBase {
@@ -52,7 +51,7 @@ final class Practice extends PluginBase {
         $this->saveDefaultConfig();
         $this->saveResource('scoreboard.yml', true);
 
-        $config = new Config(Practice::getInstance()->getDataFolder() . 'scoreboard.yml');
+        $config = new Config(self::getInstance()->getDataFolder() . 'scoreboard.yml');
 
         if (!is_array($scoreboardLine = $config->get('lines'))) {
             throw new RuntimeException('Invalid scoreboard.yml');
@@ -117,9 +116,9 @@ final class Practice extends PluginBase {
      * @return string|null
      */
     public static function replacePlaceholders(Player $player, LocalProfile $localProfile, string $identifier): ?string {
-        if ($identifier === 'total_queue_count') return strval(QueueManager::getInstance()->getQueueCount());
-        if ($identifier === 'total_match_count') return strval(MatchManager::getInstance()->getMatchCount());
-        if ($identifier === 'online_players') return strval(count(self::getInstance()->getServer()->getOnlinePlayers()));
+        if ($identifier === 'total_queue_count') return (string) (QueueManager::getInstance()->getQueueCount());
+        if ($identifier === 'total_match_count') return (string) (MatchManager::getInstance()->getMatchCount());
+        if ($identifier === 'online_players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
 
         if (str_starts_with($identifier, 'queue_')) {
             if (($matchQueue = $localProfile->getMatchQueue()) === null) return null;

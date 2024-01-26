@@ -21,7 +21,7 @@ final class PlayerQuitListener implements Listener {
     public function onPlayerQuitEvent(PlayerQuitEvent $ev): void {
         $player = $ev->getPlayer();
 
-        $match = MatchManager::getInstance()->getPlayerMatch($player->getXuid());
+        $match = MatchManager::getInstance()->getMatchByPlayer($player->getXuid());
         $match?->removePlayer($player);
 
         ProfileManager::getInstance()->removeProfile($player->getXuid());

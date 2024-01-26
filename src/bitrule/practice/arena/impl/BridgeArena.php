@@ -88,8 +88,8 @@ final class BridgeArena extends AbstractArena {
      *
      * @return BridgeArena
      */
-    public static function parse(string $name, array $data): BridgeArena {
-        return new BridgeArena(
+    public static function parse(string $name, array $data): self {
+        return new self(
             $name,
             self::deserializeVector($data['first_position'] ?? []),
             self::deserializeVector($data['second_position'] ?? []),
@@ -104,8 +104,8 @@ final class BridgeArena extends AbstractArena {
      *
      * @return BridgeArena
      */
-    protected static function parseEmpty(string $name): BridgeArena {
-        return new BridgeArena(
+    protected static function parseEmpty(string $name): self {
+        return new self(
             $name,
             Vector3::zero(),
             Vector3::zero(),

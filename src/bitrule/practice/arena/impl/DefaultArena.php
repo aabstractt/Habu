@@ -18,8 +18,8 @@ final class DefaultArena extends AbstractArena {
      *
      * @return DefaultArena
      */
-    protected static function parse(string $name, array $data): DefaultArena {
-        return new DefaultArena(
+    protected static function parse(string $name, array $data): self {
+        return new self(
             $name,
             self::deserializeVector($data['first_position'] ?? []),
             self::deserializeVector($data['second_position'] ?? []),
@@ -32,8 +32,8 @@ final class DefaultArena extends AbstractArena {
      *
      * @return DefaultArena
      */
-    protected static function parseEmpty(string $name): DefaultArena {
-        return new DefaultArena(
+    protected static function parseEmpty(string $name): self {
+        return new self(
             $name,
             Vector3::zero(),
             Vector3::zero(),

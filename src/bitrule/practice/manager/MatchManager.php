@@ -53,7 +53,7 @@ final class MatchManager {
      *
      * @return AbstractMatch|null
      */
-    public function getPlayerMatch(string $xuid): ?AbstractMatch {
+    public function getMatchByPlayer(string $xuid): ?AbstractMatch {
         $duelProfile = ProfileManager::getInstance()->getDuelProfile($xuid);
         if ($duelProfile === null) return null;
 
