@@ -11,9 +11,9 @@ use bitrule\practice\profile\scoreboard\Scoreboard;
 use pocketmine\network\mcpe\NetworkBroadcastUtils;
 use pocketmine\player\Player;
 use pocketmine\Server;
-use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
+use function count;
 
 final class ProfileManager {
     use SingletonTrait;
@@ -29,17 +29,8 @@ final class ProfileManager {
 
     /** @var array<string, DuelProfile> */
     private array $duelProfiles = [];
-    /** @var array<string, array<string, string>> */
-    private array $scoreboardLines = [];
 
     public function init(): void {
-        $config = new Config(Practice::getInstance()->getDataFolder() . 'scoreboard.yml');
-
-        if (!is_array($scoreboardLine = $config->get('lines'))) {
-            throw new RuntimeException('Invalid scoreboard.yml');
-        }
-
-        $this->scoreboardLines = $scoreboardLine;
     }
 
     /**
@@ -59,24 +50,9 @@ final class ProfileManager {
             throw new RuntimeException('Player already exists in local players list');
         }
 
-        $this->localProfiles[$player->getXuid()] = $localProfile = new LocalProfile($player->getXuid(), $player->getName());
+        $this->localProfiles[$player->getXuid()] = new LocalProfile($player->getXuid(), $player->getName());
 
-        $this->setScoreboard($localProfile, self::LOBBY_SCOREBOARD);
-    }
-
-    public function setScoreboard(LocalProfile $localProfile, string $identifier): void {
-        $player = Server::getInstance()->getPlayerExact($localProfile->getName());
-        if ($player === null || !$player->isOnline()) {
-            throw new RuntimeException('Player not found.');
-        }
-
-        if (($scoreboard = $localProfile->getScoreboard()) !== null) {
-            $scoreboard->hide($player);
-            // TODO: Fix this, the issue is fixed sending the scoreboard instantly after change that
-        }
-
-        $localProfile->setScoreboard($scoreboard = new Scoreboard());
-        $scoreboard->load($this->scoreboardLines[$identifier] ?? throw new RuntimeException('Invalid scoreboard.yml'));
+        Practice::setProfileScoreboard($player, self::LOBBY_SCOREBOARD);
     }
 
     /**

@@ -6,11 +6,10 @@ namespace bitrule\practice\arena;
 
 use bitrule\practice\arena\impl\BridgeArena;
 use bitrule\practice\arena\impl\DefaultArena;
-use bitrule\practice\Practice;
 use pocketmine\math\Vector3;
-use pocketmine\utils\Config;
-use pocketmine\world\World;
 use RuntimeException;
+use function count;
+use function in_array;
 
 abstract class AbstractArena {
 
@@ -120,10 +119,10 @@ abstract class AbstractArena {
      */
     public function serialize(): array {
         return [
-            'type' => 'normal',
-            'first_position' => self::serializeVector($this->firstPosition),
-            'second_position' => self::serializeVector($this->secondPosition),
-            'kits' => $this->kits
+        	'type' => 'normal',
+        	'first_position' => self::serializeVector($this->firstPosition),
+        	'second_position' => self::serializeVector($this->secondPosition),
+        	'kits' => $this->kits
         ];
     }
 

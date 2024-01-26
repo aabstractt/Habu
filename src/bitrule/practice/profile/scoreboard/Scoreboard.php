@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile\scoreboard;
 
-use bitrule\practice\manager\MatchManager;
 use bitrule\practice\Practice;
 use pocketmine\network\mcpe\protocol\RemoveObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
@@ -12,6 +11,8 @@ use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use function str_contains;
+use function usort;
 
 final class Scoreboard {
 

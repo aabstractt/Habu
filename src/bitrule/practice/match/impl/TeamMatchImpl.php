@@ -8,6 +8,9 @@ use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\match\Team;
 use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
+use function array_merge;
+use function ceil;
+use function count;
 
 final class TeamMatchImpl extends AbstractMatch {
 

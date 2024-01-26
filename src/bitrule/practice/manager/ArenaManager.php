@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
+use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
-use bitrule\practice\arena\AbstractArena;
 use Exception;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
+use function array_rand;
+use function in_array;
+use function is_array;
+use function is_string;
 
 final class ArenaManager {
     use SingletonTrait;

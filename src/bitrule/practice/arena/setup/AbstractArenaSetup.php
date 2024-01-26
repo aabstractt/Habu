@@ -16,6 +16,7 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use RuntimeException;
+use function strtolower;
 
 abstract class AbstractArenaSetup {
 
