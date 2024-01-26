@@ -9,6 +9,9 @@ use pocketmine\math\Vector3;
 use RuntimeException;
 use function array_merge;
 
+/**
+ * Class BridgeArena is a bridge arena.
+ */
 final class BridgeArena extends AbstractArena {
 
     /**

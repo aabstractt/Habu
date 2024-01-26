@@ -7,7 +7,6 @@ namespace bitrule\practice\manager;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\profile\LocalProfile;
-use bitrule\practice\profile\scoreboard\Scoreboard;
 use pocketmine\network\mcpe\NetworkBroadcastUtils;
 use pocketmine\player\Player;
 use pocketmine\Server;

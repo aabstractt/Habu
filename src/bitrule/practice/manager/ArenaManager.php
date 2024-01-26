@@ -8,6 +8,7 @@ use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
 use Exception;
+use JsonException;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
@@ -38,7 +39,7 @@ final class ArenaManager {
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function saveAll(): void {
         $config = new Config(Practice::getInstance()->getDataFolder() . 'arenas.yml');

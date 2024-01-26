@@ -16,7 +16,7 @@ use pocketmine\utils\Terminal;
 function main(): Generator {
     $start = microtime(true);
 
-    $opts = getopt("", ['out:', 'release']);
+    $opts = getopt('', ['out:', 'release']);
     $targetPath = $opts['out'] ?? getcwd();
 
     if (!is_string($basePath = getcwd()) || !is_string($targetPath)) {

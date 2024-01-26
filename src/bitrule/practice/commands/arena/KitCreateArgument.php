@@ -8,6 +8,7 @@ use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\manager\KitManager;
+use JsonException;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use function count;
@@ -39,7 +40,7 @@ final class KitCreateArgument extends Argument {
             KitManager::getInstance()->createKit($kit);
 
             $sender->sendMessage(TextFormat::GREEN . 'Kit ' . $args[0] . ' successfully saved!');
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             $sender->sendMessage(TextFormat::RED . 'Failed to save kit: ' . $e->getMessage());
         }
     }

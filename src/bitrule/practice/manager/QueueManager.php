@@ -8,7 +8,6 @@ use bitrule\practice\match\MatchQueue;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\LocalProfile;
 use Closure;
-use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;

@@ -12,6 +12,7 @@ use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\World;
+use RuntimeException;
 
 abstract class AbstractMatch {
 
@@ -47,7 +48,7 @@ abstract class AbstractMatch {
      * @return World
      */
     public function getWorld(): World {
-        return Server::getInstance()->getWorldManager()->getWorldByName($this->getFullName()) ?? throw new \RuntimeException('World not found.');
+        return Server::getInstance()->getWorldManager()->getWorldByName($this->getFullName()) ?? throw new RuntimeException('World not found.');
     }
 
     /**
@@ -96,7 +97,7 @@ abstract class AbstractMatch {
     public function postSetup(array $totalPlayers): void {
         foreach ($totalPlayers as $player) {
             if (!$player->isOnline()) {
-                throw new \RuntimeException('Player ' . $player->getName() . ' is not online');
+                throw new RuntimeException('Player ' . $player->getName() . ' is not online');
             }
 
             ProfileManager::getInstance()->addDuelProfile($player, $this->getFullName());

@@ -6,12 +6,14 @@ namespace bitrule\practice\manager;
 
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
+use JsonException;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
+use RuntimeException;
 use function array_map;
 use function is_array;
 use function is_int;
@@ -62,7 +64,7 @@ final class KitManager {
     /**
      * @param Kit $kit
      *
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function createKit(Kit $kit): void {
         $this->kits[$kit->getName()] = $kit;
@@ -100,12 +102,12 @@ final class KitManager {
     public static function parseItem(array $itemData): Item {
         $name = $itemData['name'] ?? null;
         if ($name === null) {
-            throw new \RuntimeException('Item name is not set');
+            throw new RuntimeException('Item name is not set');
         }
 
         $item = VanillaItems::getAll()[strtoupper($name)] ?? null;
         if ($item === null) {
-            throw new \RuntimeException('Item ' . $name . ' does not exist');
+            throw new RuntimeException('Item ' . $name . ' does not exist');
         }
 
         if (isset($itemData['customName'])) {
@@ -119,16 +121,16 @@ final class KitManager {
         if (isset($itemData['enchantments'])) {
             foreach ($itemData['enchantments'] as [$id, $level]) {
                 if (!is_int($id)) {
-                    throw new \RuntimeException('Enchantment id is not an integer');
+                    throw new RuntimeException('Enchantment id is not an integer');
                 }
 
                 if (!is_int($level)) {
-                    throw new \RuntimeException('Enchantment level is not an integer');
+                    throw new RuntimeException('Enchantment level is not an integer');
                 }
 
                 $enchantment = EnchantmentIdMap::getInstance()->fromId($id);
                 if ($enchantment === null) {
-                    throw new \RuntimeException('Enchantment ' . $id . ' does not exist');
+                    throw new RuntimeException('Enchantment ' . $id . ' does not exist');
                 }
 
                 $item->addEnchantment(new EnchantmentInstance($enchantment, $level));

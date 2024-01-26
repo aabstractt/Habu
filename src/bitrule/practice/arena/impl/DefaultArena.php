@@ -7,6 +7,9 @@ namespace bitrule\practice\arena\impl;
 use bitrule\practice\arena\AbstractArena;
 use pocketmine\math\Vector3;
 
+/**
+ * Class DefaultArena is a default arena.
+ */
 final class DefaultArena extends AbstractArena {
 
     /**
