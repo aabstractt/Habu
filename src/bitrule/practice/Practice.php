@@ -9,6 +9,8 @@ use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
+use bitrule\practice\listener\EntityTeleportListener;
+use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\manager\ArenaManager;
 use bitrule\practice\manager\KitManager;
 use bitrule\practice\manager\MatchManager;
@@ -62,9 +64,14 @@ final class Practice extends PluginBase {
         KitManager::getInstance()->loadAll();
         ArenaManager::getInstance()->init();
 
+        // TODO: Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerInteractListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerQuitListener(), $this);
+
+        // TODO: Match listeners
+        $this->getServer()->getPluginManager()->registerEvents(new EntityTeleportListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),

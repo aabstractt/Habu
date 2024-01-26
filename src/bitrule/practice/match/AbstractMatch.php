@@ -13,6 +13,7 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\World;
 use RuntimeException;
+use function array_filter;
 
 abstract class AbstractMatch {
 
@@ -102,6 +103,8 @@ abstract class AbstractMatch {
 
             ProfileManager::getInstance()->addDuelProfile($player, $this->getFullName());
         }
+
+        // TODO: Generate the world and teleport the players to the spawn point.
     }
 
     /**
@@ -118,30 +121,14 @@ abstract class AbstractMatch {
      * @return DuelProfile[]
      */
     public function getAlive(): array {
-        $alive = [];
-
-        foreach ($this->getEveryone() as $duelProfile) {
-            if (!$duelProfile->isAlive()) continue;
-
-            $alive[] = $duelProfile;
-        }
-
-        return $alive;
+        return array_filter($this->getEveryone(), fn(DuelProfile $duelProfile) => $duelProfile->isAlive());
     }
 
     /**
      * @return DuelProfile[]
      */
     public function getSpectators(): array {
-        $spectators = [];
-
-        foreach ($this->getEveryone() as $duelProfile) {
-            if ($duelProfile->isAlive()) continue;
-
-            $spectators[] = $duelProfile;
-        }
-
-        return $spectators;
+        return array_filter($this->getEveryone(), fn(DuelProfile $duelProfile) => !$duelProfile->isAlive());
     }
 
     /**

@@ -12,8 +12,9 @@ use JsonException;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
+use function array_filter;
 use function array_rand;
-use function in_array;
+use function count;
 use function is_array;
 use function is_string;
 
@@ -80,13 +81,8 @@ final class ArenaManager {
      * @return AbstractArena|null
      */
     public function getRandomArena(Kit $kit): ?AbstractArena {
-        $arenas = [];
-
-        foreach ($this->arenas as $arena) {
-            if (!in_array($kit->getName(), $arena->getKits(), true)) continue;
-
-            $arenas[] = $arena;
-        }
+        $arenas = array_filter($this->arenas, fn(AbstractArena $arena) => $arena->hasKit($kit->getName()));
+        if (count($arenas) === 0) return null;
 
         return $arenas[array_rand($arenas)] ?? null;
     }

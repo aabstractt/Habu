@@ -9,6 +9,7 @@ use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 use function array_diff;
+use function array_filter;
 use function array_map;
 
 final class SingleMatchImpl extends AbstractMatch {
@@ -27,16 +28,13 @@ final class SingleMatchImpl extends AbstractMatch {
      * @return DuelProfile[]
      */
     public function getEveryone(): array {
-        /** @var DuelProfile[] $everyone */
-        $everyone = [];
-
-        foreach ($this->players as $xuid) {
-            if (($duelProfile = ProfileManager::getInstance()->getDuelProfile($xuid)) === null) continue;
-
-            $everyone[] = $duelProfile;
-        }
-
-        return $everyone;
+        return array_filter(
+            array_map(
+                fn (string $xuid) => ProfileManager::getInstance()->getDuelProfile($xuid),
+                $this->players
+            ),
+            fn(?DuelProfile $duelProfile) => $duelProfile !== null
+        );
     }
 
     /**
