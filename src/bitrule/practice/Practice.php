@@ -135,6 +135,8 @@ final class Practice extends PluginBase {
             if ($identifier === 'queue_duration') return gmdate('i:s', time() - $matchQueue->getTimestamp());
         }
 
-        return null;
+        return MatchManager::getInstance()
+            ->getMatchByPlayer($player->getXuid())
+            ?->replacePlaceholders($player, $identifier);
     }
 }

@@ -7,6 +7,7 @@ namespace bitrule\practice\match;
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\stage\AbstractStage;
+use bitrule\practice\match\stage\PlayingStage;
 use bitrule\practice\match\stage\StartingStage;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
@@ -15,6 +16,8 @@ use pocketmine\Server;
 use pocketmine\world\World;
 use RuntimeException;
 use function array_filter;
+use function gmdate;
+use function time;
 
 abstract class AbstractMatch {
 
@@ -173,5 +176,21 @@ abstract class AbstractMatch {
 
             $duelProfile->sendMessage($message);
         }
+    }
+
+    /**
+     * @param Player $player
+     * @param string $identifier
+     *
+     * @return string|null
+     */
+    public function replacePlaceholders(Player $player, string $identifier): ?string {
+        if ($identifier === 'match_duration' && $this->stage instanceof PlayingStage) {
+            return gmdate('i:s', time() - $this->stage->getSeconds());
+        }
+
+        if ($identifier === 'your_ping') return (string) $player->getNetworkSession()->getPing();
+
+        return null;
     }
 }

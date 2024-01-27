@@ -13,6 +13,7 @@ use function array_filter;
 use function array_map;
 use function array_search;
 use function is_int;
+use function str_starts_with;
 
 final class SingleMatchImpl extends AbstractMatch {
 
@@ -63,5 +64,46 @@ final class SingleMatchImpl extends AbstractMatch {
             fn(Player $player) => $player->getXuid(),
             $totalPlayers
         );
+    }
+
+    /**
+     * @param Player $player
+     *
+     * @return Player|null
+     */
+    public function getOpponent(Player $player): ?Player {
+        $spawnId = array_search($player->getXuid(), $this->players, true);
+        if (!is_int($spawnId)) {
+            throw new \RuntimeException('Player not found in match.');
+        }
+
+        $opponentXuid = match ($spawnId) {
+            0 => $this->players[1],
+            1 => $this->players[0],
+            default => null
+        };
+        if ($opponentXuid === null) return null;
+
+        return ProfileManager::getInstance()->getDuelProfile($opponentXuid)?->toPlayer();
+    }
+
+    /**
+     * @param Player $player
+     * @param string $identifier
+     *
+     * @return string|null
+     */
+    public function replacePlaceholders(Player $player, string $identifier): ?string {
+        $parent = parent::replacePlaceholders($player, $identifier);
+        if ($parent !== null) return $parent;
+
+        if (str_starts_with($identifier, 'match_opponent')) {
+            $opponent = $this->getOpponent($player);
+            if ($opponent === null) return null;
+
+            return $identifier === 'match_opponent_name' ? $opponent->getName() : (string) $opponent->getNetworkSession()->getPing();
+        }
+
+        return null;
     }
 }
