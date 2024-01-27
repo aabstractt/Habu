@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\match;
 
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\stage\AbstractStage;
 use bitrule\practice\match\stage\PlayingStage;
@@ -101,14 +102,19 @@ abstract class AbstractMatch {
     }
 
     /**
-     * @param Player[] $totalPlayers
+     * @param Player $player
      */
-    abstract public function setup(array $totalPlayers): void;
+    abstract public function joinPlayer(Player $player): void;
 
     /**
      * @param Player[] $totalPlayers
      */
-    public function postSetup(array $totalPlayers): void {
+    abstract public function prepare(array $totalPlayers): void;
+
+    /**
+     * @param Player[] $totalPlayers
+     */
+    public function postPrepare(array $totalPlayers): void {
         foreach ($totalPlayers as $player) {
             if (!$player->isOnline()) {
                 throw new RuntimeException('Player ' . $player->getName() . ' is not online');
@@ -135,6 +141,36 @@ abstract class AbstractMatch {
         $this->loaded = true;
 
         // TODO: Generate the world and teleport the players to the spawn point.
+    }
+
+    /**
+     * This method is called when the match stage change to Ending.
+     * Usually is used to send the match results to the players.
+     */
+    abstract public function end(): void;
+
+    /**
+     * This method is called when the countdown ends.
+     * Usually is used to delete the world
+     * and teleport the players to the spawn point.
+     */
+    public function postEnd(): void {
+        foreach ($this->getEveryone() as $duelProfile) {
+            $player = $duelProfile->toPlayer();
+            if ($player === null || !$player->isOnline()) {
+                throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
+            }
+
+            $this->removePlayer($player);
+
+            Practice::giveLobbyAttributes($player);
+        }
+
+        // Unload the world and delete the folder.
+        Server::getInstance()->getWorldManager()->unloadWorld($this->getWorld());
+        Server::getInstance()->getAsyncPool()->submitTask(new FileDeleteAsyncTask(
+            Server::getInstance()->getDataPath() . 'worlds/' . $this->getFullName()
+        ));
     }
 
     /**

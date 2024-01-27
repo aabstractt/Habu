@@ -51,7 +51,7 @@ final class TeamMatchImpl extends AbstractMatch {
     /**
      * @param Player[] $totalPlayers
      */
-    public function setup(array $totalPlayers): void {
+    public function prepare(array $totalPlayers): void {
         $teams = [];
         $teamSize = (int) ceil(count($totalPlayers) / 2);
         $teamId = 0;

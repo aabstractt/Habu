@@ -6,7 +6,7 @@ namespace bitrule\practice\match\stage;
 
 use bitrule\practice\match\AbstractMatch;
 
-final class StartingStage implements AbstractStage {
+final class EndingStage implements AbstractStage {
 
     /** @var int */
     private int $countdown = 5;
@@ -17,21 +17,10 @@ final class StartingStage implements AbstractStage {
      * @param AbstractMatch $match
      */
     public function update(AbstractMatch $match): void {
-        if (!$match->isLoaded()) return;
-
         $this->countdown--;
-
-        $match->broadcastMessage('Match starting in ' . $this->countdown . ' seconds.');
 
         if ($this->countdown > 1) return;
 
-        $match->setStage(new PlayingStage());
-    }
-
-    /**
-     * @return int
-     */
-    public function getCountdown(): int {
-        return $this->countdown;
+        $match->postEnd();
     }
 }

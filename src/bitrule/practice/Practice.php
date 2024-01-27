@@ -23,6 +23,7 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
 use RuntimeException;
 use function count;
 use function gmdate;
@@ -38,6 +39,8 @@ final class Practice extends PluginBase {
     /** @var array<string, array<string, string>> */
     private array $scoreboardLines = [];
 
+    private ?Config $messagesConfig = null;
+
     protected function onEnable(): void {
         self::setInstance($this);
 
@@ -52,14 +55,17 @@ final class Practice extends PluginBase {
 
         $this->saveDefaultConfig();
         $this->saveResource('scoreboard.yml', true);
+        $this->saveResource('messages.yml', true);
 
-        $config = new Config(self::getInstance()->getDataFolder() . 'scoreboard.yml');
+        $config = new Config($this->getDataFolder() . 'scoreboard.yml');
 
         if (!is_array($scoreboardLine = $config->get('lines'))) {
             throw new RuntimeException('Invalid scoreboard.yml');
         }
 
         $this->scoreboardLines = $scoreboardLine;
+
+        $this->messagesConfig = new Config($this->getDataFolder() . 'messages.yml');
 
         KitManager::getInstance()->loadAll();
         ArenaManager::getInstance()->init();
@@ -82,6 +88,31 @@ final class Practice extends PluginBase {
             MatchManager::getInstance()->tickStages();
             ProfileManager::getInstance()->tickScoreboard();
         }), 20);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function giveLobbyAttributes(Player $player): void {
+        LocalProfile::resetInventory($player);
+
+        // TODO: Give lobby items
+
+        self::setProfileScoreboard($player, ProfileManager::LOBBY_SCOREBOARD);
+    }
+
+    public static function wrapMessage(string $messageKey, array $placeholders = []): string {
+        $message = self::getInstance()->messagesConfig?->getNested($messageKey);
+        if (!is_string($message)) {
+            return TextFormat::colorize('&f<Missing message: &a\'' . $messageKey . '\'&f>');
+        }
+
+        foreach ($placeholders as $placeholder => $value) {
+            $message = str_replace('<' . $placeholder . '>', $value, $message);
+        }
+
+        return TextFormat::colorize($message);
+
     }
 
     /**

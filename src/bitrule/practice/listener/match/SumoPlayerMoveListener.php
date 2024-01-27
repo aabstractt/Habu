@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace bitrule\practice\listener\match;
 
 use bitrule\practice\manager\MatchManager;
+use bitrule\practice\manager\ProfileManager;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerMoveEvent;
+use RuntimeException;
 
 final class SumoPlayerMoveListener implements Listener {
 
@@ -24,5 +26,12 @@ final class SumoPlayerMoveListener implements Listener {
         $match = MatchManager::getInstance()->getMatchByPlayer($player->getXuid());
         if ($match === null) return;
         // TODO: Kill player
+
+        $duelProfile = ProfileManager::getInstance()->getDuelProfile($player->getXuid());
+        if ($duelProfile === null) {
+            throw new RuntimeException('Error code 2');
+        }
+
+        $duelProfile->convertAsSpectator($match, false);
     }
 }

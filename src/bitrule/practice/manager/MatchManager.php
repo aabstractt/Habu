@@ -42,12 +42,12 @@ final class MatchManager {
             $match = new SingleMatchImpl($arena, $this->matchesPlayed++, $ranked);
         }
 
-        $match->setup($totalPlayers);
+        $match->prepare($totalPlayers);
 
         ArenaManager::getInstance()->loadWorld(
             $arena->getName(),
             $match->getFullName(),
-            fn() => $match->postSetup($totalPlayers)
+            fn() => $match->postPrepare($totalPlayers)
         );
 
         $this->matches[$match->getFullName()] = $match;

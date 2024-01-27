@@ -4,22 +4,28 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile;
 
+use bitrule\practice\match\AbstractMatch;
+use bitrule\practice\match\MatchStatistics;
+use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
 
 final class DuelProfile {
 
+    /** @var bool */
     private bool $alive = true;
 
     /**
-     * @param string $xuid
-     * @param string $name
-     * @param string $matchFullName
+     * @param string          $xuid
+     * @param string          $name
+     * @param string          $matchFullName
+     * @param MatchStatistics $matchStatistics
      */
     public function __construct(
         private readonly string $xuid,
         private readonly string $name,
-        private readonly string $matchFullName
+        private readonly string $matchFullName,
+        private readonly MatchStatistics $matchStatistics = new MatchStatistics()
     ) {}
 
     /**
@@ -41,6 +47,13 @@ final class DuelProfile {
      */
     public function getMatchFullName(): string {
         return $this->matchFullName;
+    }
+
+    /**
+     * @return MatchStatistics
+     */
+    public function getMatchStatistics(): MatchStatistics {
+        return $this->matchStatistics;
     }
 
     /**
@@ -71,5 +84,28 @@ final class DuelProfile {
         if (($player = $this->toPlayer()) === null) return;
 
         $player->sendMessage($message);
+    }
+
+    /**
+     * Convert the player to spectator.
+     * If the player recently joined the match, they will be added to the match.
+     *
+     * @param AbstractMatch $match
+     * @param bool          $joined
+     */
+    public function convertAsSpectator(AbstractMatch $match, bool $joined): void {
+        if (($player = $this->toPlayer()) === null) return;
+
+        $this->alive = false;
+
+        if ($joined) {
+            $match->joinPlayer($player);
+        }
+
+        LocalProfile::resetInventory($player);
+
+        $player->setGamemode(GameMode::SPECTATOR);
+        $player->setAllowFlight(true);
+        $player->setFlying(true);
     }
 }

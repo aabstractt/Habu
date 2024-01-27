@@ -7,6 +7,7 @@ namespace bitrule\practice\profile;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\match\MatchQueue;
 use bitrule\practice\profile\scoreboard\Scoreboard;
+use pocketmine\player\Player;
 
 final class LocalProfile {
 
@@ -76,5 +77,16 @@ final class LocalProfile {
      */
     public function setMatchQueue(?MatchQueue $matchQueue): void {
         $this->matchQueue = $matchQueue;
+    }
+
+    /**
+     * Resets the player's inventory.
+     * @param Player $player
+     */
+    public static function resetInventory(Player $player): void {
+        $player->getInventory()->clearAll();
+        $player->getArmorInventory()->clearAll();
+        $player->getCursorInventory()->clearAll();
+        $player->getOffHandInventory()->clearAll();
     }
 }

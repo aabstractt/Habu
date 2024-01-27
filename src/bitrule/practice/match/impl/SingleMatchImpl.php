@@ -7,6 +7,7 @@ namespace bitrule\practice\match\impl;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\profile\DuelProfile;
+use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
 use function array_diff;
 use function array_filter;
@@ -19,6 +20,53 @@ final class SingleMatchImpl extends AbstractMatch {
 
     /** @var string[] */
     private array $players = [];
+
+    /**
+     * This method is called when a player joins the match.
+     * Add the player to the match and teleport them to their spawn.
+     *
+     * @param Player $player
+     */
+    public function joinPlayer(Player $player): void {
+        $this->players[] = $player->getXuid();
+
+        $this->teleportSpawn($player);
+    }
+
+    /**
+     * @param Player[] $totalPlayers
+     */
+    public function prepare(array $totalPlayers): void {
+        $this->players = array_map(
+            fn(Player $player) => $player->getXuid(),
+            $totalPlayers
+        );
+    }
+
+    public function end(): void {
+        foreach ($this->players as $xuid) {
+            $duelPlayer = ProfileManager::getInstance()->getDuelProfile($xuid);
+            if ($duelPlayer === null) continue;
+
+            $player = $duelPlayer->toPlayer();
+            if ($player === null || !$player->isOnline()) continue;
+
+            $opponent = $this->getOpponent($player);
+            if ($opponent === null) continue;
+
+            $matchStatistics = $duelPlayer->getMatchStatistics();
+            $opponentMatchStatistics = $opponent->getMatchStatistics();
+
+            $player->sendMessage(TranslationKeys::MATCH_END_STATISTICS_NORMAL->build(
+                $opponent->getName(),
+                '&a(+0)',
+                (string) $matchStatistics->getCritics(),
+                (string) $matchStatistics->getDamageDealt(),
+                (string) $opponentMatchStatistics->getCritics(),
+                (string) $opponentMatchStatistics->getDamageDealt(),
+            ));
+        }
+    }
 
     /**
      * @param Player $player
@@ -57,21 +105,11 @@ final class SingleMatchImpl extends AbstractMatch {
     }
 
     /**
-     * @param Player[] $totalPlayers
-     */
-    public function setup(array $totalPlayers): void {
-        $this->players = array_map(
-            fn(Player $player) => $player->getXuid(),
-            $totalPlayers
-        );
-    }
-
-    /**
      * @param Player $player
      *
-     * @return Player|null
+     * @return DuelProfile|null
      */
-    public function getOpponent(Player $player): ?Player {
+    public function getOpponent(Player $player): ?DuelProfile {
         $spawnId = array_search($player->getXuid(), $this->players, true);
         if (!is_int($spawnId)) {
             throw new \RuntimeException('Player not found in match.');
@@ -84,7 +122,7 @@ final class SingleMatchImpl extends AbstractMatch {
         };
         if ($opponentXuid === null) return null;
 
-        return ProfileManager::getInstance()->getDuelProfile($opponentXuid)?->toPlayer();
+        return ProfileManager::getInstance()->getDuelProfile($opponentXuid);
     }
 
     /**
@@ -101,7 +139,10 @@ final class SingleMatchImpl extends AbstractMatch {
             $opponent = $this->getOpponent($player);
             if ($opponent === null) return null;
 
-            return $identifier === 'match_opponent_name' ? $opponent->getName() : (string) $opponent->getNetworkSession()->getPing();
+            $instance = $opponent->toPlayer();
+            if ($instance === null || !$instance->isOnline()) return null;
+
+            return $identifier === 'match_opponent_name' ? $opponent->getName() : (string) $instance->getNetworkSession()->getPing();
         }
 
         return null;
