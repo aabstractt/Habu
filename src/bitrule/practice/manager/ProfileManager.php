@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bitrule\practice\manager;
 
 use bitrule\practice\match\AbstractMatch;
-use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\profile\LocalProfile;
 use pocketmine\player\Player;

@@ -15,7 +15,6 @@ use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
 use pocketmine\world\Position;
 use RuntimeException;
-use function array_diff;
 use function array_filter;
 use function array_map;
 use function array_search;

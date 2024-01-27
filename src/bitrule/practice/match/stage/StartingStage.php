@@ -7,6 +7,7 @@ namespace bitrule\practice\match\stage;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\Practice;
+use function count;
 
 final class StartingStage implements AbstractStage {
 
