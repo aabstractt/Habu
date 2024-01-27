@@ -33,29 +33,8 @@ final class ScoreboardLine {
     /**
      * @return int
      */
-    public function getCurrentSlot(): int {
-        return $this->currentSlot;
-    }
-
-    /**
-     * @param int $currentSlot
-     */
-    public function setCurrentSlot(int $currentSlot): void {
-        $this->currentSlot = $currentSlot;
-    }
-
-    /**
-     * @return int
-     */
     public function getOldSlot(): int {
         return $this->oldSlot;
-    }
-
-    /**
-     * @param int $oldSlot
-     */
-    public function setOldSlot(int $oldSlot): void {
-        $this->oldSlot = $oldSlot;
     }
 
     /**
@@ -63,13 +42,6 @@ final class ScoreboardLine {
      */
     public function getText(): ?string {
         return $this->text;
-    }
-
-    /**
-     * @param string|null $text
-     */
-    public function setText(?string $text): void {
-        $this->text = $text;
     }
 
     /**
