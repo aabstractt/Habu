@@ -6,10 +6,10 @@ namespace bitrule\practice\arena;
 
 use bitrule\practice\arena\impl\BridgeArena;
 use bitrule\practice\arena\impl\DefaultArena;
-use bitrule\practice\Practice;
 use pocketmine\math\Vector3;
-use pocketmine\utils\Config;
 use RuntimeException;
+use function count;
+use function in_array;
 
 abstract class AbstractArena {
 
@@ -17,13 +17,13 @@ abstract class AbstractArena {
      * @param string   $name
      * @param Vector3  $firstPosition
      * @param Vector3  $secondPosition
-     * @param string[] $duelTypes
+     * @param string[] $kits
      */
     public function __construct(
         protected readonly string $name,
         private Vector3         $firstPosition,
         private Vector3         $secondPosition,
-        private array           $duelTypes
+        private array $kits
     ) {}
 
     /**
@@ -64,24 +64,54 @@ abstract class AbstractArena {
     /**
      * @return array
      */
-    public function getDuelTypes(): array {
-        return $this->duelTypes;
+    public function getKits(): array {
+        return $this->kits;
     }
 
     /**
-     * @param string $duelType
+     * @param array $kits
      */
-    public function addDuelType(string $duelType): void {
-        $this->duelTypes[] = $duelType;
+    public function setKits(array $kits): void {
+        $this->kits = $kits;
     }
 
     /**
-     * @param string $duelType
+     * @param string $kitName
+     */
+    public function addKit(string $kitName): void {
+        $this->kits[] = $kitName;
+    }
+
+    /**
+     * @param string $kitName
      *
      * @return bool
      */
-    public function hasDuelType(string $duelType): bool {
-        return in_array($duelType, $this->duelTypes, true);
+    public function hasKit(string $kitName): bool {
+        return in_array($kitName, $this->kits, true);
+    }
+
+    /**
+     * @param array $arenaData
+     */
+    public function setup(array $arenaData): void {
+        if (!isset($arenaData['first_position'])) {
+            throw new RuntimeException('Invalid offset "first_position"');
+        }
+
+        $this->firstPosition = self::deserializeVector($arenaData['first_position']);
+
+        if (!isset($arenaData['second_position'])) {
+            throw new RuntimeException('Invalid offset "second_position"');
+        }
+
+        $this->secondPosition = self::deserializeVector($arenaData['second_position']);
+
+        if (!isset($arenaData['kits'])) {
+            throw new RuntimeException('Invalid offset "kits"');
+        }
+
+        $this->kits = $arenaData['kits'];
     }
 
     /**
@@ -89,10 +119,10 @@ abstract class AbstractArena {
      */
     public function serialize(): array {
         return [
-            'type' => 'normal',
-            'first_position' => self::serializeVector($this->firstPosition),
-            'second_position' => self::serializeVector($this->secondPosition),
-            'duel_types' => $this->duelTypes
+        	'type' => 'normal',
+        	'first_position' => self::serializeVector($this->firstPosition),
+        	'second_position' => self::serializeVector($this->secondPosition),
+        	'kits' => $this->kits
         ];
     }
 
@@ -102,7 +132,7 @@ abstract class AbstractArena {
      *
      * @return AbstractArena
      */
-    public static function createFromArray(string $name, array $data): AbstractArena {
+    public static function createFromArray(string $name, array $data): self {
         if (!isset($data['type'])) {
             throw new RuntimeException('Invalid offset "type"');
         }
@@ -123,7 +153,7 @@ abstract class AbstractArena {
      *
      * @return AbstractArena
      */
-    public static function createEmpty(string $name, string $type): AbstractArena {
+    public static function createEmpty(string $name, string $type): self {
         return match ($type) {
             'normal' => DefaultArena::parseEmpty($name),
             'bridge' => BridgeArena::parseEmpty($name),
@@ -150,6 +180,6 @@ abstract class AbstractArena {
      * @return int[]
      */
     public static function serializeVector(Vector3 $vector): array {
-        return [$vector->getX(), $vector->getY(), $vector->getZ()];
+        return [$vector->getFloorX(), $vector->getFloorY(), $vector->getFloorZ()];
     }
 }

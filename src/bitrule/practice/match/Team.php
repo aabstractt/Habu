@@ -6,6 +6,10 @@ namespace bitrule\practice\match;
 
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\profile\DuelProfile;
+use function array_filter;
+use function array_map;
+use function array_search;
+use function in_array;
 
 final class Team {
 
@@ -58,5 +62,14 @@ final class Team {
             ),
             fn (?DuelProfile $duelProfile) => $duelProfile !== null
         );
+    }
+
+    /**
+     * @param string $xuid
+     *
+     * @return bool
+     */
+    public function isMember(string $xuid): bool {
+        return in_array($xuid, $this->players, true);
     }
 }

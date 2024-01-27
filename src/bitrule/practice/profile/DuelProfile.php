@@ -4,22 +4,31 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile;
 
+use bitrule\practice\match\AbstractMatch;
+use bitrule\practice\match\MatchStatistics;
+use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
+use function count;
 
 final class DuelProfile {
 
+    /** @var bool */
     private bool $alive = true;
 
     /**
-     * @param string $xuid
-     * @param string $name
-     * @param string $matchFullName
+     * @param string          $xuid
+     * @param string          $name
+     * @param string          $matchFullName
+     * @param bool            $playing
+     * @param MatchStatistics $matchStatistics
      */
     public function __construct(
         private readonly string $xuid,
         private readonly string $name,
-        private readonly string $matchFullName
+        private readonly string $matchFullName,
+        private readonly bool $playing,
+        private readonly MatchStatistics $matchStatistics = new MatchStatistics()
     ) {}
 
     /**
@@ -44,6 +53,13 @@ final class DuelProfile {
     }
 
     /**
+     * @return MatchStatistics
+     */
+    public function getMatchStatistics(): MatchStatistics {
+        return $this->matchStatistics;
+    }
+
+    /**
      * @return Player|null
      */
     public function toPlayer(): ?Player {
@@ -65,11 +81,43 @@ final class DuelProfile {
     }
 
     /**
+     * @return bool
+     */
+    public function isPlaying(): bool {
+        return $this->playing;
+    }
+
+    /**
      * @param string $message
      */
     public function sendMessage(string $message): void {
         if (($player = $this->toPlayer()) === null) return;
 
         $player->sendMessage($message);
+    }
+
+    /**
+     * Convert the player to spectator.
+     * If the player recently joined the match, they will be added to the match.
+     *
+     * @param AbstractMatch $match
+     * @param bool          $joined
+     */
+    public function convertAsSpectator(AbstractMatch $match, bool $joined): void {
+        if (($player = $this->toPlayer()) === null) return;
+
+        $this->alive = false;
+
+        if ($joined) {
+            $match->joinSpectator($player);
+        } elseif (count($match->getAlive()) <= 1) {
+            $match->end();
+        }
+
+        LocalProfile::resetInventory($player);
+
+        $player->setGamemode(GameMode::SPECTATOR);
+        $player->setAllowFlight(true);
+        $player->setFlying(true);
     }
 }

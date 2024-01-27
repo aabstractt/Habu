@@ -4,14 +4,22 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
+use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\profile\LocalProfile;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
 
 final class ProfileManager {
     use SingletonTrait;
+
+    public const LOBBY_SCOREBOARD = 'lobby';
+    public const QUEUE_SCOREBOARD = 'queue';
+    public const MATCH_STARTING_SCOREBOARD = 'match-starting';
+    public const MATCH_PLAYING_SCOREBOARD = 'match-playing';
+    public const MATCH_ENDING_SCOREBOARD = 'match-ending';
 
     /** @var array<string, LocalProfile> */
     private array $localProfiles = [];
@@ -36,7 +44,21 @@ final class ProfileManager {
             throw new RuntimeException('Player already exists in local players list');
         }
 
-        $this->localProfiles[$player->getXuid()] = new LocalProfile($player->getXuid(), $player->getName());
+        $this->localProfiles[$player->getXuid()] = $localProfile = new LocalProfile($player->getXuid(), $player->getName());
+
+        $localProfile->joinLobby($player, true);
+    }
+
+    /**
+     * @param string $xuid
+     */
+    public function removeProfile(string $xuid): void {
+        $localProfile = $this->localProfiles[$xuid] ?? null;
+        if ($localProfile === null) return;
+
+        QueueManager::getInstance()->removeQueue($localProfile);
+
+        unset($localProfile);
     }
 
     /**
@@ -49,21 +71,42 @@ final class ProfileManager {
     }
 
     /**
-     * @param Player $player
-     * @param string $matchFullName
+     * @param Player        $player
+     * @param AbstractMatch $match
+     * @param bool          $spectator
      */
-    public function addDuelProfile(Player $player, string $matchFullName): void {
+    public function addDuelProfile(Player $player, AbstractMatch $match, bool $spectator = false): void {
         if (isset($this->duelProfiles[$player->getXuid()])) {
             throw new RuntimeException('Player already exists in duel players list');
         }
 
-        $this->duelProfiles[$player->getXuid()] = new DuelProfile($player->getXuid(), $player->getName(), $matchFullName);
+        $this->duelProfiles[$player->getXuid()] = $duelProfile = new DuelProfile(
+            $player->getXuid(),
+            $player->getName(),
+            $match->getFullName(),
+            !$spectator
+        );
+
+        if (!$spectator) return;
+
+        $duelProfile->convertAsSpectator($match, true);
+    }
+
+    public function removeDuelProfile(Player $player): void {
+        unset($this->duelProfiles[$player->getXuid()]);
     }
 
     /**
-     * @param string $xuid
+     * Tick the scoreboard for all players
      */
-    public function removeProfile(string $xuid): void {
-        unset($this->localProfiles[$xuid], $this->duelProfiles[$xuid]);
+    public function tickScoreboard(): void {
+        foreach ($this->localProfiles as $localProfile) {
+            if (($scoreboard = $localProfile->getScoreboard()) === null) continue;
+
+            $player = Server::getInstance()->getPlayerExact($localProfile->getName());
+            if ($player === null || !$player->isOnline()) continue;
+
+            $scoreboard->update($player, $localProfile);
+        }
     }
 }

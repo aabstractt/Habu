@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\setup;
 
-final class DefaultArenaSetup extends ScalableArenaSetup {
+final class DefaultArenaSetup extends AbstractArenaSetup {
 
     public function increaseSpawnStep(): void {
         parent::increaseSpawnStep();

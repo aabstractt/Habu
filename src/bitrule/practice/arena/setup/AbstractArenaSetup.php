@@ -10,11 +10,13 @@ use bitrule\practice\Practice;
 use InvalidArgumentException;
 use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use RuntimeException;
+use function strtolower;
 
 abstract class AbstractArenaSetup {
 
@@ -25,6 +27,8 @@ abstract class AbstractArenaSetup {
     private ?Vector3 $firstPosition = null;
     /** @var Vector3|null */
     private ?Vector3 $secondPosition = null;
+    /** @var string[] */
+    private array $kits = [];
 
     /**
      * Whether the setup has started.
@@ -78,6 +82,13 @@ abstract class AbstractArenaSetup {
      */
     public function setSecondPosition(?Vector3 $secondPosition): void {
         $this->secondPosition = $secondPosition;
+    }
+
+    /**
+     * @param string $kitName
+     */
+    public function addKit(string $kitName): void {
+        $this->kits[] = $kitName;
     }
 
     /**
@@ -154,7 +165,10 @@ abstract class AbstractArenaSetup {
         $player->getCursorInventory()->clearAll();
         $player->getOffHandInventory()->clearAll();
 
-        $player->getInventory()->setItem(0, VanillaItems::STICK()->setCustomName(TextFormat::RESET . TextFormat::YELLOW . 'Select Spawns'));
+        $player->getInventory()->setItem(0, VanillaItems::STICK()
+            ->setCustomName(TextFormat::RESET . TextFormat::YELLOW . 'Select Spawns')
+            ->setNamedTag(CompoundTag::create()->setString('arena', $this->name))
+        );
 
         $player->setGamemode(GameMode::CREATIVE);
         $player->setFlying(true);
@@ -185,6 +199,7 @@ abstract class AbstractArenaSetup {
 
         $arena->setFirstPosition($this->firstPosition);
         $arena->setSecondPosition($this->secondPosition);
+        $arena->setKits($this->kits);
     }
 
     /**
@@ -192,7 +207,7 @@ abstract class AbstractArenaSetup {
      *
      * @return AbstractArenaSetup
      */
-    public static function from(string $type): AbstractArenaSetup {
+    public static function from(string $type): self {
         return match (strtolower($type)) {
             'normal' => new DefaultArenaSetup(),
             'bridge' => new BridgeArenaSetup(),

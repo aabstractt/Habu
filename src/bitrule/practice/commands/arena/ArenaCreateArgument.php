@@ -9,7 +9,9 @@ use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\form\arena\ArenaSetupForm;
 use bitrule\practice\manager\ProfileManager;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use function count;
 
 final class ArenaCreateArgument extends Argument {
     use PlayerArgumentTrait;
@@ -20,8 +22,8 @@ final class ArenaCreateArgument extends Argument {
      * @param array  $args
      */
     public function onPlayerExecute(Player $sender, string $label, array $args): void {
-        if (count($args) < 2) {
-            $sender->sendMessage(TextFormat::RED . 'Usage: /' . $label . ' create <type>');
+        if (count($args) === 0) {
+            $sender->sendMessage(TextFormat::RED . 'Usage: /' . $label . ' create <world>');
 
             return;
         }
@@ -39,8 +41,15 @@ final class ArenaCreateArgument extends Argument {
             return;
         }
 
+        $world = Server::getInstance()->getWorldManager()->getWorldByName($args[0]);
+        if ($world === null) {
+            $sender->sendMessage(TextFormat::RED . 'World not found');
+
+            return;
+        }
+
         $form = new ArenaSetupForm();
-        $form->setup();
+        $form->setup($world);
 
         $sender->sendForm($form);
     }

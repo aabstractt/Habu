@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\impl;
 
-use bitrule\practice\arena\ScalableArena;
+use bitrule\practice\arena\AbstractArena;
 use pocketmine\math\Vector3;
 
-final class DefaultArena extends ScalableArena {
+/**
+ * Class DefaultArena is a default arena.
+ */
+final class DefaultArena extends AbstractArena {
 
     /**
      * @param string $name
@@ -15,12 +18,12 @@ final class DefaultArena extends ScalableArena {
      *
      * @return DefaultArena
      */
-    protected static function parse(string $name, array $data): DefaultArena {
-        return new DefaultArena(
+    protected static function parse(string $name, array $data): self {
+        return new self(
             $name,
-            self::deserializeVector($data['firstPosition'] ?? []),
-            self::deserializeVector($data['secondPosition'] ?? []),
-            $data['duelTypes'] ?? []
+            self::deserializeVector($data['first_position'] ?? []),
+            self::deserializeVector($data['second_position'] ?? []),
+            $data['kits'] ?? []
         );
     }
 
@@ -29,8 +32,8 @@ final class DefaultArena extends ScalableArena {
      *
      * @return DefaultArena
      */
-    protected static function parseEmpty(string $name): DefaultArena {
-        return new DefaultArena(
+    protected static function parseEmpty(string $name): self {
+        return new self(
             $name,
             Vector3::zero(),
             Vector3::zero(),

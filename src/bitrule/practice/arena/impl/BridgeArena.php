@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\impl;
 
-use bitrule\practice\arena\ScalableArena;
+use bitrule\practice\arena\AbstractArena;
 use pocketmine\math\Vector3;
 use RuntimeException;
+use function array_merge;
 
-final class BridgeArena extends ScalableArena {
+/**
+ * Class BridgeArena is a bridge arena.
+ */
+final class BridgeArena extends AbstractArena {
 
     /**
      * @param string   $name
@@ -71,9 +75,9 @@ final class BridgeArena extends ScalableArena {
         return array_merge(
             parent::serialize(),
             [
-                'type' => 'bridge',
-                'first_portal' => self::serializeVector($this->firstPortal),
-                'second_portal' => self::serializeVector($this->secondPortal)
+            	'type' => 'bridge',
+            	'first_portal' => self::serializeVector($this->firstPortal),
+            	'second_portal' => self::serializeVector($this->secondPortal)
             ]
         );
     }
@@ -84,14 +88,14 @@ final class BridgeArena extends ScalableArena {
      *
      * @return BridgeArena
      */
-    public static function parse(string $name, array $data): BridgeArena {
-        return new BridgeArena(
+    public static function parse(string $name, array $data): self {
+        return new self(
             $name,
-            self::deserializeVector($data['firstPosition'] ?? []),
-            self::deserializeVector($data['secondPosition'] ?? []),
-            self::deserializeVector($data['firstPortal'] ?? []),
-            self::deserializeVector($data['secondPortal'] ?? []),
-            $data['duelTypes'] ?? []
+            self::deserializeVector($data['first_position'] ?? []),
+            self::deserializeVector($data['second_position'] ?? []),
+            self::deserializeVector($data['first_portal'] ?? []),
+            self::deserializeVector($data['second_portal'] ?? []),
+            $data['kits'] ?? []
         );
     }
 
@@ -100,8 +104,8 @@ final class BridgeArena extends ScalableArena {
      *
      * @return BridgeArena
      */
-    protected static function parseEmpty(string $name): BridgeArena {
-        return new BridgeArena(
+    protected static function parseEmpty(string $name): self {
+        return new self(
             $name,
             Vector3::zero(),
             Vector3::zero(),

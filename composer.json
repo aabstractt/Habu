@@ -10,7 +10,7 @@
     "ext-json": "*",
     "ext-mysqli": "*",
     "ext-curl": "*",
-    "abstract/command-framework": "^0.3",
+    "abstract/command-framework": "^0.4",
     "bitrule/forms": "dev-master",
     "ext-igbinary": "*"
   },
@@ -29,5 +29,12 @@
 
   "autoload": {
     "psr-4": {"": ["src"]}
+  },
+
+  "scripts": {
+    "make-server": [
+      "@composer install --no-dev --classmap-authoritative --ignore-platform-reqs",
+      "@php -dphar.readonly=0 make-phar.php"
+    ]
   }
 }
