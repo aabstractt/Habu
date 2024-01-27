@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
+use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\match\impl\SingleMatchImpl;
 use bitrule\practice\match\impl\TeamMatchImpl;
+use bitrule\practice\match\MatchRounds;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
@@ -27,6 +29,47 @@ final class MatchManager {
     private int $matchesPlayed = 0;
 
     /**
+     * Create a match for rounding.
+     * This is used for tournaments.
+     * Or any other time you want to play multiple matches on the same arena.
+     *
+     * @param Player[]           $players
+     * @param Player[]           $spectators
+     * @param Kit                $kit
+     * @param AbstractArena|null $arena
+     * @param MatchRounds        $matchRounds
+     * @param bool               $ranked
+     */
+    public function createMatchForRounding(
+        array $players,
+        array $spectators,
+        Kit $kit,
+        ?AbstractArena $arena,
+        MatchRounds $matchRounds,
+        bool $ranked
+    ): void {
+        $arena ??= ArenaManager::getInstance()->getRandomArena($kit);
+        if ($arena === null) {
+            throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
+        }
+
+        $match = new SingleMatchImpl($arena, $kit, $this->matchesPlayed++, $ranked, $matchRounds);
+        $match->prepare($players);
+
+        ArenaManager::getInstance()->loadWorld(
+            $arena->getName(),
+            $match->getFullName(),
+            function() use ($spectators, $players, $match): void {
+                $match->postPrepare($players);
+
+                foreach ($spectators as $spectator) $match->joinSpectator($spectator);
+            }
+        );
+
+        $this->matches[$match->getFullName()] = $match;
+    }
+
+    /**
      * @param Player[] $totalPlayers
      * @param Kit      $kit
      * @param bool     $team
@@ -38,21 +81,30 @@ final class MatchManager {
             throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
 
-        if ($team) {
-            $match = new TeamMatchImpl($arena, $kit, $this->matchesPlayed++, $ranked);
-        } else {
-            $match = new SingleMatchImpl($arena, $kit, $this->matchesPlayed++, $ranked);
-        }
-
-        $match->prepare($totalPlayers);
-
-        ArenaManager::getInstance()->loadWorld(
-            $arena->getName(),
-            $match->getFullName(),
-            fn() => $match->postPrepare($totalPlayers)
+        $this->createMatchForRounding(
+            $totalPlayers,
+            [],
+            $kit,
+            $arena,
+            new MatchRounds(1, 3),
+            $ranked
         );
 
-        $this->matches[$match->getFullName()] = $match;
+//        if ($team) {
+//            $match = new TeamMatchImpl($arena, $kit, $this->matchesPlayed++, $ranked);
+//        } else {
+//            $match = new SingleMatchImpl($arena, $kit, $this->matchesPlayed++, $ranked);
+//        }
+//
+//        $match->prepare($totalPlayers);
+//
+//        ArenaManager::getInstance()->loadWorld(
+//            $arena->getName(),
+//            $match->getFullName(),
+//            fn() => $match->postPrepare($totalPlayers)
+//        );
+//
+//        $this->matches[$match->getFullName()] = $match;
     }
 
     /**

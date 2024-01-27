@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\match;
 
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\event\MatchEndEvent;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\stage\AbstractStage;
@@ -32,18 +33,26 @@ abstract class AbstractMatch {
     protected AbstractStage $stage;
     /** @var bool */
     protected bool $loaded = false;
+    /**
+     * If someone disconnected during the match.
+     *
+     * @var bool
+     */
+    protected bool $someoneDisconnected = false;
 
     /**
-     * @param AbstractArena $arena
-     * @param Kit           $kit
-     * @param int           $id
-     * @param bool          $ranked
+     * @param AbstractArena    $arena
+     * @param Kit              $kit
+     * @param int              $id
+     * @param bool             $ranked
+     * @param MatchRounds|null $matchRounds
      */
     public function __construct(
         protected readonly AbstractArena $arena,
         protected readonly Kit $kit,
         protected readonly int $id,
-        protected readonly bool          $ranked
+        protected readonly bool $ranked,
+        protected readonly ?MatchRounds $matchRounds = null
     ) {
         $this->stage = new StartingStage();
     }
@@ -78,6 +87,13 @@ abstract class AbstractMatch {
     }
 
     /**
+     * @return Kit
+     */
+    public function getKit(): Kit {
+        return $this->kit;
+    }
+
+    /**
      * @return AbstractStage
      */
     public function getStage(): AbstractStage {
@@ -103,6 +119,20 @@ abstract class AbstractMatch {
      */
     public function isRanked(): bool {
         return $this->ranked;
+    }
+
+    /**
+     * @return MatchRounds|null
+     */
+    public function getMatchRounds(): ?MatchRounds {
+        return $this->matchRounds;
+    }
+
+    /**
+     * @return DuelProfile|null
+     */
+    public function getWinner(): ?DuelProfile {
+        return $this->getAlive()[0] ?? null;
     }
 
     /**
@@ -165,6 +195,10 @@ abstract class AbstractMatch {
      * and teleport the players to the spawn point.
      */
     public function postEnd(): void {
+        $spectators = $this->getSpectators();
+        $players = $this->getPlayers();
+        $winner = $this->getWinner();
+
         foreach ($this->getEveryone() as $duelProfile) {
             $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) {
@@ -182,6 +216,8 @@ abstract class AbstractMatch {
         }
 
         $this->loaded = false;
+
+        (new MatchEndEvent($this, $winner, $players, $spectators, $this->someoneDisconnected))->call();
     }
 
     /**
@@ -218,15 +254,22 @@ abstract class AbstractMatch {
     /**
      * @return DuelProfile[]
      */
-    public function getAlive(): array {
-        return array_filter($this->getEveryone(), fn(DuelProfile $duelProfile) => $duelProfile->isAlive());
+    public function getPlayers(): array {
+        return array_filter($this->getEveryone(), fn(DuelProfile $duelProfile) => $duelProfile->isPlaying());
     }
 
     /**
      * @return DuelProfile[]
      */
+    public function getAlive(): array {
+        return array_filter($this->getEveryone(), fn(DuelProfile $duelProfile) => $duelProfile->isAlive());
+    }
+
+    /**
+     * @return array
+     */
     public function getSpectators(): array {
-        return array_filter($this->getEveryone(), fn(DuelProfile $duelProfile) => !$duelProfile->isAlive());
+        return array_filter($this->getEveryone(), fn(DuelProfile $duelProfile) => !$duelProfile->isPlaying());
     }
 
     /**

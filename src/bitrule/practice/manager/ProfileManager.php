@@ -80,7 +80,12 @@ final class ProfileManager {
             throw new RuntimeException('Player already exists in duel players list');
         }
 
-        $this->duelProfiles[$player->getXuid()] = $duelProfile = new DuelProfile($player->getXuid(), $player->getName(), $match->getFullName());
+        $this->duelProfiles[$player->getXuid()] = $duelProfile = new DuelProfile(
+            $player->getXuid(),
+            $player->getName(),
+            $match->getFullName(),
+            !$spectator
+        );
 
         if (!$spectator) return;
 

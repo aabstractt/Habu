@@ -34,10 +34,6 @@ final class SingleMatchImpl extends AbstractMatch {
      * @param Player $player
      */
     public function joinSpectator(Player $player): void {
-        if (ProfileManager::getInstance()->getDuelProfile($player->getXuid()) !== null) {
-            throw new RuntimeException('Player already in match.');
-        }
-
         if (!$this->isLoaded()) {
             throw new RuntimeException('Match not loaded.');
         }
@@ -93,7 +89,7 @@ final class SingleMatchImpl extends AbstractMatch {
         }
 
         $this->setStage(new EndingStage(
-            8,
+            5,
             $this->stage instanceof PlayingStage ? $this->stage->getSeconds() : 0
         ));
     }

@@ -20,12 +20,14 @@ final class DuelProfile {
      * @param string          $xuid
      * @param string          $name
      * @param string          $matchFullName
+     * @param bool            $playing
      * @param MatchStatistics $matchStatistics
      */
     public function __construct(
         private readonly string $xuid,
         private readonly string $name,
         private readonly string $matchFullName,
+        private readonly bool $playing,
         private readonly MatchStatistics $matchStatistics = new MatchStatistics()
     ) {}
 
@@ -76,6 +78,13 @@ final class DuelProfile {
      */
     public function setAlive(bool $alive): void {
         $this->alive = $alive;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPlaying(): bool {
+        return $this->playing;
     }
 
     /**
