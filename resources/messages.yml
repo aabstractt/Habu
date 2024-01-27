@@ -8,3 +8,4 @@ match:
       &7Elo: <opponent_elo_changes>
       &7Critics: §u<opponent_critics>
       &7Damage Dealt: §u<opponent_damage_dealt>
+  opponent_found: '&bPractice &8> &7Found a &f<type> <kit>&7 match against &c<player>'

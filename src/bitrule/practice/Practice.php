@@ -91,17 +91,6 @@ final class Practice extends PluginBase {
         }), 20);
     }
 
-    /**
-     * @param Player $player
-     */
-    public static function giveLobbyAttributes(Player $player): void {
-        LocalProfile::resetInventory($player);
-
-        // TODO: Give lobby items
-
-        self::setProfileScoreboard($player, ProfileManager::LOBBY_SCOREBOARD);
-    }
-
     public static function wrapMessage(string $messageKey, array $placeholders = []): string {
         $message = self::getInstance()->messagesConfig?->getNested($messageKey);
         if (!is_string($message)) {

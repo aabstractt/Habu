@@ -100,7 +100,7 @@ final class DuelProfile {
         $this->alive = false;
 
         if ($joined) {
-            $match->joinPlayer($player);
+            $match->joinSpectator($player);
         } elseif (count($match->getAlive()) <= 1) {
             $match->end();
         }

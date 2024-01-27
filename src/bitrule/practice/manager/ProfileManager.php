@@ -51,6 +51,18 @@ final class ProfileManager {
 
     /**
      * @param string $xuid
+     */
+    public function removeProfile(string $xuid): void {
+        $localProfile = $this->localProfiles[$xuid] ?? null;
+        if ($localProfile === null) return;
+
+        QueueManager::getInstance()->removeQueue($localProfile);
+
+        unset($localProfile);
+    }
+
+    /**
+     * @param string $xuid
      *
      * @return DuelProfile|null
      */
@@ -70,16 +82,8 @@ final class ProfileManager {
         $this->duelProfiles[$player->getXuid()] = new DuelProfile($player->getXuid(), $player->getName(), $matchFullName);
     }
 
-    /**
-     * @param string $xuid
-     */
-    public function removeProfile(string $xuid): void {
-        $localProfile = $this->localProfiles[$xuid] ?? null;
-        if ($localProfile === null) return;
-
-        QueueManager::getInstance()->removeQueue($localProfile);
-
-        unset($localProfile, $this->duelProfiles[$xuid]);
+    public function removeDuelProfile(Player $player): void {
+        unset($this->duelProfiles[$player->getXuid()]);
     }
 
     /**

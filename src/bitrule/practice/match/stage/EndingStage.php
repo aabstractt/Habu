@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace bitrule\practice\match\stage;
 
+use bitrule\practice\manager\MatchManager;
 use bitrule\practice\match\AbstractMatch;
 
 final class EndingStage implements AbstractStage {
 
+    /**
+     * @param int $countdown
+     * @param int $duration
+     */
     public function __construct(
         private int $countdown,
-        private int $duration
+        private readonly int $duration
     ) {}
 
     /**
@@ -26,6 +31,8 @@ final class EndingStage implements AbstractStage {
         if ($this->countdown > 1) return;
 
         $match->postEnd();
+
+        MatchManager::getInstance()->endMatch($match);
     }
 
     /**

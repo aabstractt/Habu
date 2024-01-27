@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace bitrule\practice\profile;
 
 use bitrule\practice\arena\setup\AbstractArenaSetup;
+use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\MatchQueue;
+use bitrule\practice\Practice;
 use bitrule\practice\profile\scoreboard\Scoreboard;
+use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 
 final class LocalProfile {
@@ -77,6 +80,26 @@ final class LocalProfile {
      */
     public function setMatchQueue(?MatchQueue $matchQueue): void {
         $this->matchQueue = $matchQueue;
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function joinLobby(Player $player): void {
+        self::resetInventory($player);
+
+        $player->setGamemode(GameMode::SURVIVAL);
+        $player->setNoClientPredictions();
+
+        $player->setHealth($player->getMaxHealth());
+        $player->getHungerManager()->setFood(20);
+        $player->getHungerManager()->setSaturation(20);
+
+        $player->getXpManager()->setXpAndProgress(0, 0);
+
+        // TODO: Give lobby items
+
+        Practice::setProfileScoreboard($player, ProfileManager::LOBBY_SCOREBOARD);
     }
 
     /**

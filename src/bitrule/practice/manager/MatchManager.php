@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
+use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\match\impl\SingleMatchImpl;
 use bitrule\practice\match\impl\TeamMatchImpl;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
 use function array_filter;
@@ -37,9 +39,9 @@ final class MatchManager {
         }
 
         if ($team) {
-            $match = new TeamMatchImpl($arena, $this->matchesPlayed++, $ranked);
+            $match = new TeamMatchImpl($arena, $kit, $this->matchesPlayed++, $ranked);
         } else {
-            $match = new SingleMatchImpl($arena, $this->matchesPlayed++, $ranked);
+            $match = new SingleMatchImpl($arena, $kit, $this->matchesPlayed++, $ranked);
         }
 
         $match->prepare($totalPlayers);
@@ -51,6 +53,19 @@ final class MatchManager {
         );
 
         $this->matches[$match->getFullName()] = $match;
+    }
+
+    /**
+     * @param AbstractMatch $match
+     */
+    public function endMatch(AbstractMatch $match): void {
+        unset($this->matches[$match->getFullName()]);
+
+        // Unload the world and delete the folder.
+        Server::getInstance()->getWorldManager()->unloadWorld($match->getWorld());
+        Server::getInstance()->getAsyncPool()->submitTask(new FileDeleteAsyncTask(
+            Server::getInstance()->getDataPath() . 'worlds/' . $match->getFullName()
+        ));
     }
 
     /**

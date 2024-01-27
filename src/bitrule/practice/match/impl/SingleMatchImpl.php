@@ -32,7 +32,7 @@ final class SingleMatchImpl extends AbstractMatch {
      *
      * @param Player $player
      */
-    public function joinPlayer(Player $player): void {
+    public function joinSpectator(Player $player): void {
         $this->players[] = $player->getXuid();
 
         $this->teleportSpawn($player);
@@ -110,6 +110,8 @@ final class SingleMatchImpl extends AbstractMatch {
         }
 
         $this->players = array_diff($this->players, [$player->getXuid()]);
+
+        ProfileManager::getInstance()->removeDuelProfile($player);
     }
 
     /**
@@ -123,6 +125,24 @@ final class SingleMatchImpl extends AbstractMatch {
             ),
             fn(?DuelProfile $duelProfile) => $duelProfile !== null
         );
+    }
+
+    /**
+     * @param string $xuid
+     *
+     * @return string|null
+     */
+    public function getOpponentName(string $xuid): ?string {
+        $spawnId = array_search($xuid, $this->players, true);
+        if (!is_int($spawnId)) return null;
+
+        $opponentXuid = match ($spawnId) {
+            0 => $this->players[1] ?? null,
+            1 => $this->players[0] ?? null,
+            default => null
+        };
+
+        return $opponentXuid === null ? null : ProfileManager::getInstance()->getDuelProfile($opponentXuid)?->getName();
     }
 
     /**

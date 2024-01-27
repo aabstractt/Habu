@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\match;
 
 use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
+use bitrule\practice\kit\Kit;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\stage\AbstractStage;
 use bitrule\practice\match\stage\EndingStage;
@@ -13,13 +13,13 @@ use bitrule\practice\match\stage\PlayingStage;
 use bitrule\practice\match\stage\StartingStage;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
+use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\World;
 use RuntimeException;
 use function array_filter;
 use function gmdate;
-use function in_array;
 
 abstract class AbstractMatch {
 
@@ -34,11 +34,13 @@ abstract class AbstractMatch {
 
     /**
      * @param AbstractArena $arena
+     * @param Kit           $kit
      * @param int           $id
      * @param bool          $ranked
      */
     public function __construct(
         protected readonly AbstractArena $arena,
+        protected readonly Kit $kit,
         protected readonly int $id,
         protected readonly bool          $ranked
     ) {
@@ -105,7 +107,7 @@ abstract class AbstractMatch {
     /**
      * @param Player $player
      */
-    abstract public function joinPlayer(Player $player): void;
+    abstract public function joinSpectator(Player $player): void;
 
     /**
      * @param Player[] $totalPlayers
@@ -134,16 +136,18 @@ abstract class AbstractMatch {
                 throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
             }
 
+            $player->sendMessage(TranslationKeys::MATCH_OPPONENT_FOUND->build(
+                $this->getOpponentName($duelProfile->getXuid()) ?? 'None',
+                $this->isRanked() ? 'Ranked' : 'Unranked',
+                $this->kit->getName()
+            ));
+
             $this->teleportSpawn($player);
 
             Practice::setProfileScoreboard($player, ProfileManager::MATCH_STARTING_SCOREBOARD);
         }
 
-        echo 'Match ' . $this->getFullName() . ' loaded.' . PHP_EOL;
-
         $this->loaded = true;
-
-        // TODO: Generate the world and teleport the players to the spawn point.
     }
 
     /**
@@ -158,8 +162,6 @@ abstract class AbstractMatch {
      * and teleport the players to the spawn point.
      */
     public function postEnd(): void {
-        $this->loaded = false;
-
         foreach ($this->getEveryone() as $duelProfile) {
             $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) {
@@ -168,14 +170,15 @@ abstract class AbstractMatch {
 
             $this->removePlayer($player, false);
 
-            Practice::giveLobbyAttributes($player);
+            $localProfile = ProfileManager::getInstance()->getLocalProfile($player->getXuid());
+            if ($localProfile === null) {
+                throw new RuntimeException('Local profile not found for player: ' . $player->getName());
+            }
+
+            $localProfile->joinLobby($player);
         }
 
-        // Unload the world and delete the folder.
-        Server::getInstance()->getWorldManager()->unloadWorld($this->getWorld());
-        Server::getInstance()->getAsyncPool()->submitTask(new FileDeleteAsyncTask(
-            Server::getInstance()->getDataPath() . 'worlds/' . $this->getFullName()
-        ));
+        $this->loaded = false;
     }
 
     /**
@@ -225,21 +228,28 @@ abstract class AbstractMatch {
     }
 
     /**
+     * @param string $xuid
+     *
+     * @return string|null
+     */
+    abstract public function getOpponentName(string $xuid): ?string;
+
+    /**
      * @param Player $player
      * @param string $identifier
      *
      * @return string|null
      */
     public function replacePlaceholders(Player $player, string $identifier): ?string {
-        if ($identifier === 'match_duration' && $this->stage instanceof PlayingStage) {
-            return gmdate('i:s', $this->stage->getSeconds());
+        if ($identifier === 'match_duration' && ($this->stage instanceof PlayingStage || $this->stage instanceof EndingStage)) {
+            return gmdate('i:s', $this->stage instanceof PlayingStage ? $this->stage->getSeconds() : $this->stage->getDuration());
         }
 
         if ($identifier === 'your_ping') return (string) $player->getNetworkSession()->getPing();
 
         if ($this->stage instanceof EndingStage) {
-            if ($identifier === 'match_ending_defeat' && !in_array($player->getXuid(), $this->getAlive(), true)) return '';
-            if ($identifier === 'match_ending_victory' && in_array($player->getXuid(), $this->getAlive(), true)) return '';
+            if ($identifier === 'match_ending_defeat' && $player->isSpectator()) return '';
+            if ($identifier === 'match_ending_victory' && $player->isSurvival()) return '';
         }
 
         return null;
