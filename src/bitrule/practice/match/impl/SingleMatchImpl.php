@@ -38,15 +38,55 @@ final class SingleMatchImpl extends AbstractMatch {
             throw new RuntimeException('Match not loaded.');
         }
 
-        ProfileManager::getInstance()->addDuelProfile(
-            $player,
-            $this,
-            true
-        );
-
         $this->players[] = $player->getXuid();
 
-        $this->teleportSpawn($player);
+        $this->postJoinSpectator($player);
+    }
+
+    /**
+     * Get the spawn id of the player
+     * If is single match the spawn id is the index of the player in the players array.
+     * If is team match the spawn id is the team id of the player.
+     *
+     * @param string $xuid
+     *
+     * @return int
+     */
+    public function getSpawnId(string $xuid): int {
+        return is_int($spawnId = array_search($xuid, $this->players, true)) ? $spawnId : -1;
+    }
+
+    /**
+     * Remove a player from the match.
+     * Check if the match can end.
+     * Usually is checked when the player died or left the match.
+     *
+     * @param Player $player
+     * @param bool   $canEnd
+     */
+    public function removePlayer(Player $player, bool $canEnd): void {
+        if (($spawnId = $this->getSpawnId($player->getXuid())) === -1) return;
+
+        if ($canEnd && count($this->getAlive()) <= ($spawnId > 2 ? 1 : 2)) {
+            $this->end();
+        }
+
+        unset($this->players[$spawnId]);
+
+        ProfileManager::getInstance()->removeDuelProfile($player);
+    }
+
+    /**
+     * @return DuelProfile[]
+     */
+    public function getEveryone(): array {
+        return array_filter(
+            array_map(
+                fn (string $xuid) => ProfileManager::getInstance()->getDuelProfile($xuid),
+                $this->players
+            ),
+            fn(?DuelProfile $duelProfile) => $duelProfile !== null
+        );
     }
 
     /**
@@ -92,70 +132,6 @@ final class SingleMatchImpl extends AbstractMatch {
             5,
             $this->stage instanceof PlayingStage ? $this->stage->getSeconds() : 0
         ));
-    }
-
-    /**
-     * Get the spawn id of the player
-     * If is single match the spawn id is the index of the player in the players array.
-     * If is team match the spawn id is the team id of the player.
-     *
-     * @param string $xuid
-     *
-     * @return int
-     */
-    public function getSpawnId(string $xuid): int {
-        return is_int($spawnId = array_search($xuid, $this->players, true)) ? $spawnId : -1;
-    }
-
-    /**
-     * @param Player $player
-     */
-    public function teleportSpawn(Player $player): void {
-        if (($spawnId = $this->getSpawnId($player->getXuid())) === -1) {
-            throw new RuntimeException('Player not found in match.');
-        }
-
-        $player->teleport(Position::fromObject(
-            match ($spawnId) {
-                0 => $this->arena->getFirstPosition(),
-                1 => $this->arena->getSecondPosition(),
-                default => $this->getWorld()->getSpawnLocation()
-            },
-            $this->getWorld()
-        ));
-    }
-
-    /**
-     * Remove a player from the match.
-     * Check if the match can end.
-     * Usually is checked when the player died or left the match.
-     *
-     * @param Player $player
-     * @param bool   $canEnd
-     */
-    public function removePlayer(Player $player, bool $canEnd): void {
-        if (($spawnId = $this->getSpawnId($player->getXuid())) === -1) return;
-
-        if ($canEnd && count($this->getAlive()) <= ($spawnId > 2 ? 1 : 2)) {
-            $this->end();
-        }
-
-        unset($this->players[$spawnId]);
-
-        ProfileManager::getInstance()->removeDuelProfile($player);
-    }
-
-    /**
-     * @return DuelProfile[]
-     */
-    public function getEveryone(): array {
-        return array_filter(
-            array_map(
-                fn (string $xuid) => ProfileManager::getInstance()->getDuelProfile($xuid),
-                $this->players
-            ),
-            fn(?DuelProfile $duelProfile) => $duelProfile !== null
-        );
     }
 
     /**

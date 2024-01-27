@@ -18,6 +18,7 @@ use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
 use pocketmine\Server;
+use pocketmine\world\Position;
 use pocketmine\world\World;
 use RuntimeException;
 use function array_filter;
@@ -136,9 +137,52 @@ abstract class AbstractMatch {
     }
 
     /**
+     * This method is used to add the player to the cache
+     * For example:
+     * - Single Match: add the player to the players array.
+     * - Team Match: add the player to the spectators team.
+     *
      * @param Player $player
      */
     abstract public function joinSpectator(Player $player): void;
+
+    /**
+     * Called after the player was added to the Match
+     * This is used to teleport the player to the spawn point.
+     *
+     * @param Player $player
+     */
+    protected function postJoinSpectator(Player $player): void {
+        if (!$this->isLoaded()) {
+            throw new RuntimeException('Match not loaded.');
+        }
+
+        ProfileManager::getInstance()->addDuelProfile(
+            $player,
+            $this,
+            true
+        );
+
+        $this->teleportSpawn($player);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function teleportSpawn(Player $player): void {
+        if (($spawnId = $this->getSpawnId($player->getXuid())) === -1) {
+            throw new RuntimeException('Player not found in match.');
+        }
+
+        $player->teleport(Position::fromObject(
+            match ($spawnId) {
+                0 => $this->arena->getFirstPosition(),
+                1 => $this->arena->getSecondPosition(),
+                default => $this->getWorld()->getSpawnLocation()
+            },
+            $this->getWorld()
+        ));
+    }
 
     /**
      * @param Player[] $totalPlayers
@@ -230,11 +274,6 @@ abstract class AbstractMatch {
      * @return int
      */
     abstract public function getSpawnId(string $xuid): int;
-
-    /**
-     * @param Player $player
-     */
-    abstract public function teleportSpawn(Player $player): void;
 
     /**
      * Remove a player from the match.

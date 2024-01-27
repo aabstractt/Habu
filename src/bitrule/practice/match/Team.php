@@ -63,4 +63,13 @@ final class Team {
             fn (?DuelProfile $duelProfile) => $duelProfile !== null
         );
     }
+
+    /**
+     * @param string $xuid
+     *
+     * @return bool
+     */
+    public function isMember(string $xuid): bool {
+        return in_array($xuid, $this->players, true);
+    }
 }
