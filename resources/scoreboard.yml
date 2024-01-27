@@ -44,6 +44,6 @@ lines:
     nothing_1: 'Match ended'
     match_ending_defeat: '&c&lDEFEAT'
     match_ending_victory: '&a&lVICTORY'
-    nothing_2: '&7'
+    nothing_2: '&d'
     match_duration: '&fDuration: §u'
     nothing_3: '&7---------------------&d'

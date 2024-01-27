@@ -13,6 +13,7 @@ use bitrule\practice\match\stage\PlayingStage;
 use bitrule\practice\match\stage\StartingStage;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
+use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -123,7 +124,7 @@ abstract class AbstractMatch {
                 throw new RuntimeException('Player ' . $player->getName() . ' is not online');
             }
 
-            ProfileManager::getInstance()->addDuelProfile($player, $this->getFullName());
+            ProfileManager::getInstance()->addDuelProfile($player, $this);
         }
 
         if (!Server::getInstance()->getWorldManager()->loadWorld($this->getFullName())) {
@@ -135,6 +136,8 @@ abstract class AbstractMatch {
             if ($player === null || !$player->isOnline()) {
                 throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
             }
+
+            LocalProfile::setDefaultAttributes($player);
 
             $player->sendMessage(TranslationKeys::MATCH_OPPONENT_FOUND->build(
                 $this->getOpponentName($duelProfile->getXuid()) ?? 'None',
@@ -175,11 +178,22 @@ abstract class AbstractMatch {
                 throw new RuntimeException('Local profile not found for player: ' . $player->getName());
             }
 
-            $localProfile->joinLobby($player);
+            $localProfile->joinLobby($player, true);
         }
 
         $this->loaded = false;
     }
+
+    /**
+     * Get the spawn id of the player
+     * If is single match the spawn id is the index of the player in the players array.
+     * If is team match the spawn id is the team id of the player.
+     *
+     * @param string $xuid
+     *
+     * @return int
+     */
+    abstract public function getSpawnId(string $xuid): int;
 
     /**
      * @param Player $player

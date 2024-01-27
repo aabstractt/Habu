@@ -21,6 +21,12 @@ final class StartingStage implements AbstractStage {
     public function update(AbstractMatch $match): void {
         if (!$match->isLoaded()) return;
 
+        if (count($match->getAlive()) < 2) {
+            $match->end();
+
+            return;
+        }
+
         $this->countdown--;
 
         $match->broadcastMessage('Match starting in ' . $this->countdown . ' seconds.');

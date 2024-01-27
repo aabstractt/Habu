@@ -84,22 +84,28 @@ final class LocalProfile {
 
     /**
      * @param Player $player
+     * @param bool   $showScoreboard
      */
-    public function joinLobby(Player $player): void {
+    public function joinLobby(Player $player, bool $showScoreboard): void {
+        self::setDefaultAttributes($player);
+        // TODO: Give lobby items
+
+        if (!$showScoreboard) return;
+
+        Practice::setProfileScoreboard($player, ProfileManager::LOBBY_SCOREBOARD);
+    }
+
+    public static function setDefaultAttributes(Player $player): void {
         self::resetInventory($player);
 
         $player->setGamemode(GameMode::SURVIVAL);
-        $player->setNoClientPredictions();
+        $player->setNoClientPredictions(false);
 
         $player->setHealth($player->getMaxHealth());
         $player->getHungerManager()->setFood(20);
         $player->getHungerManager()->setSaturation(20);
 
         $player->getXpManager()->setXpAndProgress(0, 0);
-
-        // TODO: Give lobby items
-
-        Practice::setProfileScoreboard($player, ProfileManager::LOBBY_SCOREBOARD);
     }
 
     /**

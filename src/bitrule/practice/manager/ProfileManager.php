@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
+use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\profile\LocalProfile;
@@ -44,9 +45,9 @@ final class ProfileManager {
             throw new RuntimeException('Player already exists in local players list');
         }
 
-        $this->localProfiles[$player->getXuid()] = new LocalProfile($player->getXuid(), $player->getName());
+        $this->localProfiles[$player->getXuid()] = $localProfile = new LocalProfile($player->getXuid(), $player->getName());
 
-        Practice::setProfileScoreboard($player, self::LOBBY_SCOREBOARD);
+        $localProfile->joinLobby($player, true);
     }
 
     /**
@@ -71,15 +72,20 @@ final class ProfileManager {
     }
 
     /**
-     * @param Player $player
-     * @param string $matchFullName
+     * @param Player        $player
+     * @param AbstractMatch $match
+     * @param bool          $spectator
      */
-    public function addDuelProfile(Player $player, string $matchFullName): void {
+    public function addDuelProfile(Player $player, AbstractMatch $match, bool $spectator = false): void {
         if (isset($this->duelProfiles[$player->getXuid()])) {
             throw new RuntimeException('Player already exists in duel players list');
         }
 
-        $this->duelProfiles[$player->getXuid()] = new DuelProfile($player->getXuid(), $player->getName(), $matchFullName);
+        $this->duelProfiles[$player->getXuid()] = $duelProfile = new DuelProfile($player->getXuid(), $player->getName(), $match->getFullName());
+
+        if (!$spectator) return;
+
+        $duelProfile->convertAsSpectator($match, true);
     }
 
     public function removeDuelProfile(Player $player): void {
