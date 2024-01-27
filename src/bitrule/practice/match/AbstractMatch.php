@@ -8,6 +8,7 @@ use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\stage\AbstractStage;
+use bitrule\practice\match\stage\EndingStage;
 use bitrule\practice\match\stage\PlayingStage;
 use bitrule\practice\match\stage\StartingStage;
 use bitrule\practice\Practice;
@@ -18,7 +19,7 @@ use pocketmine\world\World;
 use RuntimeException;
 use function array_filter;
 use function gmdate;
-use function time;
+use function in_array;
 
 abstract class AbstractMatch {
 
@@ -27,9 +28,9 @@ abstract class AbstractMatch {
      *
      * @var AbstractStage $stage
      */
-    private AbstractStage $stage;
+    protected AbstractStage $stage;
     /** @var bool */
-    private bool $loaded = false;
+    protected bool $loaded = false;
 
     /**
      * @param AbstractArena $arena
@@ -138,6 +139,8 @@ abstract class AbstractMatch {
             Practice::setProfileScoreboard($player, ProfileManager::MATCH_STARTING_SCOREBOARD);
         }
 
+        echo 'Match ' . $this->getFullName() . ' loaded.' . PHP_EOL;
+
         $this->loaded = true;
 
         // TODO: Generate the world and teleport the players to the spawn point.
@@ -155,13 +158,15 @@ abstract class AbstractMatch {
      * and teleport the players to the spawn point.
      */
     public function postEnd(): void {
+        $this->loaded = false;
+
         foreach ($this->getEveryone() as $duelProfile) {
             $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) {
                 throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
             }
 
-            $this->removePlayer($player);
+            $this->removePlayer($player, false);
 
             Practice::giveLobbyAttributes($player);
         }
@@ -179,9 +184,14 @@ abstract class AbstractMatch {
     abstract public function teleportSpawn(Player $player): void;
 
     /**
+     * Remove a player from the match.
+     * Check if the match can end.
+     * Usually is checked when the player died or left the match.
+     *
      * @param Player $player
+     * @param bool   $canEnd
      */
-    abstract public function removePlayer(Player $player): void;
+    abstract public function removePlayer(Player $player, bool $canEnd): void;
 
     /**
      * @return DuelProfile[]
@@ -222,10 +232,15 @@ abstract class AbstractMatch {
      */
     public function replacePlaceholders(Player $player, string $identifier): ?string {
         if ($identifier === 'match_duration' && $this->stage instanceof PlayingStage) {
-            return gmdate('i:s', time() - $this->stage->getSeconds());
+            return gmdate('i:s', $this->stage->getSeconds());
         }
 
         if ($identifier === 'your_ping') return (string) $player->getNetworkSession()->getPing();
+
+        if ($this->stage instanceof EndingStage) {
+            if ($identifier === 'match_ending_defeat' && !in_array($player->getXuid(), $this->getAlive(), true)) return '';
+            if ($identifier === 'match_ending_victory' && in_array($player->getXuid(), $this->getAlive(), true)) return '';
+        }
 
         return null;
     }

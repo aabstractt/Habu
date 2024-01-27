@@ -7,6 +7,8 @@ namespace bitrule\practice\match;
 use pocketmine\item\Item;
 use pocketmine\item\ItemTypeIds;
 use pocketmine\player\Player;
+use function array_filter;
+use function count;
 
 final class MatchStatistics {
 

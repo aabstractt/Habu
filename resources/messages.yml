@@ -1,10 +1,10 @@
 match:
   end_statistics_normal: |-
-    &u&lYour Duel Statistics&r
+    §u&lYour Duel Statistics&r
       &7Elo: <self_elo_changes>
-      &7Critics: &u<self_critics>
-      &7Damage Dealt: &u<self_damage_dealt>
-    &u&l<opponent> Duel Statistics&r
+      &7Critics: §u<self_critics>
+      &7Damage Dealt: §u<self_damage_dealt>
+    §u&l<opponent> Duel Statistics&r
       &7Elo: <opponent_elo_changes>
-      &7Critics: &u<opponent_critics>
-      &7Damage Dealt: &u<opponent_damage_dealt>
+      &7Critics: §u<opponent_critics>
+      &7Damage Dealt: §u<opponent_damage_dealt>

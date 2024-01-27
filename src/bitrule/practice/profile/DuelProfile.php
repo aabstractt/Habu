@@ -9,6 +9,7 @@ use bitrule\practice\match\MatchStatistics;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
+use function count;
 
 final class DuelProfile {
 
@@ -100,6 +101,8 @@ final class DuelProfile {
 
         if ($joined) {
             $match->joinPlayer($player);
+        } elseif (count($match->getAlive()) <= 1) {
+            $match->end();
         }
 
         LocalProfile::resetInventory($player);

@@ -22,7 +22,7 @@ final class PlayerQuitListener implements Listener {
         $player = $ev->getPlayer();
 
         $match = MatchManager::getInstance()->getMatchByPlayer($player->getXuid());
-        $match?->removePlayer($player);
+        $match?->removePlayer($player, true);
 
         ProfileManager::getInstance()->removeProfile($player->getXuid());
     }

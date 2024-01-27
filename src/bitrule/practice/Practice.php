@@ -30,6 +30,7 @@ use function gmdate;
 use function is_array;
 use function is_file;
 use function is_string;
+use function str_replace;
 use function str_starts_with;
 use function time;
 
@@ -142,6 +143,7 @@ final class Practice extends PluginBase {
 
         $scoreboard->load(self::getInstance()->scoreboardLines[$identifier] ?? throw new RuntimeException('Scoreboard not found: ' . $identifier));
         $scoreboard->show($player);
+        $scoreboard->update($player, $localProfile);
     }
 
     /**

@@ -6,6 +6,7 @@ namespace bitrule\practice\listener\match;
 
 use bitrule\practice\manager\MatchManager;
 use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\match\stage\PlayingStage;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerMoveEvent;
 use RuntimeException;
@@ -24,7 +25,7 @@ final class SumoPlayerMoveListener implements Listener {
         if ($player->getLocation()->getFloorY() > self::MIN_Y) return;
 
         $match = MatchManager::getInstance()->getMatchByPlayer($player->getXuid());
-        if ($match === null) return;
+        if ($match === null || !$match->getStage() instanceof PlayingStage) return;
         // TODO: Kill player
 
         $duelProfile = ProfileManager::getInstance()->getDuelProfile($player->getXuid());

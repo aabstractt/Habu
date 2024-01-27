@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bitrule\practice\match\stage;
 
 use bitrule\practice\match\AbstractMatch;
-use function count;
 
 final class PlayingStage implements AbstractStage {
 
@@ -22,14 +21,7 @@ final class PlayingStage implements AbstractStage {
             throw new \RuntimeException('Match is not loaded.');
         }
 
-        if (count($match->getAlive()) > 0) {
-            $this->seconds++;
-
-            return;
-        }
-
-        $match->setStage(new EndingStage());
-        $match->end();
+        $this->seconds++;
     }
 
     /**

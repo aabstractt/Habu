@@ -6,12 +6,14 @@ namespace bitrule\practice\profile\scoreboard;
 
 use bitrule\practice\Practice;
 use bitrule\practice\profile\LocalProfile;
+use pocketmine\network\mcpe\NetworkBroadcastUtils;
 use pocketmine\network\mcpe\protocol\RemoveObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use function count;
 use function str_contains;
 use function usort;
 
@@ -58,10 +60,8 @@ final class Scoreboard {
     /**
      * @param Player       $player
      * @param LocalProfile $localProfile
-     *
-     * @return array
      */
-    public function update(Player $player, LocalProfile $localProfile): array {
+    public function update(Player $player, LocalProfile $localProfile): void {
         $packets = [];
         $slot = 0;
 
@@ -92,7 +92,9 @@ final class Scoreboard {
 
         usort($packets, fn(SetScorePacket $a, SetScorePacket $b) => $a->type > $b->type ? 0 : 1);
 
-        return $packets;
+        if (count($packets) === 0) return;
+
+        NetworkBroadcastUtils::broadcastPackets([$player], $packets);
     }
 
     /**

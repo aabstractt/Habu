@@ -6,13 +6,18 @@ namespace bitrule\practice\match\impl;
 
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\AbstractMatch;
+use bitrule\practice\match\stage\EndingStage;
+use bitrule\practice\match\stage\PlayingStage;
+use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
+use pocketmine\world\Position;
 use function array_diff;
 use function array_filter;
 use function array_map;
 use function array_search;
+use function count;
 use function is_int;
 use function str_starts_with;
 
@@ -44,17 +49,21 @@ final class SingleMatchImpl extends AbstractMatch {
     }
 
     public function end(): void {
-        foreach ($this->players as $xuid) {
-            $duelPlayer = ProfileManager::getInstance()->getDuelProfile($xuid);
-            if ($duelPlayer === null) continue;
+        $this->setStage(new EndingStage(
+            8,
+            $this->stage instanceof PlayingStage ? $this->stage->getSeconds() : 0
+        ));
 
-            $player = $duelPlayer->toPlayer();
+        foreach ($this->getEveryone() as $duelProfile) {
+            $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
+
+            Practice::setProfileScoreboard($player, ProfileManager::MATCH_ENDING_SCOREBOARD);
 
             $opponent = $this->getOpponent($player);
             if ($opponent === null) continue;
 
-            $matchStatistics = $duelPlayer->getMatchStatistics();
+            $matchStatistics = $duelProfile->getMatchStatistics();
             $opponentMatchStatistics = $opponent->getMatchStatistics();
 
             $player->sendMessage(TranslationKeys::MATCH_END_STATISTICS_NORMAL->build(
@@ -77,17 +86,29 @@ final class SingleMatchImpl extends AbstractMatch {
             throw new \RuntimeException('Player not found in match.');
         }
 
-        $player->teleport(match ($spawnId) {
-            0 => $this->arena->getFirstPosition(),
-            1 => $this->arena->getSecondPosition(),
-            default => $this->getWorld()->getSpawnLocation()
-        });
+        $player->teleport(Position::fromObject(
+            match ($spawnId) {
+                0 => $this->arena->getFirstPosition(),
+                1 => $this->arena->getSecondPosition(),
+                default => $this->getWorld()->getSpawnLocation()
+            },
+            $this->getWorld()
+        ));
     }
 
     /**
+     * Remove a player from the match.
+     * Check if the match can end.
+     * Usually is checked when the player died or left the match.
+     *
      * @param Player $player
+     * @param bool   $canEnd
      */
-    public function removePlayer(Player $player): void {
+    public function removePlayer(Player $player, bool $canEnd): void {
+        if ($canEnd && count($this->getAlive()) <= 1) {
+            $this->end();
+        }
+
         $this->players = array_diff($this->players, [$player->getXuid()]);
     }
 
@@ -112,12 +133,14 @@ final class SingleMatchImpl extends AbstractMatch {
     public function getOpponent(Player $player): ?DuelProfile {
         $spawnId = array_search($player->getXuid(), $this->players, true);
         if (!is_int($spawnId)) {
-            throw new \RuntimeException('Player not found in match.');
+            echo 'No spawn id found for player ' . $player->getName() . PHP_EOL; // TODO: Remove this line
+
+            return null;
         }
 
         $opponentXuid = match ($spawnId) {
-            0 => $this->players[1],
-            1 => $this->players[0],
+            0 => $this->players[1] ?? null,
+            1 => $this->players[0] ?? null,
             default => null
         };
         if ($opponentXuid === null) return null;

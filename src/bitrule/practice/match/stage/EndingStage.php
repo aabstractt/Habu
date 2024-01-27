@@ -8,8 +8,10 @@ use bitrule\practice\match\AbstractMatch;
 
 final class EndingStage implements AbstractStage {
 
-    /** @var int */
-    private int $countdown = 5;
+    public function __construct(
+        private int $countdown,
+        private int $duration
+    ) {}
 
     /**
      * Using this method, you can update the stage of the match.
@@ -17,10 +19,19 @@ final class EndingStage implements AbstractStage {
      * @param AbstractMatch $match
      */
     public function update(AbstractMatch $match): void {
+        if (!$match->isLoaded()) return;
+
         $this->countdown--;
 
         if ($this->countdown > 1) return;
 
         $match->postEnd();
+    }
+
+    /**
+     * @return int
+     */
+    public function getDuration(): int {
+        return $this->duration;
     }
 }

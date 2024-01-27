@@ -22,7 +22,7 @@ lines:
     queue_duration: '&f Duration: §u'
     nothing_4: '&7---------------------'
   match-starting:
-    nothing_0: '&7---------------------&d'
+    nothing_0: '&7---------------------'
     nothing_1: '&7&oStarting...'
     match_opponent_name: '&fOpponent: §u'
     nothing_2: '&7'
@@ -31,10 +31,19 @@ lines:
     nothing_3: '&7---------------------&d'
 
   match-playing:
-    nothing_0: '&7---------------------&d'
+    nothing_0: '&7---------------------'
     match_opponent_name: '&fOpponent: §u'
     match_duration: '&fDuration: §u'
     nothing_1: '&7'
     your_ping: '&fYour Ping: §u'
     match_opponent_ping: '&fTheir Ping: §u'
+    nothing_3: '&7---------------------&d'
+
+  match-ending:
+    nothing_0: '&7---------------------'
+    nothing_1: 'Match ended'
+    match_ending_defeat: '&c&lDEFEAT'
+    match_ending_victory: '&a&lVICTORY'
+    nothing_2: '&7'
+    match_duration: '&fDuration: §u'
     nothing_3: '&7---------------------&d'

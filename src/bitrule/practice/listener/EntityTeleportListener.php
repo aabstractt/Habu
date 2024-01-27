@@ -26,6 +26,6 @@ final class EntityTeleportListener implements Listener {
         $to = $ev->getTo();
         if ($to->getWorld() === $match->getWorld()) return;
 
-        $match->removePlayer($entity);
+        $match->removePlayer($entity, true);
     }
 }

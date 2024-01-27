@@ -7,12 +7,10 @@ namespace bitrule\practice\manager;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\profile\LocalProfile;
-use pocketmine\network\mcpe\NetworkBroadcastUtils;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
-use function count;
 
 final class ProfileManager {
     use SingletonTrait;
@@ -94,10 +92,7 @@ final class ProfileManager {
             $player = Server::getInstance()->getPlayerExact($localProfile->getName());
             if ($player === null || !$player->isOnline()) continue;
 
-            $packets = $scoreboard->update($player, $localProfile);
-            if (count($packets) === 0) continue;
-
-            NetworkBroadcastUtils::broadcastPackets([$player], $packets);
+            $scoreboard->update($player, $localProfile);
         }
     }
 }
