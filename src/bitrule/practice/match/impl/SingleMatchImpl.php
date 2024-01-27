@@ -20,16 +20,12 @@ final class SingleMatchImpl extends AbstractMatch {
     private array $players = [];
 
     /**
-     * @param DuelProfile $duelProfile
+     * @param Player $player
      */
-    public function teleportSpawn(DuelProfile $duelProfile): void {
-        $spawnId = array_search($duelProfile->getXuid(), $this->players, true);
+    public function teleportSpawn(Player $player): void {
+        $spawnId = array_search($player->getXuid(), $this->players, true);
         if (!is_int($spawnId)) {
             throw new \RuntimeException('Player not found in match.');
-        }
-
-        if (($player = $duelProfile->toPlayer()) === null) {
-            throw new \RuntimeException('Player not found in server.');
         }
 
         $player->teleport(match ($spawnId) {

@@ -3,14 +3,14 @@ titles:
 
 lines:
   lobby:
-    nothing_0: '&7&m---------------------&d'
+    nothing_0: '&7---------------------&d'
     nothing_1: '§u&lServer'
     online_players: ' &fOnline: §u'
     total_queue_count: ' &fQueuing: §u'
     total_match_count: ' &fFighting: §u'
-    nothing_2: '&7&m---------------------'
+    nothing_2: '&7---------------------'
   queue:
-    nothing_0: '&7&m---------------------&d'
+    nothing_0: '&7---------------------&d'
     nothing_1: '§u&lServer'
     online_players: ' &fOnline: §u'
     total_queue_count: ' &fQueuing: §u'
@@ -20,4 +20,21 @@ lines:
     queue_type: '&f Type: §u'
     queue_kit: '&f Kit: §u'
     queue_duration: '&f Duration: §u'
-    nothing_4: '&7&m---------------------'
+    nothing_4: '&7---------------------'
+  match-playing:
+    nothing_0: '&7---------------------&d'
+    nothing_1: '&7&oStarting...'
+    opponent: '&fOpponent: §u'
+    nothing_2: '&7'
+    your_ping: '&fYour Ping: §u'
+    opponent_ping: '&fTheir Ping: §u'
+    nothing_3: '&7---------------------&d'
+
+  match-playing:
+    nothing_0: '&7---------------------&d'
+    opponent: '&fOpponent: §u'
+    duration: '&fDuration: §u'
+    nothing_1: '&7'
+    your_ping: '&fYour Ping: §u'
+    opponent_ping: '&fTheir Ping: §u'
+    nothing_3: '&7---------------------&d'

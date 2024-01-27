@@ -19,9 +19,9 @@ final class ProfileManager {
 
     public const LOBBY_SCOREBOARD = 'lobby';
     public const QUEUE_SCOREBOARD = 'queue';
-    public const MATCH_STARTING_SCOREBOARD = 'starting';
-    public const MATCH_PLAYING_SCOREBOARD = 'playing';
-    public const MATCH_ENDING_SCOREBOARD = 'ending';
+    public const MATCH_STARTING_SCOREBOARD = 'match-starting';
+    public const MATCH_PLAYING_SCOREBOARD = 'match-playing';
+    public const MATCH_ENDING_SCOREBOARD = 'match-ending';
 
     /** @var array<string, LocalProfile> */
     private array $localProfiles = [];

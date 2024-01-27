@@ -8,6 +8,7 @@ use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\stage\AbstractStage;
 use bitrule\practice\match\stage\StartingStage;
+use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -23,6 +24,8 @@ abstract class AbstractMatch {
      * @var AbstractStage $stage
      */
     private AbstractStage $stage;
+    /** @var bool */
+    private bool $loaded = false;
 
     /**
      * @param AbstractArena $arena
@@ -83,6 +86,13 @@ abstract class AbstractMatch {
     /**
      * @return bool
      */
+    public function isLoaded(): bool {
+        return $this->loaded;
+    }
+
+    /**
+     * @return bool
+     */
     public function isRanked(): bool {
         return $this->ranked;
     }
@@ -108,14 +118,26 @@ abstract class AbstractMatch {
             throw new RuntimeException('Failed to load world ' . $this->getFullName());
         }
 
-        foreach ($this->getEveryone() as $duelProfile) $this->teleportSpawn($duelProfile);
+        foreach ($this->getEveryone() as $duelProfile) {
+            $player = $duelProfile->toPlayer();
+            if ($player === null || !$player->isOnline()) {
+                throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
+            }
+
+            $this->teleportSpawn($player);
+
+            Practice::setProfileScoreboard($player, ProfileManager::MATCH_STARTING_SCOREBOARD);
+        }
+
+        $this->loaded = true;
+
         // TODO: Generate the world and teleport the players to the spawn point.
     }
 
     /**
-     * @param DuelProfile $duelProfile
+     * @param Player $player
      */
-    abstract public function teleportSpawn(DuelProfile $duelProfile): void;
+    abstract public function teleportSpawn(Player $player): void;
 
     /**
      * @param Player $player

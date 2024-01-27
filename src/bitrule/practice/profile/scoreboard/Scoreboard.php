@@ -62,8 +62,6 @@ final class Scoreboard {
      * @return array
      */
     public function update(Player $player, LocalProfile $localProfile): array {
-        $this->show($player); // TODO: Remove this
-
         $packets = [];
         $slot = 0;
 
@@ -83,7 +81,7 @@ final class Scoreboard {
                 );
             }
 
-            if ($updateResult === UpdateResult::REMOVED) continue;
+            if ($updateResult->nonUpdated()) continue;
 
             $packets[] = self::buildScorePacket(
                 $slot++,
@@ -104,7 +102,7 @@ final class Scoreboard {
      *
      * @return SetScorePacket
      */
-    private static function buildScorePacket(int $slot, string $text, int $type): SetScorePacket {
+    public static function buildScorePacket(int $slot, string $text, int $type): SetScorePacket {
         $entry = new ScorePacketEntry();
         $entry->objectiveName = 'bitrule';
         $entry->score = $slot;
