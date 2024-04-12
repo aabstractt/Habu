@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\match\stage;
+namespace bitrule\practice\duel\stage;
 
+use bitrule\practice\duel\Duel;
 use bitrule\practice\match\AbstractMatch;
 
 final class PlayingStage implements AbstractStage {
@@ -14,10 +15,10 @@ final class PlayingStage implements AbstractStage {
     /**
      * Using this method, you can update the stage of the match.
      *
-     * @param AbstractMatch $match
+     * @param Duel $duel
      */
-    public function update(AbstractMatch $match): void {
-        if (!$match->isLoaded()) {
+    public function update(Duel $duel): void {
+        if (!$duel->isLoaded()) {
             throw new \RuntimeException('Match is not loaded.');
         }
 

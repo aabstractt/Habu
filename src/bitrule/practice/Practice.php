@@ -14,7 +14,7 @@ use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\listener\MatchEndListener;
 use bitrule\practice\manager\ArenaManager;
 use bitrule\practice\manager\KitManager;
-use bitrule\practice\manager\MatchManager;
+use bitrule\practice\manager\DuelManager;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\manager\QueueManager;
 use bitrule\practice\profile\LocalProfile;
@@ -88,7 +88,7 @@ final class Practice extends PluginBase {
         ]);
 
         $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
-            MatchManager::getInstance()->tickStages();
+            DuelManager::getInstance()->tickStages();
             ProfileManager::getInstance()->tickScoreboard();
         }), 20);
     }
@@ -148,7 +148,7 @@ final class Practice extends PluginBase {
      */
     public static function replacePlaceholders(Player $player, LocalProfile $localProfile, string $identifier): ?string {
         if ($identifier === 'total_queue_count') return (string) (QueueManager::getInstance()->getQueueCount());
-        if ($identifier === 'total_match_count') return (string) (MatchManager::getInstance()->getMatchCount());
+        if ($identifier === 'total_match_count') return (string) (DuelManager::getInstance()->getDuelsCount());
         if ($identifier === 'online_players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
 
         if (str_starts_with($identifier, 'queue_')) {
@@ -159,8 +159,8 @@ final class Practice extends PluginBase {
             if ($identifier === 'queue_duration') return gmdate('i:s', time() - $matchQueue->getTimestamp());
         }
 
-        return MatchManager::getInstance()
-            ->getMatchByPlayer($player->getXuid())
+        return DuelManager::getInstance()
+            ->getDuelByPlayer($player->getXuid())
             ?->replacePlaceholders($player, $identifier);
     }
 }

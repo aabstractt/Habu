@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\match\stage;
+namespace bitrule\practice\duel\stage;
 
+use bitrule\practice\duel\Duel;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\Practice;
@@ -17,26 +18,26 @@ final class StartingStage implements AbstractStage {
     /**
      * Using this method, you can update the stage of the match.
      *
-     * @param AbstractMatch $match
+     * @param Duel $duel
      */
-    public function update(AbstractMatch $match): void {
-        if (!$match->isLoaded()) return;
+    public function update(Duel $duel): void {
+        if (!$duel->isLoaded()) return;
 
-        if (count($match->getAlive()) < 2) {
-            $match->end();
+        if (count($duel->getAlive()) < 2) {
+            $duel->end();
 
             return;
         }
 
         $this->countdown--;
 
-        $match->broadcastMessage('Match starting in ' . $this->countdown . ' seconds.');
+        $duel->broadcastMessage('Match starting in ' . $this->countdown . ' seconds.');
 
         if ($this->countdown > 1) return;
 
-        $match->setStage(new PlayingStage());
+        $duel->setStage(new PlayingStage());
 
-        foreach ($match->getEveryone() as $duelProfile) {
+        foreach ($duel->getEveryone() as $duelProfile) {
             $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 

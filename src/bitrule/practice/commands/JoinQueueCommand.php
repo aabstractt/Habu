@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace bitrule\practice\commands;
 
+use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\manager\KitManager;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\manager\QueueManager;
-use bitrule\practice\match\MatchQueue;
 use bitrule\practice\Practice;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -67,7 +67,7 @@ final class JoinQueueCommand extends Command {
             $localProfile,
             $kit->getName(),
             false,
-            function (MatchQueue $matchQueue) use ($sender, $localProfile): void {
+            function (Queue $matchQueue) use ($sender, $localProfile): void {
                 if (!$sender->isOnline()) return;
 
                 $localProfile->setMatchQueue($matchQueue);

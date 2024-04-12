@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\defaults;
 
-use bitrule\practice\manager\MatchManager;
+use bitrule\practice\manager\DuelManager;
 use bitrule\practice\manager\ProfileManager;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;
@@ -21,7 +21,7 @@ final class PlayerQuitListener implements Listener {
     public function onPlayerQuitEvent(PlayerQuitEvent $ev): void {
         $player = $ev->getPlayer();
 
-        $match = MatchManager::getInstance()->getMatchByPlayer($player->getXuid());
+        $match = DuelManager::getInstance()->getDuelByPlayer($player->getXuid());
         $match?->removePlayer($player, true);
 
         ProfileManager::getInstance()->removeProfile($player->getXuid());

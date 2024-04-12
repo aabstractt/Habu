@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\match;
+namespace bitrule\practice\duel;
 
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\profile\DuelProfile;

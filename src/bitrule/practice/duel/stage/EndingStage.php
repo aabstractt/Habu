@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\match\stage;
+namespace bitrule\practice\duel\stage;
 
-use bitrule\practice\manager\MatchManager;
+use bitrule\practice\duel\Duel;
+use bitrule\practice\manager\DuelManager;
 use bitrule\practice\match\AbstractMatch;
 
 final class EndingStage implements AbstractStage {
@@ -21,18 +22,18 @@ final class EndingStage implements AbstractStage {
     /**
      * Using this method, you can update the stage of the match.
      *
-     * @param AbstractMatch $match
+     * @param Duel $duel
      */
-    public function update(AbstractMatch $match): void {
-        if (!$match->isLoaded()) return;
+    public function update(Duel $duel): void {
+        if (!$duel->isLoaded()) return;
 
         $this->countdown--;
 
         if ($this->countdown > 1) return;
 
-        $match->postEnd();
+        $duel->postEnd();
 
-        MatchManager::getInstance()->endMatch($match);
+        DuelManager::getInstance()->endMatch($duel);
     }
 
     /**

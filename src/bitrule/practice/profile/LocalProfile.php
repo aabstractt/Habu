@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace bitrule\practice\profile;
 
 use bitrule\practice\arena\setup\AbstractArenaSetup;
+use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\manager\ProfileManager;
-use bitrule\practice\match\MatchQueue;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use pocketmine\player\GameMode;
@@ -18,8 +18,8 @@ final class LocalProfile {
     private ?AbstractArenaSetup $arenaSetup = null;
     /** @var Scoreboard|null */
     private ?Scoreboard $scoreboard = null;
-    /** @var MatchQueue|null */
-    private ?MatchQueue $matchQueue = null;
+    /** @var Queue|null */
+    private ?Queue $matchQueue = null;
 
     public function __construct(
         private readonly string $xuid,
@@ -69,16 +69,16 @@ final class LocalProfile {
     }
 
     /**
-     * @return MatchQueue|null
+     * @return \bitrule\practice\duel\queue\Queue|null
      */
-    public function getMatchQueue(): ?MatchQueue {
+    public function getMatchQueue(): ?Queue {
         return $this->matchQueue;
     }
 
     /**
-     * @param MatchQueue|null $matchQueue
+     * @param Queue|null $matchQueue
      */
-    public function setMatchQueue(?MatchQueue $matchQueue): void {
+    public function setMatchQueue(?Queue $matchQueue): void {
         $this->matchQueue = $matchQueue;
     }
 

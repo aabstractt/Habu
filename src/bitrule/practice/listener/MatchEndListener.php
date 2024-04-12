@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\listener;
 
 use bitrule\practice\event\MatchEndEvent;
-use bitrule\practice\manager\MatchManager;
+use bitrule\practice\manager\DuelManager;
 use bitrule\practice\profile\DuelProfile;
 use pocketmine\event\Listener;
 use pocketmine\player\Player;
@@ -47,7 +47,7 @@ final class MatchEndListener implements Listener {
 
         $matchRounds->setCurrentRound($matchRounds->getCurrentRound() + 1);
 
-        MatchManager::getInstance()->createMatchForRounding(
+        DuelManager::getInstance()->createMatchForRounding(
             array_filter(
                 array_map(fn(DuelProfile $duelProfile) => $duelProfile->toPlayer(), $ev->getPlayers()),
                 fn(?Player $player) => $player !== null

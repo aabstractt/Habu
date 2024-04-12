@@ -2,30 +2,22 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\match\impl;
+namespace bitrule\practice\duel\impl;
 
+use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\stage\EndingStage;
+use bitrule\practice\duel\stage\PlayingStage;
+use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\manager\ProfileManager;
-use bitrule\practice\match\AbstractMatch;
-use bitrule\practice\match\stage\EndingStage;
-use bitrule\practice\match\stage\PlayingStage;
-use bitrule\practice\match\stage\StartingStage;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
-use pocketmine\world\Position;
 use RuntimeException;
-use function array_filter;
-use function array_map;
-use function array_search;
 use function count;
-use function is_int;
 use function str_starts_with;
 
-final class SingleMatchImpl extends AbstractMatch {
-
-    /** @var string[] */
-    private array $players = [];
+final class NormalDuelImpl extends Duel {
 
     /**
      * This method is called when a player joins the match.
@@ -38,22 +30,9 @@ final class SingleMatchImpl extends AbstractMatch {
             throw new RuntimeException('Match not loaded.');
         }
 
-        $this->players[] = $player->getXuid();
+        $this->playersSpawn[$player->getXuid()] = self::SPECTATOR_SPAWN_ID;
 
-        $this->postJoinSpectator($player);
-    }
-
-    /**
-     * Get the spawn id of the player
-     * If is single match the spawn id is the index of the player in the players array.
-     * If is team match the spawn id is the team id of the player.
-     *
-     * @param string $xuid
-     *
-     * @return int
-     */
-    public function getSpawnId(string $xuid): int {
-        return is_int($spawnId = array_search($xuid, $this->players, true)) ? $spawnId : -1;
+//        $this->postJoinSpectator($player);
     }
 
     /**
@@ -65,38 +44,33 @@ final class SingleMatchImpl extends AbstractMatch {
      * @param bool   $canEnd
      */
     public function removePlayer(Player $player, bool $canEnd): void {
-        if (($spawnId = $this->getSpawnId($player->getXuid())) === -1) return;
+        if (!$canEnd) return;
 
-        if ($canEnd && count($this->getAlive()) <= ($spawnId > 2 ? 1 : 2)) {
-            $this->end();
-        }
+        $spawnId = $this->getSpawnId($player->getXuid());
+        if ($spawnId === -1) return;
 
-        unset($this->players[$spawnId]);
+        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
+        if (count($this->getAlive()) > $expectedPlayersAlive) return;
 
-        ProfileManager::getInstance()->removeDuelProfile($player);
-    }
-
-    /**
-     * @return DuelProfile[]
-     */
-    public function getEveryone(): array {
-        return array_filter(
-            array_map(
-                fn (string $xuid) => ProfileManager::getInstance()->getDuelProfile($xuid),
-                $this->players
-            ),
-            fn(?DuelProfile $duelProfile) => $duelProfile !== null
-        );
+        $this->end();
     }
 
     /**
      * @param Player[] $totalPlayers
      */
     public function prepare(array $totalPlayers): void {
-        $this->players = array_map(
-            fn(Player $player) => $player->getXuid(),
-            $totalPlayers
-        );
+//        $this->players = array_map(
+//            fn(Player $player) => $player->getXuid(),
+//            $totalPlayers
+//        );
+    }
+
+    /**
+     * @param Player      $player
+     * @param DuelProfile $duelProfile
+     */
+    public function processPlayerPrepare(Player $player, DuelProfile $duelProfile): void {
+        // TODO: Implement processPlayerPrepare() method.
     }
 
     /**
@@ -135,20 +109,30 @@ final class SingleMatchImpl extends AbstractMatch {
     }
 
     /**
+     * Process the player when the match ends.
+     *
+     * @param Player      $player
+     * @param DuelProfile $duelProfile
+     */
+    public function processPlayerEnd(Player $player, DuelProfile $duelProfile): void {
+        // TODO: Implement processPlayerEnd() method.
+    }
+
+    /**
      * @param string $xuid
      *
      * @return string|null
      */
     public function getOpponentName(string $xuid): ?string {
-        if (($spawnId = $this->getSpawnId($xuid)) === -1) return null;
+        if ($this->getSpawnId($xuid) === -1) return null;
 
-        $opponentXuid = match ($spawnId) {
-            0 => $this->players[1] ?? null,
-            1 => $this->players[0] ?? null,
-            default => null
-        };
+        foreach ($this->getPlayers() as $duelProfile) {
+            if ($duelProfile->getXuid() === $xuid) continue;
 
-        return $opponentXuid === null ? null : ProfileManager::getInstance()->getDuelProfile($opponentXuid)?->getName();
+            return $duelProfile->getName();
+        }
+
+        return null;
     }
 
     /**
@@ -157,16 +141,15 @@ final class SingleMatchImpl extends AbstractMatch {
      * @return DuelProfile|null
      */
     public function getOpponent(Player $player): ?DuelProfile {
-        if (($spawnId = $this->getSpawnId($player->getXuid())) === -1) return null;
+        if ($this->getSpawnId($player->getXuid()) === -1) return null;
 
-        $opponentXuid = match ($spawnId) {
-            0 => $this->players[1] ?? null,
-            1 => $this->players[0] ?? null,
-            default => null
-        };
-        if ($opponentXuid === null) return null;
+        foreach ($this->getPlayers() as $duelProfile) {
+            if ($duelProfile->getXuid() === $player->getXuid()) continue;
 
-        return ProfileManager::getInstance()->getDuelProfile($opponentXuid);
+            return $duelProfile;
+        }
+
+        return null;
     }
 
     /**

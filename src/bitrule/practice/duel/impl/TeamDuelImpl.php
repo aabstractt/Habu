@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\match\impl;
+namespace bitrule\practice\duel\impl;
 
+use bitrule\practice\duel\Team;
 use bitrule\practice\match\AbstractMatch;
-use bitrule\practice\match\Team;
 use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
-use pocketmine\world\Position;
 use function array_merge;
 use function ceil;
 use function count;
 
-final class TeamMatchImpl extends AbstractMatch {
+final class TeamDuelImpl extends AbstractMatch {
 
     /** @var Team[] */
     private array $teams = [];

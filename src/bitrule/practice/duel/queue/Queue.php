@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\match;
+namespace bitrule\practice\duel\queue;
 
-final class MatchQueue {
+final class Queue {
 
     /**
      * @param string $xuid
@@ -48,13 +48,13 @@ final class MatchQueue {
     }
 
     /**
-     * Checks if the given MatchQueue is the same type as this one.
+     * Checks if the given Queue is the same type as this one.
      * This means that the kit and ranked status are the same.
      * This is used to determine if a player can be matched with another player.
      * For example, a player in a ranked queue cannot be matched with a player in an unranked queue.
      * This is because the player in the ranked queue will lose/gain points while the player in the unranked queue will not.
      *
-     * @param MatchQueue $matchQueue
+     * @param Queue $matchQueue
      *
      * @return bool
      */

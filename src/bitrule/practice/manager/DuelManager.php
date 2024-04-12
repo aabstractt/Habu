@@ -6,10 +6,10 @@ namespace bitrule\practice\manager;
 
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
+use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\impl\NormalDuelImpl;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\match\AbstractMatch;
-use bitrule\practice\match\impl\SingleMatchImpl;
-use bitrule\practice\match\impl\TeamMatchImpl;
 use bitrule\practice\match\MatchRounds;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -20,18 +20,18 @@ use function array_map;
 use function array_sum;
 use function count;
 
-final class MatchManager {
+final class DuelManager {
     use SingletonTrait;
 
-    /** @var array<string, AbstractMatch> */
-    private array $matches = [];
+    /** @var array<string, Duel> */
+    private array $duels = [];
     /** @var int */
-    private int $matchesPlayed = 0;
+    private int $duelsPlayed = 0;
 
     /**
-     * Create a match for rounding.
+     * Create a Duel for rounding.
      * This is used for tournaments.
-     * Or any other time you want to play multiple matches on the same arena.
+     * Or any other time you want to play multiple Duel on the same arena.
      *
      * @param Player[]           $players
      * @param Player[]           $spectators
@@ -53,7 +53,7 @@ final class MatchManager {
             throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
 
-        $match = new SingleMatchImpl($arena, $kit, $this->matchesPlayed++, $ranked, $matchRounds);
+        $match = new NormalDuelImpl($arena, $kit, $this->duelsPlayed++, $ranked, $matchRounds);
         $match->prepare($players);
 
         ArenaManager::getInstance()->loadWorld(
@@ -66,7 +66,7 @@ final class MatchManager {
             }
         );
 
-        $this->matches[$match->getFullName()] = $match;
+        $this->duels[$match->getFullName()] = $match;
     }
 
     /**
@@ -91,9 +91,9 @@ final class MatchManager {
         );
 
 //        if ($team) {
-//            $match = new TeamMatchImpl($arena, $kit, $this->matchesPlayed++, $ranked);
+//            $match = new TeamDuelImpl($arena, $kit, $this->matchesPlayed++, $ranked);
 //        } else {
-//            $match = new SingleMatchImpl($arena, $kit, $this->matchesPlayed++, $ranked);
+//            $match = new NormalDuelImpl($arena, $kit, $this->matchesPlayed++, $ranked);
 //        }
 //
 //        $match->prepare($totalPlayers);
@@ -108,28 +108,28 @@ final class MatchManager {
     }
 
     /**
-     * @param AbstractMatch $match
+     * @param Duel $duel
      */
-    public function endMatch(AbstractMatch $match): void {
-        unset($this->matches[$match->getFullName()]);
+    public function endMatch(Duel $duel): void {
+        unset($this->duels[$duel->getFullName()]);
 
         // Unload the world and delete the folder.
-        Server::getInstance()->getWorldManager()->unloadWorld($match->getWorld());
+        Server::getInstance()->getWorldManager()->unloadWorld($duel->getWorld());
         Server::getInstance()->getAsyncPool()->submitTask(new FileDeleteAsyncTask(
-            Server::getInstance()->getDataPath() . 'worlds/' . $match->getFullName()
+            Server::getInstance()->getDataPath() . 'worlds/' . $duel->getFullName()
         ));
     }
 
     /**
      * @param string $xuid
      *
-     * @return AbstractMatch|null
+     * @return Duel|null
      */
-    public function getMatchByPlayer(string $xuid): ?AbstractMatch {
+    public function getDuelByPlayer(string $xuid): ?Duel {
         $duelProfile = ProfileManager::getInstance()->getDuelProfile($xuid);
         if ($duelProfile === null) return null;
 
-        return $this->matches[$duelProfile->getMatchFullName()] ?? null;
+        return $this->duels[$duelProfile->getMatchFullName()] ?? null;
     }
 
     /**
@@ -137,24 +137,26 @@ final class MatchManager {
      *
      * @return int
      */
-    public function getMatchCount(?string $kitName = null): int {
-        $matches = $this->matches;
+    public function getDuelsCount(?string $kitName = null): int {
+        $duels = $this->duels;
         if ($kitName !== null) {
-            $matches = array_filter($matches, fn(AbstractMatch $match) => $match->getArena()->hasKit($kitName));
+            $duels = array_filter($duels, fn(Duel $duel) => $duel->getArena()->hasKit($kitName));
         }
 
-        return array_sum(array_map(
-                fn(AbstractMatch $match) => count($match->getAlive()),
-                $matches)
+        return array_sum(
+            array_map(
+                fn(Duel $duel) => count($duel->getAlive()),
+                $duels
+            )
         );
     }
 
     /**
-     * Tick all matches
+     * Tick all duels
      */
     public function tickStages(): void {
-        foreach ($this->matches as $match) {
-            $match->getStage()->update($match);
+        foreach ($this->duels as $duel) {
+            $duel->getStage()->update($duel);
         }
     }
 }

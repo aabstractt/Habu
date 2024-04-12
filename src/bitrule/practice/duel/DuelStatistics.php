@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\match;
+namespace bitrule\practice\duel;
 
 use pocketmine\item\Item;
 use pocketmine\item\ItemTypeIds;
@@ -10,7 +10,7 @@ use pocketmine\player\Player;
 use function array_filter;
 use function count;
 
-final class MatchStatistics {
+final class DuelStatistics {
 
     /** @var int */
     private int $critics = 0;

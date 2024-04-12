@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\manager;
 
-use bitrule\practice\match\MatchQueue;
+use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\LocalProfile;
 use Closure;
@@ -19,7 +19,7 @@ final class QueueManager {
 
     use SingletonTrait;
 
-    /** @var array<string, MatchQueue> */
+    /** @var array<string, \bitrule\practice\duel\queue\Queue> */
     private array $queues = [];
 
     /**
@@ -28,17 +28,17 @@ final class QueueManager {
      * Also checks if there is an opponent in the queue
      * If there is, it will remove both players from the queue
      *
-     * @param LocalProfile               $sourceLocalProfile
-     * @param string                     $kitName
-     * @param bool                       $ranked
-     * @param ?Closure(MatchQueue): void $onCompletion
+     * @param LocalProfile                                       $sourceLocalProfile
+     * @param string                                             $kitName
+     * @param bool                                               $ranked
+     * @param ?Closure(\bitrule\practice\duel\queue\Queue): void $onCompletion
      */
     public function createQueue(LocalProfile $sourceLocalProfile, string $kitName, bool $ranked, ?Closure $onCompletion): void {
         if (($kit = KitManager::getInstance()->getKit($kitName)) === null) {
             throw new RuntimeException('Kit no exists.');
         }
 
-        $this->queues[$sourceXuid = $sourceLocalProfile->getXuid()] = $matchQueue = new MatchQueue($sourceXuid, $kitName, $ranked, time());
+        $this->queues[$sourceXuid = $sourceLocalProfile->getXuid()] = $matchQueue = new Queue($sourceXuid, $kitName, $ranked, time());
 
         $opponentMatchQueue = $this->lookupOpponent($matchQueue);
         if ($opponentMatchQueue === null) {
@@ -65,7 +65,7 @@ final class QueueManager {
             $totalPlayers[] = $player;
         }
 
-        MatchManager::getInstance()->createMatch(
+        DuelManager::getInstance()->createMatch(
             $totalPlayers,
             $kit,
             false,
@@ -96,7 +96,7 @@ final class QueueManager {
     public function getQueueCount(?string $kitName = null): int {
         $queues = $this->queues;
         if ($kitName !== null) {
-            $queues = array_filter($queues, function (MatchQueue $matchQueue) use ($kitName): bool {
+            $queues = array_filter($queues, function (Queue $matchQueue) use ($kitName): bool {
                 return $matchQueue->getKitName() === $kitName;
             });
         }
@@ -108,11 +108,11 @@ final class QueueManager {
      * Looks for an opponent for a player
      * Using their xuid, kit name, and if it's ranked
      *
-     * @param MatchQueue $sourceMatchQueue
+     * @param Queue $sourceMatchQueue
      *
-     * @return MatchQueue|null
+     * @return \bitrule\practice\duel\queue\Queue|null
      */
-    public function lookupOpponent(MatchQueue $sourceMatchQueue): ?MatchQueue {
+    public function lookupOpponent(Queue $sourceMatchQueue): ?Queue {
         foreach ($this->queues as $matchQueue) {
             if ($matchQueue->getXuid() === $sourceMatchQueue->getXuid()) continue;
             if (!$matchQueue->isSameType($sourceMatchQueue)) continue;

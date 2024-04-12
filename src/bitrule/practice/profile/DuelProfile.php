@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile;
 
+use bitrule\practice\duel\DuelStatistics;
 use bitrule\practice\match\AbstractMatch;
-use bitrule\practice\match\MatchStatistics;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -17,18 +17,18 @@ final class DuelProfile {
     private bool $alive = true;
 
     /**
-     * @param string          $xuid
-     * @param string          $name
-     * @param string          $matchFullName
-     * @param bool            $playing
-     * @param MatchStatistics $matchStatistics
+     * @param string         $xuid
+     * @param string         $name
+     * @param string         $matchFullName
+     * @param bool           $playing
+     * @param DuelStatistics $matchStatistics
      */
     public function __construct(
         private readonly string $xuid,
         private readonly string $name,
         private readonly string $matchFullName,
         private readonly bool $playing,
-        private readonly MatchStatistics $matchStatistics = new MatchStatistics()
+        private readonly DuelStatistics $matchStatistics = new DuelStatistics()
     ) {}
 
     /**
@@ -53,9 +53,9 @@ final class DuelProfile {
     }
 
     /**
-     * @return MatchStatistics
+     * @return DuelStatistics
      */
-    public function getMatchStatistics(): MatchStatistics {
+    public function getMatchStatistics(): DuelStatistics {
         return $this->matchStatistics;
     }
 
@@ -119,5 +119,17 @@ final class DuelProfile {
         $player->setGamemode(GameMode::SPECTATOR);
         $player->setAllowFlight(true);
         $player->setFlying(true);
+    }
+
+    /**
+     * @param Player $player
+     * @param string $matchFullName
+     * @param bool   $playing
+     *
+     * @return self
+     */
+    public static function create(Player $player, string $matchFullName, bool $playing): self {
+        return new self($player->getXuid(), $player->getName(), $matchFullName, $playing);
+
     }
 }
