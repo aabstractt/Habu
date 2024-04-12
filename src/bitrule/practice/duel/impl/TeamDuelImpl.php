@@ -4,50 +4,18 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel\impl;
 
+use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\Team;
-use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
-use function array_merge;
 use function ceil;
 use function count;
 
-final class TeamDuelImpl extends AbstractMatch {
+final class TeamDuelImpl extends Duel {
+    use SpectatingTrait;
 
     /** @var Team[] */
     private array $teams = [];
-
-    /**
-     * @param Player $player
-     */
-    public function joinSpectator(Player $player): void {
-        if (($team = $this->teams[2] ?? null) === null) {
-            $this->teams[2] = $team = new Team(2, []);
-        }
-
-        $team->addPlayer($player->getXuid());
-
-        $this->postJoinSpectator($player);
-    }
-
-    /**
-     * Get the spawn id of the player
-     * If is single match the spawn id is the index of the player in the players array.
-     * If is team match the spawn id is the team id of the player.
-     *
-     * @param string $xuid
-     *
-     * @return int
-     */
-    public function getSpawnId(string $xuid): int {
-        foreach ($this->teams as $team) {
-            if (!$team->isMember($xuid)) continue;
-
-            return $team->getId();
-        }
-
-        return -1;
-    }
 
     /**
      * @param Player $player
@@ -63,19 +31,6 @@ final class TeamDuelImpl extends AbstractMatch {
 
             break;
         }
-    }
-
-    /**
-     * @return DuelProfile[]
-     */
-    public function getEveryone(): array {
-        $players = [];
-
-        foreach ($this->teams as $team) {
-            $players = array_merge($players, $team->getPlayers());
-        }
-
-        return $players;
     }
 
     /**
@@ -108,12 +63,22 @@ final class TeamDuelImpl extends AbstractMatch {
     public function end(): void {
         throw new \RuntimeException('Not implemented');
     }
+
     /**
-     * @param string $xuid
-     *
-     * @return string|null
+     * @param Player      $player
+     * @param DuelProfile $duelProfile
      */
-    public function getOpponentName(string $xuid): ?string {
-        throw new \RuntimeException('Not implemented');
+    public function processPlayerPrepare(Player $player, DuelProfile $duelProfile): void {
+        // TODO: Implement processPlayerPrepare() method.
+    }
+
+    /**
+     * Process the player when the match ends.
+     *
+     * @param Player      $player
+     * @param DuelProfile $duelProfile
+     */
+    public function processPlayerEnd(Player $player, DuelProfile $duelProfile): void {
+        // TODO: Implement processPlayerEnd() method.
     }
 }

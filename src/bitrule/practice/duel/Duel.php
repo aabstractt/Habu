@@ -98,8 +98,8 @@ abstract class Duel {
 
         $player->teleport(Position::fromObject(
             match ($spawnId) {
-                0 => $this->arena->getFirstPosition(),
-                1 => $this->arena->getSecondPosition(),
+                self::FIRST_SPAWN_ID => $this->arena->getFirstPosition(),
+                self::SECOND_SPAWN_ID => $this->arena->getSecondPosition(),
                 default => $this->getWorld()->getSpawnLocation()
             },
             $this->getWorld()
