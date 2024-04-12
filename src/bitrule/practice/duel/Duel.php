@@ -10,6 +10,7 @@ use bitrule\practice\duel\stage\EndingStage;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\kit\Kit;
+use bitrule\practice\manager\DuelManager;
 use bitrule\practice\manager\ProfileManager;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
@@ -106,12 +107,7 @@ abstract class Duel {
     /**
      * @param Player[] $totalPlayers
      */
-    abstract public function prepare(array $totalPlayers): void;
-
-    /**
-     * @param Player[] $totalPlayers
-     */
-    public function postPrepare(array $totalPlayers): void {
+    public function prepare(array $totalPlayers): void {
         if (!Server::getInstance()->getWorldManager()->loadWorld($this->getFullName())) {
             throw new RuntimeException('Failed to load world ' . $this->getFullName());
         }
@@ -187,6 +183,7 @@ abstract class Duel {
             }
 
             $this->removePlayer($player, false);
+            $this->postRemovePlayer($player);
 
             $this->processPlayerEnd($player, $duelProfile);
 
@@ -232,7 +229,7 @@ abstract class Duel {
 
         unset($this->players[$player->getXuid()], $this->playersSpawn[$player->getXuid()]);
 
-        // TODO: Remove the duel cache of this player
+        DuelManager::getInstance()->quitPlayer($player->getXuid());
     }
 
     /**

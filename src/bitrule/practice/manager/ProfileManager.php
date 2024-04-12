@@ -50,11 +50,22 @@ final class ProfileManager {
     }
 
     /**
-     * @param string $xuid
+     * Called when a player quits the server
+     * Remove the player from the local profiles list
+     * Remove the player from the queue
+     * And remove the player from the duel if is in one
+     *
+     * @param Player $player
      */
-    public function removeProfile(string $xuid): void {
-        $localProfile = $this->localProfiles[$xuid] ?? null;
+    public function quitPlayer(Player $player): void {
+        $localProfile = $this->localProfiles[$player->getXuid()] ?? null;
         if ($localProfile === null) return;
+
+        $duel = DuelManager::getInstance()->getDuelByPlayer($player->getXuid());
+        if ($duel !== null) {
+            $duel->removePlayer($player, true);
+            $duel->postRemovePlayer($player);
+        }
 
         QueueManager::getInstance()->removeQueue($localProfile);
 

@@ -27,6 +27,8 @@ final class DuelManager {
     private array $duels = [];
     /** @var int */
     private int $duelsPlayed = 0;
+    /** @var array<string, string> */
+    private array $playersDuel = [];
 
     /**
      * Create a Duel for rounding.
@@ -53,20 +55,27 @@ final class DuelManager {
             throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
 
-        $match = new NormalDuelImpl($arena, $kit, $this->duelsPlayed++, $ranked, $matchRounds);
-        $match->prepare($players);
+        $duel = new NormalDuelImpl($arena, $kit, $this->duelsPlayed++, $ranked);
 
+        // TODO: Cache the player duel to prevent make many iterations for only a player
+        // that helps a bit with the performance
+        foreach ($players as $player) {
+            $this->playersDuel[$player->getXuid()] = $duel->getFullName();
+        }
+
+        // TODO: Copy the world from the backup to the worlds folder
+        // after that, load the world and prepare our duel!
         ArenaManager::getInstance()->loadWorld(
             $arena->getName(),
-            $match->getFullName(),
-            function() use ($spectators, $players, $match): void {
-                $match->postPrepare($players);
+            $duel->getFullName(),
+            function() use ($spectators, $players, $duel): void {
+                $duel->prepare($players);
 
-                foreach ($spectators as $spectator) $match->joinSpectator($spectator);
+                foreach ($spectators as $spectator) $duel->joinSpectator($spectator);
             }
         );
 
-        $this->duels[$match->getFullName()] = $match;
+        $this->duels[$duel->getFullName()] = $duel;
     }
 
     /**
@@ -121,6 +130,13 @@ final class DuelManager {
     }
 
     /**
+     * @param string $sourceXuid
+     */
+    public function quitPlayer(string $sourceXuid): void {
+        unset($this->playersDuel[$sourceXuid]);
+    }
+
+    /**
      * @param string $xuid
      *
      * @return Duel|null
@@ -140,7 +156,10 @@ final class DuelManager {
     public function getDuelsCount(?string $kitName = null): int {
         $duels = $this->duels;
         if ($kitName !== null) {
-            $duels = array_filter($duels, fn(Duel $duel) => $duel->getArena()->hasKit($kitName));
+            $duels = array_filter(
+                $duels,
+                fn(Duel $duel) => $duel->getArena()->hasKit($kitName)
+            );
         }
 
         return array_sum(

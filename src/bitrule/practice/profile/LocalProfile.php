@@ -19,7 +19,7 @@ final class LocalProfile {
     /** @var Scoreboard|null */
     private ?Scoreboard $scoreboard = null;
     /** @var Queue|null */
-    private ?Queue $matchQueue = null;
+    private ?Queue $queue = null;
 
     public function __construct(
         private readonly string $xuid,
@@ -69,17 +69,17 @@ final class LocalProfile {
     }
 
     /**
-     * @return \bitrule\practice\duel\queue\Queue|null
+     * @return Queue|null
      */
-    public function getMatchQueue(): ?Queue {
-        return $this->matchQueue;
+    public function getQueue(): ?Queue {
+        return $this->queue;
     }
 
     /**
-     * @param Queue|null $matchQueue
+     * @param Queue|null $queue
      */
-    public function setMatchQueue(?Queue $matchQueue): void {
-        $this->matchQueue = $matchQueue;
+    public function setQueue(?Queue $queue): void {
+        $this->queue = $queue;
     }
 
     /**

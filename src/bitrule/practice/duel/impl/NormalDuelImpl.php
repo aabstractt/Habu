@@ -13,6 +13,7 @@ use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
+use pocketmine\utils\TextFormat;
 use RuntimeException;
 use function count;
 use function str_starts_with;
@@ -56,21 +57,14 @@ final class NormalDuelImpl extends Duel {
     }
 
     /**
-     * @param Player[] $totalPlayers
-     */
-    public function prepare(array $totalPlayers): void {
-//        $this->players = array_map(
-//            fn(Player $player) => $player->getXuid(),
-//            $totalPlayers
-//        );
-    }
-
-    /**
      * @param Player      $player
      * @param DuelProfile $duelProfile
      */
     public function processPlayerPrepare(Player $player, DuelProfile $duelProfile): void {
-        // TODO: Implement processPlayerPrepare() method.
+        $opponentName = $this->getOpponentName($player->getXuid());
+
+        // TODO: Idk for what using that xd
+        $player->sendMessage(TextFormat::RED . 'Opponent: ' . ($opponentName ?? 'None'));
     }
 
     /**

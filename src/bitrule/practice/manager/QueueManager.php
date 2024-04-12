@@ -84,7 +84,7 @@ final class QueueManager {
 
         if (($player = Server::getInstance()->getPlayerExact($localProfile->getName())) === null) return;
 
-        $localProfile->setMatchQueue(null);
+        $localProfile->setQueue(null);
         Practice::setProfileScoreboard($player, ProfileManager::LOBBY_SCOREBOARD);
     }
 

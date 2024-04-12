@@ -48,7 +48,7 @@ final class JoinQueueCommand extends Command {
             return;
         }
 
-        if ($localProfile->getMatchQueue() !== null) {
+        if ($localProfile->getQueue() !== null) {
             $sender->sendMessage(TextFormat::RED . 'You are already in a queue.');
 
             return;
@@ -70,7 +70,7 @@ final class JoinQueueCommand extends Command {
             function (Queue $matchQueue) use ($sender, $localProfile): void {
                 if (!$sender->isOnline()) return;
 
-                $localProfile->setMatchQueue($matchQueue);
+                $localProfile->setQueue($matchQueue);
                 Practice::setProfileScoreboard($sender, ProfileManager::QUEUE_SCOREBOARD);
             }
         );

@@ -20,12 +20,13 @@ final class EntityTeleportListener implements Listener {
         $entity = $ev->getEntity();
         if (!$entity instanceof Player || !$entity->isOnline()) return;
 
-        $match = DuelManager::getInstance()->getDuelByPlayer($entity->getXuid());
-        if ($match === null) return;
+        $duel = DuelManager::getInstance()->getDuelByPlayer($entity->getXuid());
+        if ($duel === null) return;
 
         $to = $ev->getTo();
-        if ($to->getWorld() === $match->getWorld()) return;
+        if ($to->getWorld() === $duel->getWorld()) return;
 
-        $match->removePlayer($entity, true);
+        $duel->removePlayer($entity, true);
+        $duel->postRemovePlayer($entity);
     }
 }

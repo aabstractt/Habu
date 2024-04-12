@@ -70,7 +70,7 @@ final class Practice extends PluginBase {
         $this->messagesConfig = new Config($this->getDataFolder() . 'messages.yml');
 
         KitManager::getInstance()->loadAll();
-        ArenaManager::getInstance()->init();
+        ArenaManager::getInstance()->loadAll();
 
         // TODO: Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
@@ -87,12 +87,16 @@ final class Practice extends PluginBase {
         	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>')
         ]);
 
-        $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
-            DuelManager::getInstance()->tickStages();
-            ProfileManager::getInstance()->tickScoreboard();
-        }), 20);
+        $this->getScheduler()->scheduleRepeatingTask(
+            new ClosureTask(function (): void {
+                DuelManager::getInstance()->tickStages();
+                ProfileManager::getInstance()->tickScoreboard();
+            }),
+            20
+        );
     }
 
+    // TODO: Make more clean this code
     public static function wrapMessage(string $messageKey, array $placeholders = []): string {
         $message = self::getInstance()->messagesConfig?->getNested($messageKey);
         if (!is_string($message)) {
@@ -127,11 +131,12 @@ final class Practice extends PluginBase {
         }
 
         if (($scoreboard = $localProfile->getScoreboard()) !== null) {
-            $scoreboard->hide($player); // TODO: Yes
+            $scoreboard->hide($player); // TODO: Yes ??????
         }
 
         $localProfile->setScoreboard($scoreboard = new Scoreboard());
 
+        // TODO: Please make this more clean :sad:
         $scoreboard->load(self::getInstance()->scoreboardLines[$identifier] ?? throw new RuntimeException('Scoreboard not found: ' . $identifier));
         $scoreboard->show($player);
         $scoreboard->update($player, $localProfile);
@@ -152,15 +157,16 @@ final class Practice extends PluginBase {
         if ($identifier === 'online_players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
 
         if (str_starts_with($identifier, 'queue_')) {
-            if (($matchQueue = $localProfile->getMatchQueue()) === null) return null;
+            if (($queue = $localProfile->getQueue()) === null) return null;
 
-            if ($identifier === 'queue_type') return $matchQueue->isRanked() ? 'Ranked' : 'Unranked';
-            if ($identifier === 'queue_kit') return $matchQueue->getKitName();
-            if ($identifier === 'queue_duration') return gmdate('i:s', time() - $matchQueue->getTimestamp());
+            if ($identifier === 'queue_type') return $queue->isRanked() ? 'Ranked' : 'Unranked';
+            if ($identifier === 'queue_kit') return $queue->getKitName();
+            if ($identifier === 'queue_duration') return gmdate('i:s', time() - $queue->getTimestamp());
         }
 
-        return DuelManager::getInstance()
-            ->getDuelByPlayer($player->getXuid())
-            ?->replacePlaceholders($player, $identifier);
+        $duel = DuelManager::getInstance()->getDuelByPlayer($player->getXuid());
+        if ($duel === null) return null;
+
+        return $duel->replacePlaceholders($player, $identifier);
     }
 }

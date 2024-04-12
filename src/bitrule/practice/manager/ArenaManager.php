@@ -27,7 +27,10 @@ final class ArenaManager {
     /** @var array<string, AbstractArena> */
     private array $arenas = [];
 
-    public function init(): void {
+    /**
+     * Load all arenas from the arenas.yml file.
+     */
+    public function loadAll(): void {
         $config = new Config(Practice::getInstance()->getDataFolder() . 'arenas.yml', Config::YAML);
         foreach ($config->getAll() as $arenaName => $arenaData) {
             if (!is_string($arenaName) || !is_array($arenaData)) {
@@ -43,6 +46,7 @@ final class ArenaManager {
     }
 
     /**
+     * Save all arenas to the arenas.yml file.
      * @throws JsonException
      */
     public function saveAll(): void {
@@ -56,6 +60,8 @@ final class ArenaManager {
     }
 
     /**
+     * Add the arena to the arenas list.
+     *
      * @param AbstractArena $arena
      */
     public function createArena(AbstractArena $arena): void {
@@ -79,6 +85,8 @@ final class ArenaManager {
     }
 
     /**
+     * Find a random arena that has the specified kit.
+     *
      * @param Kit $kit
      *
      * @return AbstractArena|null

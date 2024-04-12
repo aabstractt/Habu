@@ -21,9 +21,6 @@ final class PlayerQuitListener implements Listener {
     public function onPlayerQuitEvent(PlayerQuitEvent $ev): void {
         $player = $ev->getPlayer();
 
-        $match = DuelManager::getInstance()->getDuelByPlayer($player->getXuid());
-        $match?->removePlayer($player, true);
-
-        ProfileManager::getInstance()->removeProfile($player->getXuid());
+        ProfileManager::getInstance()->quitPlayer($player);
     }
 }
