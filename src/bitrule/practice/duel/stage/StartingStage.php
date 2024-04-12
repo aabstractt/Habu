@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\Practice;
 use function count;
@@ -41,7 +41,7 @@ final class StartingStage implements AbstractStage {
             $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
-            Practice::setProfileScoreboard($player, ProfileManager::MATCH_PLAYING_SCOREBOARD);
+            Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_PLAYING_SCOREBOARD);
         }
     }
 

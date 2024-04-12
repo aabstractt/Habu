@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\manager\DuelManager;
+use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\match\AbstractMatch;
 
 final class EndingStage implements AbstractStage {
@@ -33,7 +33,7 @@ final class EndingStage implements AbstractStage {
 
         $duel->postEnd();
 
-        DuelManager::getInstance()->endMatch($duel);
+        DuelRegistry::getInstance()->endMatch($duel);
     }
 
     /**

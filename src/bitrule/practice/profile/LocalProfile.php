@@ -6,7 +6,7 @@ namespace bitrule\practice\profile;
 
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\duel\queue\Queue;
-use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use pocketmine\player\GameMode;
@@ -92,7 +92,7 @@ final class LocalProfile {
 
         if (!$showScoreboard) return;
 
-        Practice::setProfileScoreboard($player, ProfileManager::LOBBY_SCOREBOARD);
+        Practice::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
     }
 
     public static function setDefaultAttributes(Player $player): void {

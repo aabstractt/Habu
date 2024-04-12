@@ -7,7 +7,7 @@ namespace bitrule\practice\commands\arena;
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\manager\KitManager;
+use bitrule\practice\registry\KitRegistry;
 use JsonException;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
@@ -28,7 +28,7 @@ final class KitCreateArgument extends Argument {
             return;
         }
 
-        $kit = KitManager::getInstance()->getKit($args[0]);
+        $kit = KitRegistry::getInstance()->getKit($args[0]);
         if ($kit === null) {
             $kit = new Kit($args[0], [], [], 'default');
         }
@@ -37,7 +37,7 @@ final class KitCreateArgument extends Argument {
         $kit->setArmorItems($sender->getArmorInventory()->getContents());
 
         try {
-            KitManager::getInstance()->createKit($kit);
+            KitRegistry::getInstance()->createKit($kit);
 
             $sender->sendMessage(TextFormat::GREEN . 'Kit ' . $args[0] . ' successfully saved!');
         } catch (JsonException $e) {

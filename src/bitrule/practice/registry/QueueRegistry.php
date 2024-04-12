@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\manager;
+namespace bitrule\practice\registry;
 
 use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
@@ -15,7 +15,7 @@ use function array_filter;
 use function count;
 use function time;
 
-final class QueueManager {
+final class QueueRegistry {
 
     use SingletonTrait;
 
@@ -34,7 +34,7 @@ final class QueueManager {
      * @param ?Closure(\bitrule\practice\duel\queue\Queue): void $onCompletion
      */
     public function createQueue(LocalProfile $sourceLocalProfile, string $kitName, bool $ranked, ?Closure $onCompletion): void {
-        if (($kit = KitManager::getInstance()->getKit($kitName)) === null) {
+        if (($kit = KitRegistry::getInstance()->getKit($kitName)) === null) {
             throw new RuntimeException('Kit no exists.');
         }
 
@@ -51,7 +51,7 @@ final class QueueManager {
 
         $this->removeQueue($sourceLocalProfile);
 
-        if (($opponentLocalProfile = ProfileManager::getInstance()->getLocalProfile($opponentMatchQueue->getXuid())) === null) {
+        if (($opponentLocalProfile = ProfileRegistry::getInstance()->getLocalProfile($opponentMatchQueue->getXuid())) === null) {
             throw new RuntimeException('Opponent profile no exists.');
         }
 
@@ -65,7 +65,7 @@ final class QueueManager {
             $totalPlayers[] = $player;
         }
 
-        DuelManager::getInstance()->createMatch(
+        DuelRegistry::getInstance()->createMatch(
             $totalPlayers,
             $kit,
             false,
@@ -85,7 +85,7 @@ final class QueueManager {
         if (($player = Server::getInstance()->getPlayerExact($localProfile->getName())) === null) return;
 
         $localProfile->setQueue(null);
-        Practice::setProfileScoreboard($player, ProfileManager::LOBBY_SCOREBOARD);
+        Practice::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
     }
 
     /**

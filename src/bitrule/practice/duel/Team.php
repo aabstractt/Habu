@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel;
 
-use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\profile\DuelProfile;
 use function array_filter;
 use function array_map;
@@ -57,7 +57,7 @@ final class Team {
     public function getPlayers(): array {
         return array_filter(
             array_map(
-                fn (string $xuid) => ProfileManager::getInstance()->getDuelProfile($xuid),
+                fn (string $xuid) => ProfileRegistry::getInstance()->getDuelProfile($xuid),
                 $this->players
             ),
             fn (?DuelProfile $duelProfile) => $duelProfile !== null

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\manager;
+namespace bitrule\practice\registry;
 
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
@@ -20,7 +20,7 @@ use function is_int;
 use function is_string;
 use function strtoupper;
 
-final class KitManager {
+final class KitRegistry {
     use SingletonTrait;
 
     /** @var array<string, Kit> */

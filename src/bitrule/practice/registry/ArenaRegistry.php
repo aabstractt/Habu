@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\manager;
+namespace bitrule\practice\registry;
 
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
@@ -21,7 +21,7 @@ use function count;
 use function is_array;
 use function is_string;
 
-final class ArenaManager {
+final class ArenaRegistry {
     use SingletonTrait;
 
     /** @var array<string, AbstractArena> */

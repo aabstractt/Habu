@@ -12,11 +12,11 @@ use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\listener\EntityTeleportListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\listener\MatchEndListener;
-use bitrule\practice\manager\ArenaManager;
-use bitrule\practice\manager\KitManager;
-use bitrule\practice\manager\DuelManager;
-use bitrule\practice\manager\ProfileManager;
-use bitrule\practice\manager\QueueManager;
+use bitrule\practice\registry\ArenaRegistry;
+use bitrule\practice\registry\KitRegistry;
+use bitrule\practice\registry\DuelRegistry;
+use bitrule\practice\registry\ProfileRegistry;
+use bitrule\practice\registry\QueueRegistry;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use pocketmine\player\Player;
@@ -69,8 +69,8 @@ final class Practice extends PluginBase {
 
         $this->messagesConfig = new Config($this->getDataFolder() . 'messages.yml');
 
-        KitManager::getInstance()->loadAll();
-        ArenaManager::getInstance()->loadAll();
+        KitRegistry::getInstance()->loadAll();
+        ArenaRegistry::getInstance()->loadAll();
 
         // TODO: Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
@@ -89,8 +89,8 @@ final class Practice extends PluginBase {
 
         $this->getScheduler()->scheduleRepeatingTask(
             new ClosureTask(function (): void {
-                DuelManager::getInstance()->tickStages();
-                ProfileManager::getInstance()->tickScoreboard();
+                DuelRegistry::getInstance()->tickStages();
+                ProfileRegistry::getInstance()->tickScoreboard();
             }),
             20
         );
@@ -125,7 +125,7 @@ final class Practice extends PluginBase {
      * @param string $identifier
      */
     public static function setProfileScoreboard(Player $player, string $identifier): void {
-        $localProfile = ProfileManager::getInstance()->getLocalProfile($player->getXuid());
+        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
         if ($localProfile === null) {
             throw new RuntimeException('Local profile not found for player: ' . $player->getName());
         }
@@ -152,8 +152,8 @@ final class Practice extends PluginBase {
      * @return string|null
      */
     public static function replacePlaceholders(Player $player, LocalProfile $localProfile, string $identifier): ?string {
-        if ($identifier === 'total_queue_count') return (string) (QueueManager::getInstance()->getQueueCount());
-        if ($identifier === 'total_match_count') return (string) (DuelManager::getInstance()->getDuelsCount());
+        if ($identifier === 'total_queue_count') return (string) (QueueRegistry::getInstance()->getQueueCount());
+        if ($identifier === 'total_match_count') return (string) (DuelRegistry::getInstance()->getDuelsCount());
         if ($identifier === 'online_players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
 
         if (str_starts_with($identifier, 'queue_')) {
@@ -164,7 +164,7 @@ final class Practice extends PluginBase {
             if ($identifier === 'queue_duration') return gmdate('i:s', time() - $queue->getTimestamp());
         }
 
-        $duel = DuelManager::getInstance()->getDuelByPlayer($player->getXuid());
+        $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel === null) return null;
 
         return $duel->replacePlaceholders($player, $identifier);

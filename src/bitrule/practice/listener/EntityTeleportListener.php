@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener;
 
-use bitrule\practice\manager\DuelManager;
+use bitrule\practice\registry\DuelRegistry;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
 use pocketmine\player\Player;
@@ -20,7 +20,7 @@ final class EntityTeleportListener implements Listener {
         $entity = $ev->getEntity();
         if (!$entity instanceof Player || !$entity->isOnline()) return;
 
-        $duel = DuelManager::getInstance()->getDuelByPlayer($entity->getXuid());
+        $duel = DuelRegistry::getInstance()->getDuelByPlayer($entity->getXuid());
         if ($duel === null) return;
 
         $to = $ev->getTo();

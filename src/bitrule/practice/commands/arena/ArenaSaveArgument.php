@@ -8,8 +8,8 @@ use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
-use bitrule\practice\manager\ArenaManager;
-use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\registry\ArenaRegistry;
+use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\Practice;
 use Exception;
 use pocketmine\player\Player;
@@ -25,7 +25,7 @@ final class ArenaSaveArgument extends Argument {
      * @param array  $args
      */
     public function onPlayerExecute(Player $sender, string $label, array $args): void {
-        $localProfile = ProfileManager::getInstance()->getLocalProfile($sender->getXuid());
+        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($sender->getXuid());
         if ($localProfile === null) {
             $sender->sendMessage(TextFormat::RED . 'Error code 1');
 
@@ -46,8 +46,8 @@ final class ArenaSaveArgument extends Argument {
                 try {
                     $arenaSetup->submit($arena = AbstractArena::createEmpty($arenaSetup->getName(), $arenaSetup->getType()));
 
-                    ArenaManager::getInstance()->createArena($arena);
-                    ArenaManager::getInstance()->saveAll();
+                    ArenaRegistry::getInstance()->createArena($arena);
+                    ArenaRegistry::getInstance()->saveAll();
 
                     $sender->sendMessage(TextFormat::GREEN . 'Arena saved successfully!');
 

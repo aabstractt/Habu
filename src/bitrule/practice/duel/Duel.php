@@ -10,8 +10,8 @@ use bitrule\practice\duel\stage\EndingStage;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\manager\DuelManager;
-use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\registry\DuelRegistry;
+use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\profile\LocalProfile;
@@ -135,7 +135,7 @@ abstract class Duel {
             $this->processPlayerPrepare($player, $duelProfile);
             $this->teleportSpawn($player);
 
-            Practice::setProfileScoreboard($player, ProfileManager::MATCH_STARTING_SCOREBOARD);
+            Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
         }
 
         $this->loaded = true;
@@ -187,7 +187,7 @@ abstract class Duel {
 
             $this->processPlayerEnd($player, $duelProfile);
 
-//            $localProfile = ProfileManager::getInstance()->getLocalProfile($player->getXuid());
+//            $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
 //            if ($localProfile === null) {
 //                throw new RuntimeException('Local profile not found for player: ' . $player->getName());
 //            }
@@ -229,7 +229,7 @@ abstract class Duel {
 
         unset($this->players[$player->getXuid()], $this->playersSpawn[$player->getXuid()]);
 
-        DuelManager::getInstance()->quitPlayer($player->getXuid());
+        DuelRegistry::getInstance()->quitPlayer($player->getXuid());
     }
 
     /**

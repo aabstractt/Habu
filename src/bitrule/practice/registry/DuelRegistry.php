@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\manager;
+namespace bitrule\practice\registry;
 
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
@@ -20,7 +20,7 @@ use function array_map;
 use function array_sum;
 use function count;
 
-final class DuelManager {
+final class DuelRegistry {
     use SingletonTrait;
 
     /** @var array<string, Duel> */
@@ -50,7 +50,7 @@ final class DuelManager {
         MatchRounds $matchRounds,
         bool $ranked
     ): void {
-        $arena ??= ArenaManager::getInstance()->getRandomArena($kit);
+        $arena ??= ArenaRegistry::getInstance()->getRandomArena($kit);
         if ($arena === null) {
             throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
@@ -65,7 +65,7 @@ final class DuelManager {
 
         // TODO: Copy the world from the backup to the worlds folder
         // after that, load the world and prepare our duel!
-        ArenaManager::getInstance()->loadWorld(
+        ArenaRegistry::getInstance()->loadWorld(
             $arena->getName(),
             $duel->getFullName(),
             function() use ($spectators, $players, $duel): void {
@@ -85,7 +85,7 @@ final class DuelManager {
      * @param bool     $ranked
      */
     public function createMatch(array $totalPlayers, Kit $kit, bool $team, bool $ranked): void {
-        $arena = ArenaManager::getInstance()->getRandomArena($kit);
+        $arena = ArenaRegistry::getInstance()->getRandomArena($kit);
         if ($arena === null) {
             throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
@@ -107,7 +107,7 @@ final class DuelManager {
 //
 //        $match->prepare($totalPlayers);
 //
-//        ArenaManager::getInstance()->loadWorld(
+//        ArenaRegistry::getInstance()->loadWorld(
 //            $arena->getName(),
 //            $match->getFullName(),
 //            fn() => $match->postPrepare($totalPlayers)
@@ -142,7 +142,7 @@ final class DuelManager {
      * @return Duel|null
      */
     public function getDuelByPlayer(string $xuid): ?Duel {
-        $duelProfile = ProfileManager::getInstance()->getDuelProfile($xuid);
+        $duelProfile = ProfileRegistry::getInstance()->getDuelProfile($xuid);
         if ($duelProfile === null) return null;
 
         return $this->duels[$duelProfile->getMatchFullName()] ?? null;

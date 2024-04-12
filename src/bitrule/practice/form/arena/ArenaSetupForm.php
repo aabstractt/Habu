@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace bitrule\practice\form\arena;
 
 use bitrule\practice\arena\setup\AbstractArenaSetup;
-use bitrule\practice\manager\KitManager;
-use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\registry\KitRegistry;
+use bitrule\practice\registry\ProfileRegistry;
 use cosmicpe\form\CustomForm;
 use cosmicpe\form\entries\custom\CustomFormEntry;
 use cosmicpe\form\entries\custom\DropdownEntry;
@@ -65,7 +65,7 @@ final class ArenaSetupForm extends CustomForm {
         );
 
         $this->addEntry(
-            new DropdownEntry(TextFormat::GRAY . 'Arena Kit', $options = array_keys(KitManager::getInstance()->getKits())),
+            new DropdownEntry(TextFormat::GRAY . 'Arena Kit', $options = array_keys(KitRegistry::getInstance()->getKits())),
             function (Player $player, CustomFormEntry $entry, $value) use ($options): void {
                 if (!is_int($value)) {
                     throw new FormValidationException('Please select a kit.');
@@ -75,7 +75,7 @@ final class ArenaSetupForm extends CustomForm {
                     throw new FormValidationException('Please select a kit.');
                 }
 
-                if (KitManager::getInstance()->getKit($kitName) === null) {
+                if (KitRegistry::getInstance()->getKit($kitName) === null) {
                     throw new FormValidationException('The kit ' . $kitName . ' does not exist.');
                 }
 
@@ -96,7 +96,7 @@ final class ArenaSetupForm extends CustomForm {
             throw new RuntimeException('Arena setup form not initialized.');
         }
 
-        $localProfile = ProfileManager::getInstance()->getLocalProfile($player->getXuid());
+        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
         if ($localProfile === null) {
             throw new RuntimeException('Local player not found.');
         }

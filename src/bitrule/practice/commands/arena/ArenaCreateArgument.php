@@ -7,7 +7,7 @@ namespace bitrule\practice\commands\arena;
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\form\arena\ArenaSetupForm;
-use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -28,7 +28,7 @@ final class ArenaCreateArgument extends Argument {
             return;
         }
 
-        $localProfile = ProfileManager::getInstance()->getLocalProfile($sender->getXuid());
+        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($sender->getXuid());
         if ($localProfile === null) {
             $sender->sendMessage(TextFormat::RED . 'Error code 1');
 

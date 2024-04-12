@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\setup;
 
 use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\manager\ArenaManager;
+use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\Practice;
 use InvalidArgumentException;
 use pocketmine\item\VanillaItems;
@@ -142,7 +142,7 @@ abstract class AbstractArenaSetup {
             throw new RuntimeException('Arena name is not set');
         }
 
-        if (ArenaManager::getInstance()->getArena($this->name) !== null) {
+        if (ArenaRegistry::getInstance()->getArena($this->name) !== null) {
             throw new RuntimeException('Arena ' . $this->name . ' already exists');
         }
 

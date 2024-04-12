@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace bitrule\practice\commands;
 
 use bitrule\practice\duel\queue\Queue;
-use bitrule\practice\manager\KitManager;
-use bitrule\practice\manager\ProfileManager;
-use bitrule\practice\manager\QueueManager;
+use bitrule\practice\registry\KitRegistry;
+use bitrule\practice\registry\ProfileRegistry;
+use bitrule\practice\registry\QueueRegistry;
 use bitrule\practice\Practice;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -41,7 +41,7 @@ final class JoinQueueCommand extends Command {
             return;
         }
 
-        $localProfile = ProfileManager::getInstance()->getLocalProfile($sender->getXuid());
+        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($sender->getXuid());
         if ($localProfile === null) {
             $sender->sendMessage(TextFormat::RED . 'Your profile has not loaded yet.');
 
@@ -54,7 +54,7 @@ final class JoinQueueCommand extends Command {
             return;
         }
 
-        $kit = KitManager::getInstance()->getKit($args[0]);
+        $kit = KitRegistry::getInstance()->getKit($args[0]);
         if ($kit === null) {
             $sender->sendMessage(TextFormat::RED . 'Kit not found.');
 
@@ -63,7 +63,7 @@ final class JoinQueueCommand extends Command {
 
         $sender->sendMessage(TextFormat::GREEN . 'You have joined the queue for ' . TextFormat::AQUA . $kit->getName() . TextFormat::GREEN . '.');
 
-        QueueManager::getInstance()->createQueue(
+        QueueRegistry::getInstance()->createQueue(
             $localProfile,
             $kit->getName(),
             false,
@@ -71,7 +71,7 @@ final class JoinQueueCommand extends Command {
                 if (!$sender->isOnline()) return;
 
                 $localProfile->setQueue($matchQueue);
-                Practice::setProfileScoreboard($sender, ProfileManager::QUEUE_SCOREBOARD);
+                Practice::setProfileScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
             }
         );
     }

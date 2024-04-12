@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\manager;
+namespace bitrule\practice\registry;
 
 use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\profile\DuelProfile;
@@ -12,7 +12,7 @@ use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
 
-final class ProfileManager {
+final class ProfileRegistry {
     use SingletonTrait;
 
     public const LOBBY_SCOREBOARD = 'lobby';
@@ -61,13 +61,13 @@ final class ProfileManager {
         $localProfile = $this->localProfiles[$player->getXuid()] ?? null;
         if ($localProfile === null) return;
 
-        $duel = DuelManager::getInstance()->getDuelByPlayer($player->getXuid());
+        $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel !== null) {
             $duel->removePlayer($player, true);
             $duel->postRemovePlayer($player);
         }
 
-        QueueManager::getInstance()->removeQueue($localProfile);
+        QueueRegistry::getInstance()->removeQueue($localProfile);
 
         unset($localProfile);
     }

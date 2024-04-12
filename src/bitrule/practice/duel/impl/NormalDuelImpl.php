@@ -8,7 +8,7 @@ use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\stage\EndingStage;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\duel\stage\StartingStage;
-use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKeys;
@@ -76,7 +76,7 @@ final class NormalDuelImpl extends Duel {
             $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
-            Practice::setProfileScoreboard($player, ProfileManager::MATCH_ENDING_SCOREBOARD);
+            Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_ENDING_SCOREBOARD);
 
             if ($this->stage instanceof StartingStage) continue;
 
