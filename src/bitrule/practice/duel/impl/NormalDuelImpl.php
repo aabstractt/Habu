@@ -8,33 +8,17 @@ use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\stage\EndingStage;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\duel\stage\StartingStage;
-use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
+use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
-use RuntimeException;
 use function count;
 use function str_starts_with;
 
 final class NormalDuelImpl extends Duel {
-
-    /**
-     * This method is called when a player joins the match.
-     * Add the player to the match and teleport them to their spawn.
-     *
-     * @param Player $player
-     */
-    public function joinSpectator(Player $player): void {
-        if (!$this->isLoaded()) {
-            throw new RuntimeException('Match not loaded.');
-        }
-
-        $this->playersSpawn[$player->getXuid()] = self::SPECTATOR_SPAWN_ID;
-
-//        $this->postJoinSpectator($player);
-    }
+    use SpectatingTrait;
 
     /**
      * Remove a player from the match.

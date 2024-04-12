@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\defaults;
 
-use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;

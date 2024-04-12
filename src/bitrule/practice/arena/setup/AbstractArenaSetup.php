@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\setup;
 
 use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\Practice;
+use bitrule\practice\registry\ArenaRegistry;
 use InvalidArgumentException;
 use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;

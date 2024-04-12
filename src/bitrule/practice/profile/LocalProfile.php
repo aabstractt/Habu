@@ -6,9 +6,9 @@ namespace bitrule\practice\profile;
 
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\duel\queue\Queue;
-use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\scoreboard\Scoreboard;
+use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 

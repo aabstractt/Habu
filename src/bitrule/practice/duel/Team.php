@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel;
 
-use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\profile\DuelProfile;
+use bitrule\practice\registry\ProfileRegistry;
 use function array_filter;
 use function array_map;
 use function array_search;

@@ -10,16 +10,18 @@ use bitrule\practice\duel\stage\EndingStage;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\registry\DuelRegistry;
-use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\registry\DuelRegistry;
+use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 use RuntimeException;
+use function array_filter;
+use function gmdate;
 
 abstract class Duel {
 
@@ -260,7 +262,6 @@ abstract class Duel {
     }
 
     /**
-     *
      * @return DuelProfile[]
      */
     public function getSpectators(): array {
@@ -319,7 +320,7 @@ abstract class Duel {
     }
 
     /**
-     * @return \bitrule\practice\duel\stage\AbstractStage
+     * @return AbstractStage
      */
     public function getStage(): AbstractStage {
         return $this->stage;

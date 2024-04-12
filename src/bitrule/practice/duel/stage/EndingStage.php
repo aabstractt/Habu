@@ -6,7 +6,6 @@ namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\duel\Duel;
 use bitrule\practice\registry\DuelRegistry;
-use bitrule\practice\match\AbstractMatch;
 
 final class EndingStage implements AbstractStage {
 

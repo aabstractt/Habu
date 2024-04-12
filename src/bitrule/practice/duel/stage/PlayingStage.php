@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\match\AbstractMatch;
 
 final class PlayingStage implements AbstractStage {
 

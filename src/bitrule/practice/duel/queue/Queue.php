@@ -54,11 +54,11 @@ final class Queue {
      * For example, a player in a ranked queue cannot be matched with a player in an unranked queue.
      * This is because the player in the ranked queue will lose/gain points while the player in the unranked queue will not.
      *
-     * @param Queue $matchQueue
+     * @param Queue $queue
      *
      * @return bool
      */
-    public function isSameType(self $matchQueue): bool {
-        return $this->ranked === $matchQueue->ranked && $this->kitName === $matchQueue->kitName;
+    public function isSameType(self $queue): bool {
+        return $this->ranked === $queue->ranked && $this->kitName === $queue->kitName;
     }
 }

@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\registry\ProfileRegistry;
-use bitrule\practice\match\AbstractMatch;
 use bitrule\practice\Practice;
+use bitrule\practice\registry\ProfileRegistry;
 use function count;
 
 final class StartingStage implements AbstractStage {

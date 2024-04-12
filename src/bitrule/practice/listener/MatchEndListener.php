@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace bitrule\practice\listener;
 
 use bitrule\practice\event\MatchEndEvent;
-use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\profile\DuelProfile;
+use bitrule\practice\registry\DuelRegistry;
 use pocketmine\event\Listener;
 use pocketmine\player\Player;
 use pocketmine\Server;
