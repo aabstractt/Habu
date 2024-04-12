@@ -18,7 +18,7 @@ use function count;
 use function str_starts_with;
 
 final class NormalDuelImpl extends Duel {
-    use SpectatingTrait;
+    use SpectatingDuelTrait;
 
     /**
      * Remove a player from the match.

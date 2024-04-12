@@ -8,7 +8,7 @@ use bitrule\practice\duel\Duel;
 use pocketmine\player\Player;
 use RuntimeException;
 
-trait SpectatingTrait {
+trait SpectatingDuelTrait {
 
     /**
      * This method is called when a player joins the match.

@@ -12,7 +12,7 @@ use function ceil;
 use function count;
 
 final class TeamDuelImpl extends Duel {
-    use SpectatingTrait;
+    use SpectatingDuelTrait;
 
     /** @var Team[] */
     private array $teams = [];
