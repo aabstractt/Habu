@@ -11,7 +11,6 @@ use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\listener\EntityTeleportListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
-use bitrule\practice\listener\MatchEndListener;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ArenaRegistry;
@@ -88,8 +87,9 @@ final class Practice extends PluginBase {
 
         $this->getScheduler()->scheduleRepeatingTask(
             new ClosureTask(function (): void {
-                DuelRegistry::getInstance()->tickStages();
                 ProfileRegistry::getInstance()->tickScoreboard();
+
+                DuelRegistry::getInstance()->tickStages();
             }),
             20
         );

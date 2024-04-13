@@ -8,6 +8,7 @@ use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
+use function count;
 use function str_starts_with;
 
 final class NormalRoundingDuelImpl extends RoundingDuel {
