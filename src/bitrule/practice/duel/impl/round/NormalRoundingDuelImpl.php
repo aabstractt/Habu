@@ -15,7 +15,6 @@ use function count;
 use function str_starts_with;
 
 final class NormalRoundingDuelImpl extends RoundingDuel {
-    use NormalDuelSpawnTrait;
     use SpectatingDuelTrait;
 
     /**

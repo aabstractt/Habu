@@ -43,6 +43,8 @@ abstract class Duel {
 
     /** @var array<string, DuelProfile> */
     protected array $players = [];
+    /** @var array<string, int> */
+    protected array $playersSpawn = [];
 
     /**
      * @param AbstractArena    $arena
@@ -169,7 +171,9 @@ abstract class Duel {
      *
      * @return int
      */
-    abstract public function getSpawnId(string $xuid): int;
+    public function getSpawnId(string $xuid): int {
+        return $this->playersSpawn[$xuid] ?? -1;
+    }
 
     /**
      * Called when the duel stage changes

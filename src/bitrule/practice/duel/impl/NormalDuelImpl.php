@@ -15,7 +15,6 @@ use function count;
 use function str_starts_with;
 
 final class NormalDuelImpl extends Duel {
-    use NormalDuelSpawnTrait;
     use SpectatingDuelTrait;
 
     /**
