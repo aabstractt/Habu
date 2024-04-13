@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
+use bitrule\practice\duel\impl\round\RoundingInfo;
 use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\LocalProfile;
@@ -19,7 +20,7 @@ final class QueueRegistry {
 
     use SingletonTrait;
 
-    /** @var array<string, \bitrule\practice\duel\queue\Queue> */
+    /** @var array<string, Queue> */
     private array $queues = [];
 
     /**
@@ -28,10 +29,10 @@ final class QueueRegistry {
      * Also checks if there is an opponent in the queue
      * If there is, it will remove both players from the queue
      *
-     * @param LocalProfile                                       $sourceLocalProfile
-     * @param string                                             $kitName
-     * @param bool                                               $ranked
-     * @param ?Closure(\bitrule\practice\duel\queue\Queue): void $onCompletion
+     * @param LocalProfile          $sourceLocalProfile
+     * @param string                $kitName
+     * @param bool                  $ranked
+     * @param ?Closure(Queue): void $onCompletion
      */
     public function createQueue(LocalProfile $sourceLocalProfile, string $kitName, bool $ranked, ?Closure $onCompletion): void {
         if (($kit = KitRegistry::getInstance()->getKit($kitName)) === null) {
@@ -69,7 +70,13 @@ final class QueueRegistry {
             $totalPlayers,
             [],
             $kit,
-            $ranked
+            $ranked,
+            new RoundingInfo(
+                0,
+                3,
+                [],
+                []
+            )
         );
     }
 
@@ -110,7 +117,7 @@ final class QueueRegistry {
      *
      * @param Queue $sourceMatchQueue
      *
-     * @return \bitrule\practice\duel\queue\Queue|null
+     * @return Queue|null
      */
     public function lookupOpponent(Queue $sourceMatchQueue): ?Queue {
         foreach ($this->queues as $matchQueue) {
