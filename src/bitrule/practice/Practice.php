@@ -80,7 +80,6 @@ final class Practice extends PluginBase {
         // TODO: Match listeners
         $this->getServer()->getPluginManager()->registerEvents(new EntityTeleportListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
-        $this->getServer()->getPluginManager()->registerEvents(new MatchEndListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),
