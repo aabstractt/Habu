@@ -33,54 +33,6 @@ final class DuelRegistry {
     private array $playersDuel = [];
 
     /**
-     * Create a Duel for rounding.
-     * This is used for tournaments.
-     * Or any other time you want to play multiple Duel on the same arena.
-     *
-     * @param Player[]           $players
-     * @param Player[]           $spectators
-     * @param Kit                $kit
-     * @param AbstractArena|null $arena
-     * @param MatchRounds        $matchRounds
-     * @param bool               $ranked
-     */
-    public function createMatchForRounding(
-        array $players,
-        array $spectators,
-        Kit $kit,
-        ?AbstractArena $arena,
-        MatchRounds $matchRounds,
-        bool $ranked
-    ): void {
-        $arena ??= ArenaRegistry::getInstance()->getRandomArena($kit);
-        if ($arena === null) {
-            throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
-        }
-
-        $duel = new NormalDuelImpl($arena, $kit, $this->duelsPlayed++, $ranked);
-
-        // TODO: Cache the player duel to prevent make many iterations for only a player
-        // that helps a bit with the performance
-        foreach ($players as $player) {
-            $this->playersDuel[$player->getXuid()] = $duel->getFullName();
-        }
-
-        // TODO: Copy the world from the backup to the worlds folder
-        // after that, load the world and prepare our duel!
-        ArenaRegistry::getInstance()->loadWorld(
-            $arena->getName(),
-            $duel->getFullName(),
-            function() use ($spectators, $players, $duel): void {
-                $duel->prepare($players);
-
-                foreach ($spectators as $spectator) $duel->joinSpectator($spectator);
-            }
-        );
-
-        $this->duels[$duel->getFullName()] = $duel;
-    }
-
-    /**
      * @param Player[]           $players
      * @param Player[]           $spectators
      * @param Kit                $kit

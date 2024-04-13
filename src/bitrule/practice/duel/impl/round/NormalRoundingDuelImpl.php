@@ -34,16 +34,16 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
         $opponent = $this->getOpponent($player);
         if ($opponent === null) return;
 
-        $matchStatistics = $duelProfile->getMatchStatistics();
-        $opponentMatchStatistics = $opponent->getMatchStatistics();
+        $duelStatistics = $duelProfile->getDuelStatistics();
+        $opponentDuelStatistics = $opponent->getDuelStatistics();
 
         $player->sendMessage(TranslationKeys::MATCH_END_STATISTICS_NORMAL->build(
             $opponent->getName(),
             '&a(+0)',
-            (string) $matchStatistics->getCritics(),
-            (string) $matchStatistics->getDamageDealt(),
-            (string) $opponentMatchStatistics->getCritics(),
-            (string) $opponentMatchStatistics->getDamageDealt(),
+            (string) $duelStatistics->getCritics(),
+            (string) $duelStatistics->getDamageDealt(),
+            (string) $opponentDuelStatistics->getCritics(),
+            (string) $opponentDuelStatistics->getDamageDealt(),
         ));
     }
 
@@ -56,27 +56,15 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
      * @param bool   $canEnd
      */
     public function removePlayer(Player $player, bool $canEnd): void {
-        // TODO: Implement removePlayer() method.
-    }
+        if (!$canEnd) return;
 
-    /**
-     * Let the server know if the duel
-     * can be re-duel.
-     *
-     * @param DuelProfile[] $players
-     *
-     * @return bool
-     */
-    protected function canReDuel(array $players): bool {
-        // TODO: Implement canReDuel() method.
-}
+        $spawnId = $this->getSpawnId($player->getXuid());
+        if ($spawnId === -1) return;
 
-    /**
-     * @param DuelProfile $winner
-     */
-    public function roundsEnded(DuelProfile $winner): void {
-        foreach ($this->getEveryone() as $duelProfile) {
-        }
+        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
+        if (count($this->getAlive()) > $expectedPlayersAlive) return;
+
+        $this->end();
     }
 
     /**

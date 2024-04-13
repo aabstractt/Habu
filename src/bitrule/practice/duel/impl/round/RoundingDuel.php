@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\impl\round;
 
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\impl\SpectatingDuelTrait;
 use bitrule\practice\kit\Kit;
@@ -13,6 +14,7 @@ use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\registry\DuelRegistry;
 use Exception;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use function array_filter;
 use function array_map;
 
@@ -40,6 +42,8 @@ abstract class RoundingDuel extends Duel {
      * Usually is used to send the match results to the players.
      */
     public function end(): void {
+        $this->roundingInfo->registerWorld($this->getFullName());
+
         if ($this->hasSomeoneDisconnected()) {
             $this->end();
 
@@ -90,11 +94,17 @@ abstract class RoundingDuel extends Duel {
     }
 
     /**
-     * Let the server know if the duel
-     * can be re-duel.
-     *
-     * @param DuelProfile[] $players
-     * @return bool
+     * This method is called when the countdown ends.
+     * Usually is used to delete the world
+     * and teleport the players to the spawn point.
      */
-    abstract protected function canReDuel(array $players): bool;
+    public function postEnd(): void {
+        parent::postEnd();
+
+        foreach ($this->roundingInfo->getWorlds() as $worldName) {
+            Server::getInstance()->getAsyncPool()->submitTask(new FileDeleteAsyncTask(
+                Server::getInstance()->getDataPath() . 'worlds/' . $worldName
+            ));
+        }
+    }
 }

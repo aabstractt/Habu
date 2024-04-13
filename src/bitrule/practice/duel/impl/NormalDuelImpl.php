@@ -17,26 +17,6 @@ final class NormalDuelImpl extends Duel {
     use SpectatingDuelTrait;
 
     /**
-     * Remove a player from the match.
-     * Check if the match can end.
-     * Usually is checked when the player died or left the match.
-     *
-     * @param Player $player
-     * @param bool   $canEnd
-     */
-    public function removePlayer(Player $player, bool $canEnd): void {
-        if (!$canEnd) return;
-
-        $spawnId = $this->getSpawnId($player->getXuid());
-        if ($spawnId === -1) return;
-
-        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
-        if (count($this->getAlive()) > $expectedPlayersAlive) return;
-
-        $this->end();
-    }
-
-    /**
      * @param Player      $player
      * @param DuelProfile $duelProfile
      */
@@ -61,8 +41,8 @@ final class NormalDuelImpl extends Duel {
         $opponent = $this->getOpponent($player);
         if ($opponent === null) return;
 
-        $matchStatistics = $duelProfile->getMatchStatistics();
-        $opponentMatchStatistics = $opponent->getMatchStatistics();
+        $matchStatistics = $duelProfile->getDuelStatistics();
+        $opponentMatchStatistics = $opponent->getDuelStatistics();
 
         $player->sendMessage(TranslationKeys::MATCH_END_STATISTICS_NORMAL->build(
             $opponent->getName(),
@@ -72,6 +52,26 @@ final class NormalDuelImpl extends Duel {
             (string) $opponentMatchStatistics->getCritics(),
             (string) $opponentMatchStatistics->getDamageDealt(),
         ));
+    }
+
+    /**
+     * Remove a player from the match.
+     * Check if the match can end.
+     * Usually is checked when the player died or left the match.
+     *
+     * @param Player $player
+     * @param bool   $canEnd
+     */
+    public function removePlayer(Player $player, bool $canEnd): void {
+        if (!$canEnd) return;
+
+        $spawnId = $this->getSpawnId($player->getXuid());
+        if ($spawnId === -1) return;
+
+        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
+        if (count($this->getAlive()) > $expectedPlayersAlive) return;
+
+        $this->end();
     }
 
     /**

@@ -71,4 +71,11 @@ final class RoundingInfo {
     public function registerWorld(string $worldName): void {
         $this->worlds[] = $worldName;
     }
+
+    /**
+     * @return string[]
+     */
+    public function getWorlds(): array {
+        return $this->worlds;
+    }
 }

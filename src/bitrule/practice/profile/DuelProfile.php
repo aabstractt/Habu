@@ -21,14 +21,14 @@ final class DuelProfile {
      * @param string         $name
      * @param string         $matchFullName
      * @param bool           $playing
-     * @param DuelStatistics $matchStatistics
+     * @param DuelStatistics $duelStatistics
      */
     public function __construct(
         private readonly string $xuid,
         private readonly string $name,
         private readonly string $matchFullName,
         private readonly bool $playing,
-        private readonly DuelStatistics $matchStatistics = new DuelStatistics()
+        private readonly DuelStatistics $duelStatistics = new DuelStatistics()
     ) {}
 
     /**
@@ -55,8 +55,8 @@ final class DuelProfile {
     /**
      * @return DuelStatistics
      */
-    public function getMatchStatistics(): DuelStatistics {
-        return $this->matchStatistics;
+    public function getDuelStatistics(): DuelStatistics {
+        return $this->duelStatistics;
     }
 
     /**
