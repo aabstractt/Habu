@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\impl;
 
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\impl\trait\NormalDuelSpawnTrait;
 use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKeys;
@@ -14,6 +15,7 @@ use function count;
 use function str_starts_with;
 
 final class NormalDuelImpl extends Duel {
+    use NormalDuelSpawnTrait;
     use SpectatingDuelTrait;
 
     /**
@@ -21,6 +23,8 @@ final class NormalDuelImpl extends Duel {
      * @param DuelProfile $duelProfile
      */
     public function processPlayerPrepare(Player $player, DuelProfile $duelProfile): void {
+        $this->playersSpawn[$player->getXuid()] = count($this->playersSpawn);
+
         $opponentName = $this->getOpponentName($player->getXuid());
 
         // TODO: Idk for what using that xd
@@ -63,6 +67,8 @@ final class NormalDuelImpl extends Duel {
      * @param bool   $canEnd
      */
     public function removePlayer(Player $player, bool $canEnd): void {
+        unset($this->playersSpawn[$player->getXuid()]);
+
         if (!$canEnd) return;
 
         $spawnId = $this->getSpawnId($player->getXuid());

@@ -4,21 +4,31 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel\impl\round;
 
+use bitrule\practice\duel\impl\SpectatingDuelTrait;
+use bitrule\practice\duel\impl\trait\NormalDuelSpawnTrait;
 use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
+use pocketmine\utils\TextFormat;
 use function count;
 use function str_starts_with;
 
 final class NormalRoundingDuelImpl extends RoundingDuel {
+    use NormalDuelSpawnTrait;
+    use SpectatingDuelTrait;
 
     /**
      * @param Player      $player
      * @param DuelProfile $duelProfile
      */
     public function processPlayerPrepare(Player $player, DuelProfile $duelProfile): void {
-        // TODO: Implement processPlayerPrepare() method.
+        $this->playersSpawn[$player->getXuid()] = count($this->playersSpawn);
+
+        $opponentName = $this->getOpponentName($player->getXuid());
+
+        // TODO: Idk for what using that xd
+        $player->sendMessage(TextFormat::RED . 'Opponent: ' . ($opponentName ?? 'None'));
     }
 
     /**
@@ -57,6 +67,8 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
      * @param bool   $canEnd
      */
     public function removePlayer(Player $player, bool $canEnd): void {
+        unset($this->playersSpawn[$player->getXuid()]);
+
         if (!$canEnd) return;
 
         $spawnId = $this->getSpawnId($player->getXuid());

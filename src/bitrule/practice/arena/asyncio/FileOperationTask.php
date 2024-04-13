@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\asyncio;
 
+use bitrule\practice\Practice;
 use Exception;
 use pocketmine\scheduler\AsyncTask;
 use function is_callable;
@@ -45,6 +46,8 @@ abstract class FileOperationTask extends AsyncTask {
             if (!is_callable($closure = $this->fetchLocal('FILE_OPERATION_CLOSURE'))) return;
 
             $closure();
-        } catch (Exception) {}
+        } catch (Exception $e) {
+            Practice::getInstance()->getLogger()->logException($e);
+        }
     }
 }
