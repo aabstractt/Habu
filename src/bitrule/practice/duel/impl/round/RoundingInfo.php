@@ -62,7 +62,7 @@ final class RoundingInfo {
             $winnerXuid = $playerXuid;
         }
 
-        return $winnerXuid;
+        return is_numeric($winnerXuid) ? strval($winnerXuid) : $winnerXuid;
     }
 
     /**

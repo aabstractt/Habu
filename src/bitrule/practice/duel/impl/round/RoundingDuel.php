@@ -23,6 +23,10 @@ abstract class RoundingDuel extends Duel {
 
     /** @var RoundingInfo $roundingInfo */
     protected RoundingInfo $roundingInfo;
+    /**
+     * @var bool
+     */
+    protected bool $ended = false;
 
     /**
      * @param AbstractArena $arena
@@ -45,7 +49,8 @@ abstract class RoundingDuel extends Duel {
         $this->roundingInfo->registerWorld($this->getFullName());
 
         if ($this->hasSomeoneDisconnected()) {
-            $this->end();
+            parent::end();
+            $this->ended = true;
 
             return;
         }
@@ -53,12 +58,16 @@ abstract class RoundingDuel extends Duel {
         $winnerXuid = $this->roundingInfo->findWinner();
         $winnerDuelProfile = $winnerXuid !== null ? $this->players[$winnerXuid] ?? null : null;
         if ($winnerDuelProfile !== null) {
-            $this->end();
+            parent::end();
+            $this->ended = true;
 
             return;
         }
 
-        $spectators = $this->getSpectators();
+        $literalSpectators = array_filter(
+            $this->getSpectators(),
+            fn(DuelProfile $duelProfile) => !$duelProfile->isPlaying()
+        );
         $players = $this->getPlayers();
 
         $this->postEnd();
@@ -79,7 +88,7 @@ abstract class RoundingDuel extends Duel {
                     fn(?Player $player) => $player !== null && $player->isOnline()
                 ),
                 array_filter(
-                    array_map(fn (DuelProfile $duelProfile) => $duelProfile->toPlayer(), $spectators),
+                    array_map(fn (DuelProfile $duelProfile) => $duelProfile->toPlayer(), $literalSpectators),
                     fn(?Player $player) => $player !== null && $player->isOnline()
                 ),
                 $this->kit,
@@ -89,7 +98,8 @@ abstract class RoundingDuel extends Duel {
         } catch (Exception $e) {
             Practice::getInstance()->getLogger()->error($e->getMessage());
 
-            $this->end();
+            parent::end();
+            $this->ended = true;
         }
     }
 
@@ -100,6 +110,8 @@ abstract class RoundingDuel extends Duel {
      */
     public function postEnd(): void {
         parent::postEnd();
+
+        if (!$this->ended) return;
 
         foreach ($this->roundingInfo->getWorlds() as $worldName) {
             Server::getInstance()->getAsyncPool()->submitTask(new FileDeleteAsyncTask(

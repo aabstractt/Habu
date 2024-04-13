@@ -12,7 +12,9 @@ use bitrule\practice\duel\impl\round\NormalRoundingDuelImpl;
 use bitrule\practice\duel\impl\round\RoundingDuel;
 use bitrule\practice\duel\impl\round\RoundingInfo;
 use bitrule\practice\kit\Kit;
+use bitrule\practice\Practice;
 use pocketmine\player\Player;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
@@ -89,7 +91,22 @@ final class DuelRegistry {
     public function endDuel(Duel $duel): void {
         unset($this->duels[$duel->getFullName()]);
 
-        // Unload the world and delete the folder.
+        // First check if the world is doing tick
+        // if it is, we need to wait until the tick is done
+        // to unload the world
+        // otherwise, we can unload the world immediately
+        // and delete the world file
+        $world = $duel->getWorld();
+        if ($world->isDoingTick()) {
+            Practice::getInstance()->getScheduler()->scheduleTask(
+                new ClosureTask(function () use ($duel): void {
+                    $this->endDuel($duel);
+                })
+            );
+
+            return;
+        }
+
         Server::getInstance()->getWorldManager()->unloadWorld($duel->getWorld());
 
         if ($duel instanceof RoundingDuel) return;
