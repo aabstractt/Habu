@@ -2,49 +2,22 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\duel\impl;
+namespace bitrule\practice\duel\impl\round;
 
-use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKeys;
 use pocketmine\player\Player;
-use pocketmine\utils\TextFormat;
-use function count;
 use function str_starts_with;
 
-final class NormalDuelImpl extends Duel {
-    use SpectatingDuelTrait;
-
-    /**
-     * Remove a player from the match.
-     * Check if the match can end.
-     * Usually is checked when the player died or left the match.
-     *
-     * @param Player $player
-     * @param bool   $canEnd
-     */
-    public function removePlayer(Player $player, bool $canEnd): void {
-        if (!$canEnd) return;
-
-        $spawnId = $this->getSpawnId($player->getXuid());
-        if ($spawnId === -1) return;
-
-        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
-        if (count($this->getAlive()) > $expectedPlayersAlive) return;
-
-        $this->end();
-    }
+final class NormalRoundingDuelImpl extends RoundingDuel {
 
     /**
      * @param Player      $player
      * @param DuelProfile $duelProfile
      */
     public function processPlayerPrepare(Player $player, DuelProfile $duelProfile): void {
-        $opponentName = $this->getOpponentName($player->getXuid());
-
-        // TODO: Idk for what using that xd
-        $player->sendMessage(TextFormat::RED . 'Opponent: ' . ($opponentName ?? 'None'));
+        // TODO: Implement processPlayerPrepare() method.
     }
 
     /**
@@ -72,6 +45,38 @@ final class NormalDuelImpl extends Duel {
             (string) $opponentMatchStatistics->getCritics(),
             (string) $opponentMatchStatistics->getDamageDealt(),
         ));
+    }
+
+    /**
+     * Remove a player from the match.
+     * Check if the match can end.
+     * Usually is checked when the player died or left the match.
+     *
+     * @param Player $player
+     * @param bool   $canEnd
+     */
+    public function removePlayer(Player $player, bool $canEnd): void {
+        // TODO: Implement removePlayer() method.
+    }
+
+    /**
+     * Let the server know if the duel
+     * can be re-duel.
+     *
+     * @param DuelProfile[] $players
+     *
+     * @return bool
+     */
+    protected function canReDuel(array $players): bool {
+        // TODO: Implement canReDuel() method.
+}
+
+    /**
+     * @param DuelProfile $winner
+     */
+    public function roundsEnded(DuelProfile $winner): void {
+        foreach ($this->getEveryone() as $duelProfile) {
+        }
     }
 
     /**

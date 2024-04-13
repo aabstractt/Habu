@@ -22,15 +22,15 @@ final class TeamDuelImpl extends Duel {
      * @param bool   $canEnd
      */
     public function removePlayer(Player $player, bool $canEnd): void {
-        if ($canEnd && count($this->getAlive()) <= 1) {
-            $this->end();
-        }
-
         foreach ($this->teams as $team) {
             if (!$team->removePlayer($player->getXuid())) continue;
 
             break;
         }
+
+        if (!$canEnd || count($this->getAlive()) > 1) return;
+
+        $this->end();
     }
 
     /**
@@ -48,20 +48,12 @@ final class TeamDuelImpl extends Duel {
 
             $team->addPlayer($player->getXuid());
 
-            if (count($team->getPlayers()) < $teamSize) continue;
+            if (count($team->getPlayers($this)) < $teamSize) continue;
 
             $teamId++;
         }
 
         $this->teams = $teams;
-    }
-
-    /**
-     * This method is called when the match stage change to Ending.
-     * Usually is used to send the match results to the players.
-     */
-    public function end(): void {
-        throw new \RuntimeException('Not implemented');
     }
 
     /**

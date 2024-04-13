@@ -8,6 +8,9 @@ use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\impl\NormalDuelImpl;
+use bitrule\practice\duel\impl\round\NormalRoundingDuelImpl;
+use bitrule\practice\duel\impl\round\RoundingDuel;
+use bitrule\practice\duel\impl\round\RoundingInfo;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\match\MatchRounds;
 use pocketmine\player\Player;
@@ -78,51 +81,68 @@ final class DuelRegistry {
     }
 
     /**
-     * @param Player[] $totalPlayers
-     * @param Kit      $kit
-     * @param bool     $team
-     * @param bool     $ranked
+     * @param Player[]           $players
+     * @param Player[]           $spectators
+     * @param Kit                $kit
+     * @param bool               $ranked
+     * @param RoundingInfo|null  $roundingInfo
+     * @param AbstractArena|null $arena
+     *
+     * @return Duel
      */
-    public function createMatch(array $totalPlayers, Kit $kit, bool $team, bool $ranked): void {
-        $arena = ArenaRegistry::getInstance()->getRandomArena($kit);
+    public function createDuel(
+        array $players,
+        array $spectators,
+        Kit $kit,
+        bool $ranked,
+        ?RoundingInfo $roundingInfo = null,
+        ?AbstractArena $arena = null
+    ): Duel {
+        $arena ??= ArenaRegistry::getInstance()->getRandomArena($kit);
         if ($arena === null) {
             throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
 
-        $this->createMatchForRounding(
-            $totalPlayers,
-            [],
-            $kit,
-            $arena,
-            new MatchRounds(1, 3),
-            $ranked
+        if ($roundingInfo === null) {
+            $duel = new NormalDuelImpl($arena, $kit, $this->duelsPlayed++, $ranked);
+        } else {
+            $duel = new NormalRoundingDuelImpl($arena, $kit, $roundingInfo, $this->duelsPlayed++, $ranked);
+        }
+
+        // TODO: Cache the player duel to prevent make many iterations for only a player
+        // that helps a bit with the performance
+        foreach ($players as $player) {
+            $this->playersDuel[$player->getXuid()] = $duel->getFullName();
+        }
+
+        // TODO: Copy the world from the backup to the worlds folder
+        // after that, load the world and prepare our duel!
+        ArenaRegistry::getInstance()->loadWorld(
+            $arena->getName(),
+            $duel->getFullName(),
+            function() use ($spectators, $players, $duel): void {
+                $duel->prepare($players);
+
+                foreach ($spectators as $spectator) $duel->joinSpectator($spectator);
+            }
         );
 
-//        if ($team) {
-//            $match = new TeamDuelImpl($arena, $kit, $this->matchesPlayed++, $ranked);
-//        } else {
-//            $match = new NormalDuelImpl($arena, $kit, $this->matchesPlayed++, $ranked);
-//        }
-//
-//        $match->prepare($totalPlayers);
-//
-//        ArenaRegistry::getInstance()->loadWorld(
-//            $arena->getName(),
-//            $match->getFullName(),
-//            fn() => $match->postPrepare($totalPlayers)
-//        );
-//
-//        $this->matches[$match->getFullName()] = $match;
+        $this->duels[$duel->getFullName()] = $duel;
+
+        return $duel;
     }
 
     /**
      * @param Duel $duel
      */
-    public function endMatch(Duel $duel): void {
+    public function endDuel(Duel $duel): void {
         unset($this->duels[$duel->getFullName()]);
 
         // Unload the world and delete the folder.
         Server::getInstance()->getWorldManager()->unloadWorld($duel->getWorld());
+
+        if ($duel instanceof RoundingDuel) return;
+
         Server::getInstance()->getAsyncPool()->submitTask(new FileDeleteAsyncTask(
             Server::getInstance()->getDataPath() . 'worlds/' . $duel->getFullName()
         ));
@@ -141,10 +161,10 @@ final class DuelRegistry {
      * @return Duel|null
      */
     public function getDuelByPlayer(string $xuid): ?Duel {
-        $duelProfile = ProfileRegistry::getInstance()->getDuelProfile($xuid);
-        if ($duelProfile === null) return null;
+        $duelName = $this->playersDuel[$xuid] ?? null;
+        if ($duelName === null) return null;
 
-        return $this->duels[$duelProfile->getMatchFullName()] ?? null;
+        return $this->duels[$duelName] ?? null;
     }
 
     /**

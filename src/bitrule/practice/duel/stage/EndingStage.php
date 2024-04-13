@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\registry\DuelRegistry;
 
 final class EndingStage implements AbstractStage {
 
@@ -31,8 +30,6 @@ final class EndingStage implements AbstractStage {
         if ($this->countdown > 1) return;
 
         $duel->postEnd();
-
-        DuelRegistry::getInstance()->endMatch($duel);
     }
 
     /**
@@ -40,5 +37,17 @@ final class EndingStage implements AbstractStage {
      */
     public function getDuration(): int {
         return $this->duration;
+    }
+
+    /**
+     * @param int $duration
+     *
+     * @return self
+     */
+    public static function create(int $duration): self {
+        return new self(
+            5,
+            $duration
+        );
     }
 }

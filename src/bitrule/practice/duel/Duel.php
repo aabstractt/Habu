@@ -21,6 +21,7 @@ use pocketmine\world\Position;
 use pocketmine\world\World;
 use RuntimeException;
 use function array_filter;
+use function count;
 use function gmdate;
 
 abstract class Duel {
@@ -37,6 +38,8 @@ abstract class Duel {
     protected AbstractStage $stage;
     /** @var bool */
     protected bool $loaded = false;
+    /** @var bool */
+    protected bool $ending = false;
 
     /** @var array<string, DuelProfile> */
     protected array $players = [];
@@ -163,10 +166,21 @@ abstract class Duel {
     }
 
     /**
-     * This method is called when the match stage change to Ending.
-     * Usually is used to send the match results to the players.
+     * Called when the duel stage changes
+     * to Ending.
      */
-    abstract public function end(): void;
+    public function end(): void {
+        $this->stage = EndingStage::create($this->stage instanceof PlayingStage ? $this->stage->getSeconds() : 0);
+
+        foreach ($this->getEveryone() as $duelProfile) {
+            $player = $duelProfile->toPlayer();
+            if ($player === null || !$player->isOnline()) {
+                throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
+            }
+
+            $this->processPlayerEnd($player, $duelProfile);
+        }
+    }
 
     /**
      * This method is called when the countdown ends.
@@ -174,10 +188,6 @@ abstract class Duel {
      * and teleport the players to the spawn point.
      */
     public function postEnd(): void {
-        $spectators = $this->getSpectators();
-        $players = $this->getPlayers();
-        $winner = $this->getWinner();
-
         foreach ($this->getEveryone() as $duelProfile) {
             $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) {
@@ -187,19 +197,17 @@ abstract class Duel {
             $this->removePlayer($player, false);
             $this->postRemovePlayer($player);
 
-            $this->processPlayerEnd($player, $duelProfile);
+            $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
+            if ($localProfile === null) {
+                throw new RuntimeException('Local profile not found for player: ' . $player->getName());
+            }
 
-//            $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-//            if ($localProfile === null) {
-//                throw new RuntimeException('Local profile not found for player: ' . $player->getName());
-//            }
-//
-//            $localProfile->joinLobby($player, true);
+            $localProfile->joinLobby($player, true);
         }
 
         $this->loaded = false;
 
-//        (new MatchEndEvent($this, $winner, $players, $spectators, $this->someoneDisconnected))->call();
+        DuelRegistry::getInstance()->endDuel($this);
     }
 
     /**
@@ -208,7 +216,9 @@ abstract class Duel {
      * @param Player      $player
      * @param DuelProfile $duelProfile
      */
-    abstract public function processPlayerEnd(Player $player, DuelProfile $duelProfile): void;
+    public function processPlayerEnd(Player $player, DuelProfile $duelProfile): void {
+        Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_ENDING_SCOREBOARD);
+    }
 
     /**
      * Remove a player from the match.
@@ -272,6 +282,15 @@ abstract class Duel {
     }
 
     /**
+     * @param string $xuid
+     *
+     * @return DuelProfile|null
+     */
+    public function getPlayer(string $xuid): ?DuelProfile {
+        return $this->players[$xuid] ?? null;
+    }
+
+    /**
      * @param string $message
      * @param bool   $includeSpectators
      */
@@ -281,6 +300,16 @@ abstract class Duel {
 
             $duelProfile->sendMessage($message);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSomeoneDisconnected(): bool {
+        return count(array_filter(
+            $this->getPlayers(),
+            fn(DuelProfile $duelProfile): bool => ($player = $duelProfile->toPlayer()) === null || !$player->isOnline()
+            )) > 0;
     }
 
     /**

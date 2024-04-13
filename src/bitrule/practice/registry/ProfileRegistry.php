@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
-use bitrule\practice\match\AbstractMatch;
-use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\profile\LocalProfile;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -23,9 +21,6 @@ final class ProfileRegistry {
 
     /** @var array<string, LocalProfile> */
     private array $localProfiles = [];
-
-    /** @var array<string, DuelProfile> */
-    private array $duelProfiles = [];
 
     /**
      * @param string $xuid
@@ -70,41 +65,6 @@ final class ProfileRegistry {
         QueueRegistry::getInstance()->removeQueue($localProfile);
 
         unset($localProfile);
-    }
-
-    /**
-     * @param string $xuid
-     *
-     * @return DuelProfile|null
-     */
-    public function getDuelProfile(string $xuid): ?DuelProfile {
-        return $this->duelProfiles[$xuid] ?? null;
-    }
-
-    /**
-     * @param Player        $player
-     * @param AbstractMatch $match
-     * @param bool          $spectator
-     */
-    public function addDuelProfile(Player $player, AbstractMatch $match, bool $spectator = false): void {
-        if (isset($this->duelProfiles[$player->getXuid()])) {
-            throw new RuntimeException('Player already exists in duel players list');
-        }
-
-        $this->duelProfiles[$player->getXuid()] = $duelProfile = new DuelProfile(
-            $player->getXuid(),
-            $player->getName(),
-            $match->getFullName(),
-            !$spectator
-        );
-
-        if (!$spectator) return;
-
-        $duelProfile->convertAsSpectator($match, true);
-    }
-
-    public function removeDuelProfile(Player $player): void {
-        unset($this->duelProfiles[$player->getXuid()]);
     }
 
     /**

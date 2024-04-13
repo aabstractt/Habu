@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile;
 
+use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelStatistics;
-use bitrule\practice\match\AbstractMatch;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -100,18 +100,18 @@ final class DuelProfile {
      * Convert the player to spectator.
      * If the player recently joined the match, they will be added to the match.
      *
-     * @param AbstractMatch $match
-     * @param bool          $joined
+     * @param Duel $duel
+     * @param bool $joined
      */
-    public function convertAsSpectator(AbstractMatch $match, bool $joined): void {
+    public function convertAsSpectator(Duel $duel, bool $joined): void {
         if (($player = $this->toPlayer()) === null) return;
 
         $this->alive = false;
 
         if ($joined) {
-            $match->joinSpectator($player);
-        } elseif (count($match->getAlive()) <= 1) {
-            $match->end();
+            $duel->joinSpectator($player);
+        } elseif (count($duel->getAlive()) <= 1) {
+            $duel->end();
         }
 
         LocalProfile::resetInventory($player);

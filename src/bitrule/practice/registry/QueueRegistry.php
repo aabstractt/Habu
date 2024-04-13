@@ -65,10 +65,10 @@ final class QueueRegistry {
             $totalPlayers[] = $player;
         }
 
-        DuelRegistry::getInstance()->createMatch(
+        DuelRegistry::getInstance()->createDuel(
             $totalPlayers,
+            [],
             $kit,
-            false,
             $ranked
         );
     }
