@@ -66,6 +66,7 @@ final class NormalDuelImpl extends Duel {
      * @param bool   $canEnd
      */
     public function removePlayer(Player $player, bool $canEnd): void {
+        // TODO: This going to give some issues
         unset($this->playersSpawn[$player->getXuid()]);
 
         if (!$canEnd) return;
@@ -80,6 +81,8 @@ final class NormalDuelImpl extends Duel {
     }
 
     /**
+     * TODO: Move this to an trait
+     
      * @param string $xuid
      *
      * @return string|null
