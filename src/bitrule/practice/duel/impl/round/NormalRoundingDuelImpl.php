@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\impl\round;
 
 use bitrule\practice\duel\impl\SpectatingDuelTrait;
-use bitrule\practice\duel\impl\trait\NormalDuelSpawnTrait;
 use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKeys;

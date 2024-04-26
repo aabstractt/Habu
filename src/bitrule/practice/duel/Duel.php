@@ -82,7 +82,7 @@ abstract class Duel {
             throw new RuntimeException('Match not loaded.');
         }
 
-        $this->players[$player->getXuid()] = DuelProfile::create($player, false);
+        $this->players[$player->getXuid()] = DuelProfile::spectator($player);
 
         $this->teleportSpawn($player);
     }
@@ -116,42 +116,28 @@ abstract class Duel {
             throw new RuntimeException('Failed to load world ' . $this->getFullName());
         }
 
-        echo 'Prepare method' . PHP_EOL;
-
         foreach ($totalPlayers as $player) {
-            echo 'Adding ' . $player->getName() . ' to cache!' . PHP_EOL;
-
             if (!$player->isOnline()) {
                 throw new RuntimeException('Player ' . $player->getName() . ' is not online');
             }
 
-            $this->players[$player->getXuid()] = DuelProfile::create($player, true);
+            $this->players[$player->getXuid()] = DuelProfile::normal($player);
         }
 
-        echo 'Added to players cache!' . PHP_EOL;
-        echo 'Total players > ' . count($this->players);
-
         foreach ($this->players as $duelProfile) {
-            echo 'Iterating!' . PHP_EOL;
             $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) {
                 throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
             }
 
-            echo 'Default' . PHP_EOL;
             LocalProfile::setDefaultAttributes($player);
 
-            echo 'Prepare' . PHP_EOL;
             $this->processPlayerPrepare($player, $duelProfile);
 
-            echo 'Teleport' . PHP_EOL;
             $this->teleportSpawn($player);
 
-            echo 'Scoreboard' . PHP_EOL;
             Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
         }
-
-        echo 'Loaded!' . PHP_EOL;
 
         $this->loaded = true;
     }

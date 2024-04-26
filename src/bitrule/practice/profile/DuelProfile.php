@@ -114,12 +114,21 @@ final class DuelProfile {
 
     /**
      * @param Player $player
-     * @param bool   $playing
      *
      * @return self
      */
-    public static function create(Player $player, bool $playing): self {
-        return new self($player->getXuid(), $player->getName(), $playing);
+    public static function normal(Player $player): self {
+        return new self($player->getXuid(), $player->getName(), true);
+    }
 
+    /**
+     * Create a spectator profile
+     *
+     * @param Player $source
+     *
+     * @return self
+     */
+    public static function spectator(Player $source): self {
+        return new self($source->getXuid(), $source->getName(), false);
     }
 }
