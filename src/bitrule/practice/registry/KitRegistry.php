@@ -10,6 +10,7 @@ use JsonException;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
+use pocketmine\item\StringToItemParser;
 use pocketmine\item\VanillaItems;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
@@ -105,7 +106,7 @@ final class KitRegistry {
             throw new RuntimeException('Item name is not set');
         }
 
-        $item = VanillaItems::getAll()[strtoupper($name)] ?? null;
+        $item = StringToItemParser::getInstance()->parse($name);
         if ($item === null) {
             throw new RuntimeException('Item ' . $name . ' does not exist');
         }
@@ -147,7 +148,7 @@ final class KitRegistry {
      */
     public static function writeItem(Item $item): array {
         return [
-        	'name' => $item->getName(),
+        	'name' => $item->getVanillaName(),
         	'customName' => $item->getCustomName(),
         	'lore' => $item->getLore(),
         	'enchantments' => array_map(

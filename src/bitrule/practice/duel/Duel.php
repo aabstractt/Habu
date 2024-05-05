@@ -191,13 +191,6 @@ abstract class Duel {
 
             $this->removePlayer($player, false);
             $this->postRemovePlayer($player);
-
-            $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-            if ($localProfile === null) {
-                throw new RuntimeException('Local profile not found for player: ' . $player->getName());
-            }
-
-            $localProfile->joinLobby($player, true);
         }
 
         $this->loaded = false;
@@ -237,6 +230,13 @@ abstract class Duel {
         unset($this->players[$player->getXuid()]);
 
         DuelRegistry::getInstance()->quitPlayer($player->getXuid());
+
+        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
+        if ($localProfile === null) {
+            throw new RuntimeException('Local profile not found for player: ' . $player->getName());
+        }
+
+        $localProfile->joinLobby($player, true);
     }
 
     /**
@@ -396,9 +396,12 @@ abstract class Duel {
 
         if ($identifier === 'your-ping') return (string) $player->getNetworkSession()->getPing();
 
-        if ($this->stage instanceof EndingStage) {
-            if ($identifier === 'duel-ending-defeat' && $player->isSpectator()) return '';
-            if ($identifier === 'duel-ending-victory' && $player->isSurvival()) return '';
+        $duelPlayer = $this->getPlayer($player->getXuid());
+        if ($duelPlayer === null) return null;
+
+        if ($this->stage instanceof EndingStage && $duelPlayer->isPlaying()) {
+            if ($identifier === 'duel-ending-defeat' && !$duelPlayer->isAlive()) return '';
+            if ($identifier === 'duel-ending-victory' && $duelPlayer->isAlive()) return '';
         }
 
         return null;

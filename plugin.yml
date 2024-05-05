@@ -1,7 +1,7 @@
 ---
 name: BitrulePractice
 author: bitrule
-version: "2024.0505.1"
+version: "2024.505"
 api: 5.0.0
 main: bitrule\practice\Practice
 permissions:

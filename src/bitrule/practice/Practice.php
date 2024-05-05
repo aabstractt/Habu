@@ -9,6 +9,7 @@ use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
+use bitrule\practice\listener\entity\EntityDamageListener;
 use bitrule\practice\listener\EntityTeleportListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\profile\LocalProfile;
@@ -79,6 +80,7 @@ final class Practice extends PluginBase {
         // TODO: Match listeners
         $this->getServer()->getPluginManager()->registerEvents(new EntityTeleportListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new EntityDamageListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),
@@ -87,11 +89,16 @@ final class Practice extends PluginBase {
 
         $this->getScheduler()->scheduleRepeatingTask(
             new ClosureTask(function (): void {
-                ProfileRegistry::getInstance()->tickScoreboard();
-
                 DuelRegistry::getInstance()->tickStages();
             }),
             20
+        );
+
+        $this->getScheduler()->scheduleRepeatingTask(
+            new ClosureTask(function (): void {
+                ProfileRegistry::getInstance()->tickScoreboard();
+            }),
+            5
         );
     }
 
@@ -152,7 +159,7 @@ final class Practice extends PluginBase {
      */
     public static function replacePlaceholders(Player $player, LocalProfile $localProfile, string $identifier): ?string {
         if ($identifier === 'total-queue-count') return (string) (QueueRegistry::getInstance()->getQueueCount());
-        if ($identifier === 'total-match-count') return (string) (DuelRegistry::getInstance()->getDuelsCount());
+        if ($identifier === 'total-duel-count') return (string) (DuelRegistry::getInstance()->getDuelsCount());
         if ($identifier === 'online-players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
 
         if (str_starts_with($identifier, 'queue-')) {

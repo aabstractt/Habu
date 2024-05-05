@@ -88,9 +88,7 @@ final class TranslationKey {
             self::create(
                 'BOXING_DUEL_HITS_DIFFERENCE_NONE',
                 'duel.boxing.hits-difference.none',
-                [
-                	'amount'
-                ]
+                []
             ),
             self::create(
                 'BOXING_DUEL_COMBO_OPPONENT',
@@ -109,9 +107,7 @@ final class TranslationKey {
             self::create(
                 'BOXING_DUEL_COMBO_NONE',
                 'duel.boxing.current-combo.none',
-                [
-                	'amount'
-                ]
+                []
             )
         );
     }

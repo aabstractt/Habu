@@ -68,7 +68,7 @@ final class Scoreboard {
         foreach ($this->lines as $identifier => $scoreboardLine) {
             $updateResult = $scoreboardLine->update(
                 $slot,
-                str_contains($identifier, 'nothing_') ? '' : Practice::replacePlaceholders($player, $localProfile, $identifier)
+                str_contains($identifier, 'nothing-') ? '' : Practice::replacePlaceholders($player, $localProfile, $identifier)
             );
 
             if ($updateResult === UpdateResult::NOT_UPDATED) {

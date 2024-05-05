@@ -37,10 +37,6 @@ final class PlayingStage implements AbstractStage {
      * @param EntityDamageEvent $ev
      */
     public function onAnythingDamageEvent(Duel $duel, Player $victim, EntityDamageEvent $ev): void {
-        $kit = $duel->getKit();
-        if ($kit->getName() === Kit::BOXING || $kit->getName() === Kit::SUMO) {
-            $ev->setBaseDamage(0.0);
-        }
     }
 
     /**
@@ -65,10 +61,6 @@ final class PlayingStage implements AbstractStage {
         $attackerDuelStatistics->increaseTotalHits();
 
         $kit = $duel->getKit();
-        if ($kit->getName() === Kit::BOXING || $kit->getName() === Kit::SUMO) {
-            $ev->setBaseDamage(0.0);
-        }
-
         if ($kit->getName() !== Kit::BOXING) return;
 
         if ($attackerDuelStatistics->getTotalHits() >= 100) {

@@ -14,7 +14,7 @@ duel:
     hits-difference:
       self: '&a(+<amount>)'
       opponent: '(&c-<amount>)'
-      none: '&e(+/-<amount>)'
+      none: '&eNone'
     current-combo:
       opponent: '&c<amount> Combo'
       self: '&a<amount> Combo'

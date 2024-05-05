@@ -77,6 +77,15 @@ final class NormalDuelImpl extends Duel {
         // TODO: Already fixed
         unset($this->playersSpawn[$player->getXuid()]);
 
+        $duelPlayer = $this->getPlayer($player->getXuid());
+        if ($duelPlayer === null) {
+            throw new RuntimeException('Player not found in the match.');
+        }
+
+        if ($duelPlayer->isAlive()) {
+            $duelPlayer->convertAsSpectator($this, false);
+        }
+
         if (!$canEnd) return;
 
         $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
