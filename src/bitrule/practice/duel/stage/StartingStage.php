@@ -40,7 +40,13 @@ final class StartingStage implements AbstractStage {
             $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
-            Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_PLAYING_SCOREBOARD);
+            Practice::setProfileScoreboard(
+                $player,
+                match ($duel->getKit()->getName()) {
+                    'Boxing' => ProfileRegistry::MATCH_PLAYING_BOXING_SCOREBOARD,
+                    default => ProfileRegistry::MATCH_PLAYING_SCOREBOARD
+                }
+            );
         }
     }
 

@@ -7,7 +7,7 @@ namespace bitrule\practice\duel\impl\round;
 use bitrule\practice\duel\impl\SpectatingDuelTrait;
 use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\profile\DuelProfile;
-use bitrule\practice\TranslationKeys;
+use bitrule\practice\TranslationKey;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use function count;
@@ -46,7 +46,7 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
         $duelStatistics = $duelProfile->getDuelStatistics();
         $opponentDuelStatistics = $opponent->getDuelStatistics();
 
-        $player->sendMessage(TranslationKeys::MATCH_END_STATISTICS_NORMAL->build(
+        $player->sendMessage(TranslationKey::DUEL_END_STATISTICS_NORMAL()->build(
             $opponent->getName(),
             '&a(+0)',
             (string) $duelStatistics->getCritics(),

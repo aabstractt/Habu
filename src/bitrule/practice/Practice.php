@@ -151,16 +151,16 @@ final class Practice extends PluginBase {
      * @return string|null
      */
     public static function replacePlaceholders(Player $player, LocalProfile $localProfile, string $identifier): ?string {
-        if ($identifier === 'total_queue_count') return (string) (QueueRegistry::getInstance()->getQueueCount());
-        if ($identifier === 'total_match_count') return (string) (DuelRegistry::getInstance()->getDuelsCount());
-        if ($identifier === 'online_players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
+        if ($identifier === 'total-queue-count') return (string) (QueueRegistry::getInstance()->getQueueCount());
+        if ($identifier === 'total-match-count') return (string) (DuelRegistry::getInstance()->getDuelsCount());
+        if ($identifier === 'online-players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
 
-        if (str_starts_with($identifier, 'queue_')) {
+        if (str_starts_with($identifier, 'queue-')) {
             if (($queue = $localProfile->getQueue()) === null) return null;
 
-            if ($identifier === 'queue_type') return $queue->isRanked() ? 'Ranked' : 'Unranked';
-            if ($identifier === 'queue_kit') return $queue->getKitName();
-            if ($identifier === 'queue_duration') return gmdate('i:s', time() - $queue->getTimestamp());
+            if ($identifier === 'queue-type') return $queue->isRanked() ? 'Ranked' : 'Unranked';
+            if ($identifier === 'queue-kit') return $queue->getKitName();
+            if ($identifier === 'queue-duration') return gmdate('i:s', time() - $queue->getTimestamp());
         }
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());

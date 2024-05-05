@@ -18,6 +18,21 @@ final class DuelStatistics {
     private int $totalPotions = 0;
     /** @var float */
     private float $damageDealt = 0.0;
+    /**
+     * Total hits given to other players.
+     * @var int
+     */
+    private int $totalHits = 0;
+    /**
+     * The current combo of the player.
+     * @var int
+     */
+    private int $currentCombo = 0;
+    /**
+     * The highest combo achieved by the player.
+     * @var int
+     */
+    private int $highestCombo = 0;
 
     /**
      * @return int
@@ -64,5 +79,54 @@ final class DuelStatistics {
      */
     public function increaseDamageDealt(float $damageDealt): void {
         $this->damageDealt += $damageDealt;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTotalHits(): int {
+        return $this->totalHits;
+    }
+
+    /**
+     * Increments the total hits.
+     */
+    public function increaseTotalHits(): void {
+        $this->totalHits++;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCurrentCombo(): int {
+        return $this->currentCombo;
+    }
+
+    /**
+     * Increments the current combo.
+     */
+    public function increaseCurrentCombo(): void {
+        $this->currentCombo++;
+    }
+
+    /**
+     * Resets the current combo.
+     */
+    public function resetCurrentCombo(): void {
+        $this->currentCombo = 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHighestCombo(): int {
+        return $this->highestCombo;
+    }
+
+    /**
+     * @param int $highestCombo
+     */
+    public function setHighestCombo(int $highestCombo): void {
+        $this->highestCombo = $highestCombo;
     }
 }

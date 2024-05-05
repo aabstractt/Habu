@@ -23,9 +23,7 @@ abstract class RoundingDuel extends Duel {
 
     /** @var RoundingInfo $roundingInfo */
     protected RoundingInfo $roundingInfo;
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected bool $ended = false;
 
     /**

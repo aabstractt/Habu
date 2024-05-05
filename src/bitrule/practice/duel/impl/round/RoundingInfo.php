@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel\impl\round;
 
+use function is_numeric;
+
 final class RoundingInfo {
 
     /**
@@ -62,7 +64,7 @@ final class RoundingInfo {
             $winnerXuid = $playerXuid;
         }
 
-        return is_numeric($winnerXuid) ? strval($winnerXuid) : $winnerXuid;
+        return is_numeric($winnerXuid) ? (string) $winnerXuid : $winnerXuid;
     }
 
     /**

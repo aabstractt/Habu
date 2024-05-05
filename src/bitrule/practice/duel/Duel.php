@@ -21,6 +21,7 @@ use pocketmine\world\Position;
 use pocketmine\world\World;
 use RuntimeException;
 use function array_filter;
+use function array_key_first;
 use function count;
 use function gmdate;
 
@@ -95,8 +96,6 @@ abstract class Duel {
         if ($spawnId === -1) {
             throw new RuntimeException('Player not found in match.');
         }
-
-        echo 'Teleporting to spawn...' . PHP_EOL;
 
         $player->teleport(Position::fromObject(
             match ($spawnId) {
@@ -376,7 +375,12 @@ abstract class Duel {
      * @return DuelProfile|null
      */
     public function getWinner(): ?DuelProfile {
-        return $this->getAlive()[0] ?? null;
+        if (count($this->getAlive()) !== 1) return null;
+
+        $firstKey = array_key_first($this->getAlive());
+        if ($firstKey === null) return null;
+
+        return $this->players[$firstKey] ?? null;
     }
 
     /**
@@ -386,15 +390,15 @@ abstract class Duel {
      * @return string|null
      */
     public function replacePlaceholders(Player $player, string $identifier): ?string {
-        if ($identifier === 'match_duration' && ($this->stage instanceof PlayingStage || $this->stage instanceof EndingStage)) {
+        if ($identifier === 'duel-duration' && ($this->stage instanceof PlayingStage || $this->stage instanceof EndingStage)) {
             return gmdate('i:s', $this->stage instanceof PlayingStage ? $this->stage->getSeconds() : $this->stage->getDuration());
         }
 
-        if ($identifier === 'your_ping') return (string) $player->getNetworkSession()->getPing();
+        if ($identifier === 'your-ping') return (string) $player->getNetworkSession()->getPing();
 
         if ($this->stage instanceof EndingStage) {
-            if ($identifier === 'match_ending_defeat' && $player->isSpectator()) return '';
-            if ($identifier === 'match_ending_victory' && $player->isSurvival()) return '';
+            if ($identifier === 'duel-ending-defeat' && $player->isSpectator()) return '';
+            if ($identifier === 'duel-ending-victory' && $player->isSurvival()) return '';
         }
 
         return null;

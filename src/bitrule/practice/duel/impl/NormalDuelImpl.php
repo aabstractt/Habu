@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\impl;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\impl\trait\NormalDuelSpawnTrait;
 use bitrule\practice\duel\stage\StartingStage;
+use bitrule\practice\kit\Kit;
 use bitrule\practice\profile\DuelProfile;
-use bitrule\practice\TranslationKeys;
+use bitrule\practice\TranslationKey;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use RuntimeException;
+use function abs;
 use function count;
 use function str_starts_with;
 
@@ -47,7 +49,7 @@ final class NormalDuelImpl extends Duel {
         $matchStatistics = $duelProfile->getDuelStatistics();
         $opponentMatchStatistics = $opponent->getDuelStatistics();
 
-        $player->sendMessage(TranslationKeys::MATCH_END_STATISTICS_NORMAL->build(
+        $player->sendMessage(TranslationKey::DUEL_END_STATISTICS_NORMAL()->build(
             $opponent->getName(),
             '&a(+0)',
             (string) $matchStatistics->getCritics(),
@@ -66,13 +68,16 @@ final class NormalDuelImpl extends Duel {
      * @param bool   $canEnd
      */
     public function removePlayer(Player $player, bool $canEnd): void {
+        $spawnId = $this->getSpawnId($player->getXuid());
+        if ($spawnId === -1) {
+            throw new RuntimeException('Player not found in the match.');
+        }
+
         // TODO: This going to give some issues
+        // TODO: Already fixed
         unset($this->playersSpawn[$player->getXuid()]);
 
         if (!$canEnd) return;
-
-        $spawnId = $this->getSpawnId($player->getXuid());
-        if ($spawnId === -1) return;
 
         $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
         if (count($this->getAlive()) > $expectedPlayersAlive) return;
@@ -82,7 +87,7 @@ final class NormalDuelImpl extends Duel {
 
     /**
      * TODO: Move this to an trait
-     
+     *
      * @param string $xuid
      *
      * @return string|null
@@ -126,14 +131,52 @@ final class NormalDuelImpl extends Duel {
         $parent = parent::replacePlaceholders($player, $identifier);
         if ($parent !== null) return $parent;
 
-        if (str_starts_with($identifier, 'match_opponent')) {
+        $duelProfile = $this->getPlayer($player->getXuid());
+        if ($duelProfile === null) return null;
+
+        if (str_starts_with($identifier, 'duel-opponent')) {
             $opponent = $this->getOpponent($player);
             if ($opponent === null) return null;
 
             $instance = $opponent->toPlayer();
             if ($instance === null || !$instance->isOnline()) return null;
 
-            return $identifier === 'match_opponent_name' ? $opponent->getName() : (string) $instance->getNetworkSession()->getPing();
+            return $identifier === 'duel-opponent-name' ? $opponent->getName() : (string) $instance->getNetworkSession()->getPing();
+        }
+
+        if ($this->kit->getName() === Kit::BOXING) {
+            $opponent = $this->getOpponent($player);
+            if ($opponent === null) return null;
+
+            $opponentDuelStatistics = $opponent->getDuelStatistics();
+            $duelStatistics = $duelProfile->getDuelStatistics();
+
+            if ($identifier === 'duel-hits-difference') {
+                $difference = $duelStatistics->getTotalHits() - $opponentDuelStatistics->getTotalHits();
+                if ($difference === 0) {
+                    return TranslationKey::BOXING_DUEL_HITS_DIFFERENCE_NONE()->build();
+                }
+
+                if ($difference > 0) {
+                    return TranslationKey::BOXING_DUEL_HITS_DIFFERENCE_SELF()->build((string) $difference);
+                }
+
+                return TranslationKey::BOXING_DUEL_HITS_DIFFERENCE_OPPONENT()->build((string) abs($difference));
+            }
+
+            if ($identifier === 'duel-hits-diff-self') return (string) $duelStatistics->getTotalHits();
+            if ($identifier === 'duel-hits-diff-opponent') return (string) $opponentDuelStatistics->getTotalHits();
+            if ($identifier === 'duel-hits-status') {
+                if ($opponentDuelStatistics->getCurrentCombo() > 0) {
+                    return TranslationKey::BOXING_DUEL_COMBO_OPPONENT()->build((string) $opponentDuelStatistics->getCurrentCombo());
+                }
+
+                if ($duelStatistics->getCurrentCombo() > 0) {
+                    return TranslationKey::BOXING_DUEL_COMBO_SELF()->build((string) $duelStatistics->getCurrentCombo());
+                }
+
+                return TranslationKey::BOXING_DUEL_COMBO_NONE()->build();
+            }
         }
 
         return null;
