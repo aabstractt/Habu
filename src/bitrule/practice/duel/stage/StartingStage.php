@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\duel\Duel;
+use bitrule\practice\event\duel\DuelStartedEvent;
 use bitrule\practice\Practice;
 use bitrule\practice\registry\ProfileRegistry;
 use function count;
@@ -35,6 +36,8 @@ final class StartingStage implements AbstractStage {
         if ($this->countdown > 1) return;
 
         $duel->setStage(new PlayingStage());
+
+        (new DuelStartedEvent($duel))->call();
 
         foreach ($duel->getEveryone() as $duelProfile) {
             $player = $duelProfile->toPlayer();

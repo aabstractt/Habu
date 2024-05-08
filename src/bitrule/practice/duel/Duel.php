@@ -132,8 +132,9 @@ abstract class Duel {
             LocalProfile::setDefaultAttributes($player);
 
             $this->processPlayerPrepare($player, $duelProfile);
-
             $this->teleportSpawn($player);
+
+            $this->kit->applyOn($player);
 
             Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
 

@@ -17,6 +17,8 @@ final class SumoPlayerMoveListener implements Listener {
 
     /**
      * @param PlayerMoveEvent $ev
+     *
+     * @priority NORMAL
      */
     public function onPlayerMoveEvent(PlayerMoveEvent $ev): void {
         $player = $ev->getPlayer();

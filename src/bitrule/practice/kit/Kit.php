@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace bitrule\practice\kit;
 
+use bitrule\practice\event\player\PlayerKitAppliedEvent;
 use pocketmine\item\Item;
+use pocketmine\player\Player;
 
 final class Kit {
 
@@ -71,5 +73,18 @@ final class Kit {
      */
     public function setKbProfile(string $kbProfile): void {
         $this->kbProfile = $kbProfile;
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function applyOn(Player $player): void {
+        $player->getInventory()->clearAll();
+        $player->getArmorInventory()->clearAll();
+
+        $player->getInventory()->setContents($this->inventoryItems);
+        $player->getArmorInventory()->setContents($this->armorItems);
+
+        (new PlayerKitAppliedEvent($player, $this))->call();
     }
 }
