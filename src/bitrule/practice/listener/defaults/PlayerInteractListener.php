@@ -35,14 +35,14 @@ final class PlayerInteractListener implements Listener {
 
         $ev->cancel();
 
-        if ($ev->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
+        if ($ev->getAction() === PlayerInteractEvent::LEFT_CLICK_BLOCK) {
             if ($player->isSneaking()) {
                 $arenaSetup->increaseSpawnStep();
             } else {
                 $arenaSetup->decreaseSpawnStep();
             }
 
-            $player->sendMessage(TextFormat::GREEN . 'You are now setting position for step ' . $arenaSetup->getSpawnStep());
+            $player->sendMessage(TextFormat::YELLOW . 'You are now setting position for step ' . $arenaSetup->getSpawnStep());
 
             return;
         }
@@ -51,5 +51,7 @@ final class PlayerInteractListener implements Listener {
 
         $arenaSetup->setPositionByStep($arenaSetup->getSpawnStep(), $ev->getBlock()->getPosition()->add(0, 1, 0));
         $arenaSetup->increaseSpawnStep();
+
+        $player->sendMessage(TextFormat::YELLOW . 'You are now setting position for step ' . $arenaSetup->getSpawnStep());
     }
 }

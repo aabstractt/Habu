@@ -21,9 +21,9 @@ final class FireballFightArenaSetup extends AbstractArenaSetup {
      * @param Vector3 $position
      */
     public function setPositionByStep(int $step, Vector3 $position): void {
-        if ($step < 3) {
+        if ($step < 2) {
             parent::setPositionByStep($step, $position);
-        } elseif ($step === 3) {
+        } elseif ($step === 2) {
             $this->firstBedPosition = $position;
         } else {
             $this->secondBedPosition = $position;

@@ -120,6 +120,10 @@ final class KitRegistry {
             $item->setLore($itemData['lore']);
         }
 
+        if (isset($itemData['count'])) {
+            $item->setCount($itemData['count']);
+        }
+
         if (isset($itemData['enchantments'])) {
             foreach ($itemData['enchantments'] as [$id, $level]) {
                 if (!is_int($id)) {
@@ -151,6 +155,7 @@ final class KitRegistry {
         return [
         	'name' => $item->getVanillaName(),
         	'customName' => $item->getCustomName(),
+            'count' => $item->getCount(),
         	'lore' => $item->getLore(),
         	'enchantments' => array_map(
         	    fn(EnchantmentInstance $enchantment) => [EnchantmentIdMap::getInstance()->toId($enchantment->getType()), $enchantment->getLevel()],

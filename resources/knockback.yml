@@ -1,0 +1,5 @@
+default:
+  horizontal: 0.0
+  vertical: 0.0
+  highest_limit: 0.0
+  hit_delay: -1

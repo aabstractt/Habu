@@ -38,7 +38,7 @@ final class EntityDamageListener implements Listener {
 
             $knockbackProfile = KnockbackRegistry::getInstance()->getKnockback($localProfile->getKnockbackProfile());
             if ($knockbackProfile === null) {
-                throw new \RuntimeException('KnockbackProfile is null');
+                throw new \RuntimeException('KnockbackProfile for ' . $localProfile->getKnockbackProfile() . ' is null');
             }
 
             $ev->setKnockBack(0.0);

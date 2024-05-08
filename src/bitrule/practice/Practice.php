@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice;
 
+use bitrule\practice\arena\ScoreboardId;
 use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
@@ -21,6 +22,7 @@ use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\KitRegistry;
+use bitrule\practice\registry\KnockbackRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\registry\QueueRegistry;
 use pocketmine\player\Player;
@@ -78,6 +80,7 @@ final class Practice extends PluginBase {
 
         KitRegistry::getInstance()->loadAll();
         ArenaRegistry::getInstance()->loadAll();
+        KnockbackRegistry::getInstance()->loadAll($this);
 
         // TODO: Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
@@ -184,6 +187,12 @@ final class Practice extends PluginBase {
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel === null) return null;
 
-        return $duel->replacePlaceholders($player, $identifier);
+        $result = $duel->replacePlaceholders($player, $identifier);
+        if ($result !== null) return $result;
+
+        $arena = $duel->getArena();
+        if ($arena instanceof ScoreboardId) return $arena->replacePlaceholders($duel, $player, $localProfile, $identifier);
+
+        return null;
     }
 }

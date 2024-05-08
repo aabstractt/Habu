@@ -34,10 +34,11 @@ final class PlayerKitAppliedListener implements Listener {
 
         $color = $spawnId === 0 ? DyeColor::RED() : DyeColor::BLUE();
 
-        foreach ($player->getArmorInventory()->getContents() as $item) {
+        foreach ($player->getArmorInventory()->getContents() as $slot => $item) {
             if (!$item instanceof Armor) continue;
 
             $item->setCustomColor($color->getRgbValue());
+            $player->getInventory()->setItem($slot, $item);
         }
     }
 }

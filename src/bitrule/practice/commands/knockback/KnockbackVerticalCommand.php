@@ -35,7 +35,7 @@ final class KnockbackVerticalCommand extends Argument {
             return;
         }
 
-        if (!is_float($args[1])) {
+        if (!is_numeric($args[1])) {
             $sender->sendMessage(TextFormat::RED . 'Value must be a float');
 
             return;
@@ -43,7 +43,7 @@ final class KnockbackVerticalCommand extends Argument {
 
         $sender->sendMessage(KnockbackProfileCommand::PREFIX . TextFormat::GREEN . 'Set vertical knockback for ' . $args[0] . ' to ' . $args[1] . '.');
 
-        $knockbackProfile->setVertical($args[1]);
+        $knockbackProfile->setVertical(floatval($args[1]));
         KnockbackRegistry::getInstance()->saveAll();
     }
 }

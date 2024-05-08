@@ -33,7 +33,7 @@ final class KnockbackRegistry {
      * @param Practice $plugin
      */
     public function loadAll(Practice $plugin): void {
-        $configData = (new Config(Path::join($plugin->getDataFolder(), 'knockback.yml')))->getAll();
+        $configData = (new Config($plugin->getDataFolder() . 'knockback.yml'))->getAll();
         if (count($configData) === 0) {
             $plugin->getLogger()->warning('No knockback profiles found.');
 
@@ -41,7 +41,7 @@ final class KnockbackRegistry {
         }
 
         foreach ($configData as $name => $data) {
-            if (!is_array($data) || !isset($data['horizontal'], $data['vertical'], $data['highestLimit'], $data['hitDelay'])) {
+            if (!is_array($data) || !isset($data['horizontal'], $data['vertical'], $data['highest_limit'], $data['hit_delay'])) {
                 $plugin->getLogger()->warning('Invalid knockback profile data for ' . $name);
 
                 continue;
@@ -51,7 +51,7 @@ final class KnockbackRegistry {
                 throw new InvalidArgumentException('Knockback profile name must be a string');
             }
 
-            $this->knockbackProfiles[$name] = new KnockbackProfile(
+            $this->knockbackProfiles[strtolower($name)] = new KnockbackProfile(
                 $name,
                 $data['horizontal'],
                 $data['vertical'],
@@ -87,7 +87,7 @@ final class KnockbackRegistry {
     }
 
     public function saveAll(): void {
-        $config = new Config(Path::join(Practice::getInstance()->getDataFolder(), 'knockback.yml'), Config::YAML);
+        $config = new Config(Practice::getInstance()->getDataFolder() . 'knockback.yml');
         foreach (array_keys($config->getAll()) as $key) {
             if (!is_string($key)) {
                 throw new InvalidArgumentException('Knockback profile name must be a string');

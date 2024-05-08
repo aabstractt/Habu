@@ -7,6 +7,7 @@ namespace bitrule\practice\arena\impl;
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\listener\AnythingDamageArenaListener;
 use bitrule\practice\arena\listener\AttackDamageArenaListener;
+use bitrule\practice\arena\ScoreboardId;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\properties\FireballFightProperties;
 use bitrule\practice\duel\stage\PlayingStage;
@@ -19,7 +20,7 @@ use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use function array_merge;
 
-final class FireballFightArena extends AbstractArena implements AttackDamageArenaListener, AnythingDamageArenaListener {
+final class FireballFightArena extends AbstractArena implements AttackDamageArenaListener, AnythingDamageArenaListener, ScoreboardId {
 
     public const NAME = 'fireball_fight';
 
@@ -101,7 +102,7 @@ final class FireballFightArena extends AbstractArena implements AttackDamageAren
             self::deserializeVector($data['first_bed_position'] ?? []),
             self::deserializeVector($data['second_position'] ?? []),
             self::deserializeVector($data['second_bed_position'] ?? []),
-            $data['knockback_profile'] ?? ''
+            $data['knockback_profile'] ?? 'default'
         );
     }
 
@@ -172,26 +173,46 @@ final class FireballFightArena extends AbstractArena implements AttackDamageAren
         $duel->teleportSpawn($victim);
         LocalProfile::resetInventory($victim);
 
+        $colorSupplier = fn(int $spawnId): string => $spawnId === 0 ? TextFormat::RED : TextFormat::BLUE;
+        if ($attackerProfile === null || $attacker === null) {
+            $duel->broadcastMessage(TranslationKey::FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()->build(
+                $colorSupplier($victimSpawnId) . $victim->getName()
+            ));
+        } else {
+            $duel->broadcastMessage(TranslationKey::FIREBALL_FIGHT_PLAYER_DEAD()->build(
+                $colorSupplier($victimSpawnId) . $victim->getName(),
+                $colorSupplier($duel->getSpawnId($attackerProfile->getXuid())) . $attackerProfile->getName()
+            ));
+        }
+
         $hasBeenBedDestroyed = $victimSpawnId === 0 ? $properties->isRedBedDestroyed() : $properties->isBlueBedDestroyed();
         if ($hasBeenBedDestroyed) {
             $victimProfile->convertAsSpectator($duel, false);
         } else {
             $duel->getKit()->applyOn($victim);
         }
+    }
 
-        $colorSupplier = fn(int $spawnId): string => $spawnId === 0 ? TextFormat::RED : TextFormat::BLUE;
-        if ($attackerProfile === null || $attacker === null) {
-            $duel->broadcastMessage(TranslationKey::FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()->build(
-                $colorSupplier($victimSpawnId) . $victim->getName()
-            ));
+    /**
+     * This is the scoreboard identifier of the arena.
+     *
+     * @return string
+     */
+    public function getScoreboardId(): string {
+        return 'match-playing-fireball';
+    }
 
-            return;
-        }
-
-        $attackerSpawnId = $duel->getSpawnId($attackerProfile->getXuid());
-        $duel->broadcastMessage(TranslationKey::FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()->build(
-            $colorSupplier($victimSpawnId) . $victim->getName(),
-            $colorSupplier($attackerSpawnId) . $attackerProfile->getName()
-        ));
+    /**
+     * Replace placeholders in the text.
+     *
+     * @param Duel         $duel
+     * @param Player       $source
+     * @param LocalProfile $localProfile
+     * @param string       $identifier
+     *
+     * @return string|null
+     */
+    public function replacePlaceholders(Duel $duel, Player $source, LocalProfile $localProfile, string $identifier): ?string {
+        return '';
     }
 }

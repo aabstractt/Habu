@@ -140,6 +140,7 @@ abstract class AbstractArena {
         	'type' => 'normal',
         	'first_position' => self::serializeVector($this->firstPosition),
         	'second_position' => self::serializeVector($this->secondPosition),
+            'knockback_profile' => $this->knockbackProfile,
         	'kits' => $this->kits
         ];
     }

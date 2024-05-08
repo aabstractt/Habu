@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\kit;
 
 use bitrule\practice\profile\LocalProfile;
+use InvalidArgumentException;
 use pocketmine\entity\Attribute;
 use pocketmine\entity\Entity;
 use pocketmine\player\Player;
@@ -106,7 +107,7 @@ final class KnockbackProfile {
      */
     public function applyOn(Player $victim, LocalProfile $victimProfile, ?Entity $attacker): void {
         if ($attacker === null) {
-            throw new \InvalidArgumentException('Attacker cannot be null');
+            throw new InvalidArgumentException('Attacker cannot be null');
         }
 
         $victimPosition = $victim->getPosition();
@@ -114,6 +115,9 @@ final class KnockbackProfile {
 
         $verticalKb = $this->vertical;
         $horizontalKb = $this->horizontal;
+        if ($verticalKb === 0.0 && $horizontalKb === 0.0) {
+            throw new InvalidArgumentException('Both vertical and horizontal knockback values cannot be 0');
+        }
 
         if ($this->highestLimit > 0.0 && !$victim->isOnGround()) {
             $dist = $victimPosition->getY() > $attackerPosition->getY() ? $victimPosition->getY() - $attackerPosition->getY() : $attackerPosition->getY() - $victimPosition->getY();
@@ -126,14 +130,22 @@ final class KnockbackProfile {
         $diffZ = $victimPosition->getZ() - $attackerPosition->getZ();
 
         $force = sqrt($diffX * $diffX + $diffZ * $diffZ);
-        if ($force <= 0) return;
+        if ($force <= 0) {
+            echo 'Force is less than or equal to 0' . PHP_EOL;
 
-        $attribute = $victim->getAttributeMap()->get(Attribute::ATTACK_DAMAGE);
+            return;
+        }
+
+        $attribute = $victim->getAttributeMap()->get(Attribute::KNOCKBACK_RESISTANCE);
         if ($attribute === null) {
             throw new \RuntimeException('Victim does not have attack damage attribute');
         }
 
-        if (mt_rand() / mt_getrandmax() <= $attribute->getValue()) return;
+        if (mt_rand() / mt_getrandmax() <= $attribute->getValue()) {
+            echo 'Critical hit' . PHP_EOL;
+
+            return;
+        }
 
         $force = 1 / $force;
         $motion = clone $victim->getMotion();
@@ -152,6 +164,10 @@ final class KnockbackProfile {
 
         $victimProfile->initialKnockbackMotion = true;
         $victim->setMotion($motion);
+
+        var_dump($motion);
+
+        echo 'Applied knockback' . PHP_EOL;
     }
 
     /**
