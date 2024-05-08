@@ -6,11 +6,13 @@ namespace bitrule\practice;
 
 use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\JoinQueueCommand;
+use bitrule\practice\commands\KnockbackProfileCommand;
 use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\listener\entity\EntityDamageListener;
-use bitrule\practice\listener\EntityTeleportListener;
+use bitrule\practice\listener\entity\EntityMotionListener;
+use bitrule\practice\listener\entity\EntityTeleportListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
@@ -83,11 +85,13 @@ final class Practice extends PluginBase {
         // TODO: Match listeners
         $this->getServer()->getPluginManager()->registerEvents(new EntityTeleportListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new EntityMotionListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityDamageListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),
-        	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>')
+        	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
+            new KnockbackProfileCommand()
         ]);
 
         $this->getScheduler()->scheduleRepeatingTask(

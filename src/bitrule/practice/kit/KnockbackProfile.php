@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace bitrule\practice\kit;
 
+use bitrule\practice\profile\LocalProfile;
+use pocketmine\entity\Attribute;
+use pocketmine\entity\Entity;
+use pocketmine\player\Player;
+
 final class KnockbackProfile {
 
     /**
@@ -87,6 +92,63 @@ final class KnockbackProfile {
      */
     public function setHitDelay(int $hitDelay): void {
         $this->hitDelay = $hitDelay;
+    }
+
+    /**
+     * Applies the knockback profile to the given player.
+     *
+     * @param Player       $victim
+     * @param LocalProfile $victimProfile
+     * @param Entity|null  $attacker
+     */
+    public function applyOn(Player $victim, LocalProfile $victimProfile, ?Entity $attacker): void {
+        if ($attacker === null) {
+            throw new \InvalidArgumentException('Attacker cannot be null');
+        }
+
+        $victimPosition = $victim->getPosition();
+        $attackerPosition = $attacker->getPosition();
+
+        $verticalKb = $this->vertical;
+        $horizontalKb = $this->horizontal;
+
+        if ($this->highestLimit > 0.0 && !$victim->isOnGround()) {
+            $dist = $victimPosition->getY() > $attackerPosition->getY() ? $victimPosition->getY() - $attackerPosition->getY() : $attackerPosition->getY() - $victimPosition->getY();
+            if ($dist > $this->highestLimit) {
+                $verticalKb *= 0.73;
+            }
+        }
+
+        $diffX = $victimPosition->getX() - $attackerPosition->getX();
+        $diffZ = $victimPosition->getZ() - $attackerPosition->getZ();
+
+        $force = sqrt($diffX * $diffX + $diffZ * $diffZ);
+        if ($force <= 0) return;
+
+        $attribute = $victim->getAttributeMap()->get(Attribute::ATTACK_DAMAGE);
+        if ($attribute === null) {
+            throw new \RuntimeException('Victim does not have attack damage attribute');
+        }
+
+        if (mt_rand() / mt_getrandmax() <= $attribute->getValue()) return;
+
+        $force = 1 / $force;
+        $motion = clone $victim->getMotion();
+
+        $motion->x /= 2;
+        $motion->y /= 2;
+        $motion->z /= 2;
+
+        $motion->x += $diffX * $force * $horizontalKb;
+        $motion->y += $verticalKb;
+        $motion->z += $diffZ * $force * $horizontalKb;
+
+        if ($motion->y > $verticalKb) {
+            $motion->y = $verticalKb;
+        }
+
+        $victimProfile->initialKnockbackMotion = true;
+        $victim->setMotion($motion);
     }
 
     /**

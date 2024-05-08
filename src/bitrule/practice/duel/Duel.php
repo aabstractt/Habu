@@ -136,6 +136,13 @@ abstract class Duel {
             $this->teleportSpawn($player);
 
             Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
+
+            $localPlayer = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
+            if ($localPlayer === null) {
+                throw new RuntimeException('Local profile not found for player: ' . $player->getName());
+            }
+
+            $localPlayer->setKnockbackProfile($this->arena->getKnockbackProfile());
         }
 
         $this->loaded = true;

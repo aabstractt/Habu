@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\listener;
+namespace bitrule\practice\listener\entity;
 
 use bitrule\practice\registry\DuelRegistry;
 use pocketmine\event\entity\EntityTeleportEvent;

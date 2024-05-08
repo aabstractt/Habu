@@ -20,7 +20,24 @@ final class LocalProfile {
     private ?Scoreboard $scoreboard = null;
     /** @var Queue|null */
     private ?Queue $queue = null;
+    /**
+     * @var string The knockback profile of the player.
+     */
+    private string $knockbackProfile = 'default';
 
+    /**
+     * @var bool Whether the player's knockback motion is the initial motion.
+     */
+    public bool $initialKnockbackMotion = false;
+    /**
+     * @var bool Whether the player's knockback motion should be cancelled.
+     */
+    public bool $cancelKnockbackMotion = false;
+
+    /**
+     * @param string $xuid
+     * @param string $name
+     */
     public function __construct(
         private readonly string $xuid,
         private readonly string $name
@@ -88,11 +105,26 @@ final class LocalProfile {
      */
     public function joinLobby(Player $player, bool $showScoreboard): void {
         self::setDefaultAttributes($player);
+        $this->setKnockbackProfile('default');
         // TODO: Give lobby items
 
         if (!$showScoreboard) return;
 
         Practice::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
+    }
+
+    /**
+     * @param string $knockbackProfile
+     */
+    public function setKnockbackProfile(string $knockbackProfile): void {
+        $this->knockbackProfile = $knockbackProfile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKnockbackProfile(): string {
+        return $this->knockbackProfile;
     }
 
     public static function setDefaultAttributes(Player $player): void {
