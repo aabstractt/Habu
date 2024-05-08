@@ -35,7 +35,9 @@ final class PlayerInteractListener implements Listener {
 
         $player->sendMessage(TextFormat::GREEN . 'Position for step ' . $arenaSetup->getSpawnStep() . ' set!');
 
-        $arenaSetup->setPositionByStep($arenaSetup->getSpawnStep(), $ev->getBlock()->getPosition());
+        $arenaSetup->setPositionByStep($arenaSetup->getSpawnStep(), $ev->getBlock()->getPosition()->add(0, 1, 0));
         $arenaSetup->increaseSpawnStep();
+
+        $ev->cancel();
     }
 }

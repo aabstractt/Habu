@@ -209,7 +209,7 @@ abstract class AbstractArenaSetup {
      */
     public static function from(string $type): self {
         return match (strtolower($type)) {
-            'normal' => new DefaultArenaSetup(),
+            'normal', 'boxing' => new DefaultArenaSetup($type), // BoxingArenaSetup
             'bridge' => new BridgeArenaSetup(),
             default => throw new InvalidArgumentException('Invalid arena setup type ' . $type),
         };
