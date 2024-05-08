@@ -36,7 +36,10 @@ use function str_starts_with;
 use function time;
 
 final class Practice extends PluginBase {
-    use SingletonTrait;
+    use SingletonTrait {
+        setInstance as private;
+        reset as private;
+    }
 
     /** @var array<string, array<string, string>> */
     private array $scoreboardLines = [];

@@ -15,4 +15,14 @@ permissions:
     default: op
   practice.command.joinqueue:
     default: true
+  kb.command:
+    default: op
+  kb.command.create:
+    default: op
+  kb.command.horizontal:
+    default: op
+  kb.command.vertical:
+    default: op
+  kb.command.highestlimit:
+    default: op
 ...

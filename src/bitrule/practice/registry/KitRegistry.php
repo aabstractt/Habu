@@ -11,7 +11,6 @@ use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\StringToItemParser;
-use pocketmine\item\VanillaItems;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
@@ -19,10 +18,12 @@ use function array_map;
 use function is_array;
 use function is_int;
 use function is_string;
-use function strtoupper;
 
 final class KitRegistry {
-    use SingletonTrait;
+    use SingletonTrait {
+        setInstance as private;
+        reset as private;
+    }
 
     /** @var array<string, Kit> */
     private array $kits = [];

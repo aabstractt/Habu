@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
-use bitrule\practice\duel\impl\round\RoundingInfo;
 use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\LocalProfile;
@@ -12,8 +11,6 @@ use Closure;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
-use function array_filter;
-use function count;
 use function time;
 
 final class QueueRegistry {
@@ -32,9 +29,9 @@ final class QueueRegistry {
      * @param LocalProfile          $sourceLocalProfile
      * @param string                $kitName
      * @param bool                  $ranked
-     * @param ?Closure(Queue): void $onCompletion
+     * @param Closure(Queue): void $onCompletion
      */
-    public function createQueue(LocalProfile $sourceLocalProfile, string $kitName, bool $ranked, ?Closure $onCompletion): void {
+    public function createQueue(LocalProfile $sourceLocalProfile, string $kitName, bool $ranked, Closure $onCompletion): void {
         if (($kit = KitRegistry::getInstance()->getKit($kitName)) === null) {
             throw new RuntimeException('Kit no exists.');
         }
@@ -43,9 +40,7 @@ final class QueueRegistry {
 
         $opponentMatchQueue = $this->lookupOpponent($matchQueue);
         if ($opponentMatchQueue === null) {
-            if ($onCompletion !== null) {
-                $onCompletion($matchQueue);
-            }
+            $onCompletion($matchQueue);
 
             return;
         }
@@ -101,14 +96,15 @@ final class QueueRegistry {
      * @return int
      */
     public function getQueueCount(?string $kitName = null): int {
-        $queues = $this->queues;
-        if ($kitName !== null) {
-            $queues = array_filter($queues, function (Queue $matchQueue) use ($kitName): bool {
-                return $matchQueue->getKitName() === $kitName;
-            });
+        $queueCount = 0;
+
+        foreach ($this->queues as $queue) {
+            if ($kitName !== null && $queue->getKitName() !== $kitName) continue;
+
+            $queueCount++;
         }
 
-        return count($queues);
+        return $queueCount;
     }
 
     /**

@@ -22,7 +22,10 @@ use function is_array;
 use function is_string;
 
 final class ArenaRegistry {
-    use SingletonTrait;
+    use SingletonTrait {
+        setInstance as private;
+        reset as private;
+    }
 
     /** @var array<string, AbstractArena> */
     private array $arenas = [];
