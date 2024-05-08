@@ -22,6 +22,9 @@ use function ucwords;
  * @method static self BOXING_DUEL_COMBO_OPPONENT()
  * @method static self BOXING_DUEL_COMBO_SELF()
  * @method static self BOXING_DUEL_COMBO_NONE()
+ *
+ * @method static self FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()
+ * @method static self FIREBALL_FIGHT_PLAYER_DEAD()
  */
 final class TranslationKey {
     use EnumTrait;
@@ -110,6 +113,21 @@ final class TranslationKey {
                 'BOXING_DUEL_COMBO_NONE',
                 'duel.boxing.current-combo.none',
                 []
+            ),
+            self::create(
+                'FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER',
+                'duel.fireball-fight.player-dead-without-killer',
+                [
+                	'player'
+                ]
+            ),
+            self::create(
+                'FIREBALL_FIGHT_PLAYER_DEAD',
+                'duel.fireball-fight.player-dead',
+                [
+                	'player',
+                	'killer'
+                ]
             )
         );
     }

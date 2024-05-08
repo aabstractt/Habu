@@ -5,10 +5,19 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\impl;
 
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\AnythingDamageArena;
+use bitrule\practice\arena\AttackDamageArena;
+use bitrule\practice\duel\Duel;
+use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\TranslationKey;
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\math\Vector3;
+use pocketmine\player\Player;
+use pocketmine\utils\TextFormat;
 use function array_merge;
 
-final class FireballFightArena extends AbstractArena {
+final class FireballFightArena extends AbstractArena implements AttackDamageArena, AnythingDamageArena {
 
     public const NAME = 'fireball_fight';
 
@@ -108,5 +117,60 @@ final class FireballFightArena extends AbstractArena {
             Vector3::zero(),
             'default'
         );
+    }
+
+    /**
+     * This method is called when a player is damaged by another player.
+     *
+     * @param Duel                      $duel
+     * @param Player                    $victim
+     * @param EntityDamageByEntityEvent $ev
+     */
+    public function onEntityDamageByEntityEvent(Duel $duel, Player $victim, EntityDamageByEntityEvent $ev): void {
+        $this->onAnythingDamageEvent($duel, $victim, $ev);
+    }
+
+    /**
+     * This method is called when a player is damaged by anything
+     * except another player.
+     *
+     * @param Duel              $duel
+     * @param Player            $victim
+     * @param EntityDamageEvent $ev
+     */
+    public function onAnythingDamageEvent(Duel $duel, Player $victim, EntityDamageEvent $ev): void {
+        if ($victim->getHealth() - $ev->getFinalDamage() > 0) return;
+
+        $victimProfile = $duel->getPlayer($victim->getXuid());
+        if ($victimProfile === null || !$victimProfile->isAlive()) return;
+
+        $attacker = $ev instanceof EntityDamageByEntityEvent ? $ev->getDamager() : null;
+
+        $attackerProfile = $attacker instanceof Player ? $duel->getPlayer($attacker->getXuid()) : null;
+        if ($attacker !== null && ($attackerProfile === null || !$attackerProfile->isAlive())) return;
+
+        $ev->cancel();
+
+        $duel->teleportSpawn($victim);
+        LocalProfile::resetInventory($victim);
+
+        $duel->getKit()->applyOn($victim);
+
+        $colorSupplier = fn(int $spawnId): string => $spawnId === 0 ? TextFormat::RED : TextFormat::BLUE;
+
+        $victimSpawnId = $duel->getSpawnId($victim->getXuid());
+        if ($attackerProfile === null || $attacker === null) {
+            $duel->broadcastMessage(TranslationKey::FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()->build(
+                $colorSupplier($victimSpawnId) . $victim->getName()
+            ));
+
+            return;
+        }
+
+        $attackerSpawnId = $duel->getSpawnId($attackerProfile->getXuid());
+        $duel->broadcastMessage(TranslationKey::FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()->build(
+            $colorSupplier($victimSpawnId) . $victim->getName(),
+            $colorSupplier($attackerSpawnId) . $attackerProfile->getName()
+        ));
     }
 }
