@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\setup;
 
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\impl\FireballFightArena;
 use bitrule\practice\Practice;
 use bitrule\practice\registry\ArenaRegistry;
 use InvalidArgumentException;
@@ -125,6 +126,17 @@ abstract class AbstractArenaSetup {
     }
 
     /**
+     * Decreases the spawn step by 1.
+     */
+    public function decreaseSpawnStep(): void {
+        $this->spawnStep--;
+
+        if ($this->spawnStep < 0) {
+            $this->spawnStep = 0;
+        }
+    }
+
+    /**
      * Returns the type of arena setup.
      *
      * @return string
@@ -185,6 +197,10 @@ abstract class AbstractArenaSetup {
      * @param AbstractArena $arena
      */
     public function submit(AbstractArena $arena): void {
+        if (!$this->started) {
+            throw new RuntimeException('Setup has not started');
+        }
+
         if ($this->name === null) {
             throw new RuntimeException('Arena name is not set');
         }
@@ -211,6 +227,7 @@ abstract class AbstractArenaSetup {
         return match (strtolower($type)) {
             'normal', 'boxing' => new DefaultArenaSetup($type), // BoxingArenaSetup
             'bridge' => new BridgeArenaSetup(),
+            FireballFightArena::NAME => new FireballFightArenaSetup(),
             default => throw new InvalidArgumentException('Invalid arena setup type ' . $type),
         };
     }

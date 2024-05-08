@@ -8,6 +8,8 @@ use InvalidArgumentException;
 use pocketmine\utils\EnumTrait;
 use function array_combine;
 use function count;
+use function str_replace;
+use function ucwords;
 
 /**
  * @method static self DUEL_END_STATISTICS_NORMAL()
@@ -142,5 +144,14 @@ final class TranslationKey {
         $self->arguments = $arguments;
 
         return $self;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public static function beautifulName(string $name): string {
+        return ucwords(str_replace(['-', '_'], ' ', $name));
     }
 }

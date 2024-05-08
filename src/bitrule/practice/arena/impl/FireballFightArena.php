@@ -6,6 +6,7 @@ namespace bitrule\practice\arena\impl;
 
 use bitrule\practice\arena\AbstractArena;
 use pocketmine\math\Vector3;
+use function array_merge;
 
 final class FireballFightArena extends AbstractArena {
 
@@ -30,6 +31,9 @@ final class FireballFightArena extends AbstractArena {
         parent::__construct($name, $firstPosition, $secondPosition, $knockbackProfile, [self::NAME]);
     }
 
+    /**
+     * @return Vector3
+     */
     public function getFirstBedPosition(): Vector3 {
         return $this->firstBedPosition;
     }
@@ -66,9 +70,9 @@ final class FireballFightArena extends AbstractArena {
         return array_merge(
             parent::serialize(),
             [
-                'type' => self::NAME,
-                'first_bed_position' => self::serializeVector($this->firstBedPosition),
-                'second_bed_position' => self::serializeVector($this->secondBedPosition)
+            	'type' => self::NAME,
+            	'first_bed_position' => self::serializeVector($this->firstBedPosition),
+            	'second_bed_position' => self::serializeVector($this->secondBedPosition)
             ]
         );
     }

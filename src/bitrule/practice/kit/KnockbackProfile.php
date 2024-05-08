@@ -8,6 +8,9 @@ use bitrule\practice\profile\LocalProfile;
 use pocketmine\entity\Attribute;
 use pocketmine\entity\Entity;
 use pocketmine\player\Player;
+use function mt_getrandmax;
+use function mt_rand;
+use function sqrt;
 
 final class KnockbackProfile {
 

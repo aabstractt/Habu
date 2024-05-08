@@ -91,7 +91,7 @@ final class Practice extends PluginBase {
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),
         	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
-            new KnockbackProfileCommand()
+        	new KnockbackProfileCommand()
         ]);
 
         $this->getScheduler()->scheduleRepeatingTask(

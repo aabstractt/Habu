@@ -20,18 +20,12 @@ final class LocalProfile {
     private ?Scoreboard $scoreboard = null;
     /** @var Queue|null */
     private ?Queue $queue = null;
-    /**
-     * @var string The knockback profile of the player.
-     */
+    /** @var string The knockback profile of the player. */
     private string $knockbackProfile = 'default';
 
-    /**
-     * @var bool Whether the player's knockback motion is the initial motion.
-     */
+    /** @var bool Whether the player's knockback motion is the initial motion. */
     public bool $initialKnockbackMotion = false;
-    /**
-     * @var bool Whether the player's knockback motion should be cancelled.
-     */
+    /** @var bool Whether the player's knockback motion should be cancelled. */
     public bool $cancelKnockbackMotion = false;
 
     /**
