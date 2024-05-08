@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\impl;
 
 use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\arena\AttackDamageArena;
+use bitrule\practice\arena\listener\AttackDamageArenaListener;
 use bitrule\practice\duel\Duel;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 
-final class BoxingArena extends AbstractArena implements AttackDamageArena {
+final class BoxingArena extends AbstractArena implements AttackDamageArenaListener {
 
     /**
      * This method is called when a player is damaged by another player.

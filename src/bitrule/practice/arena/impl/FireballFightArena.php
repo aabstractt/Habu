@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\impl;
 
 use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\arena\AnythingDamageArena;
-use bitrule\practice\arena\AttackDamageArena;
+use bitrule\practice\arena\listener\AnythingDamageArenaListener;
+use bitrule\practice\arena\listener\AttackDamageArenaListener;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKey;
@@ -17,7 +17,7 @@ use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use function array_merge;
 
-final class FireballFightArena extends AbstractArena implements AttackDamageArena, AnythingDamageArena {
+final class FireballFightArena extends AbstractArena implements AttackDamageArenaListener, AnythingDamageArenaListener {
 
     public const NAME = 'fireball_fight';
 

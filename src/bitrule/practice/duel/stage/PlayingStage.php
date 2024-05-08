@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel\stage;
 
-use bitrule\practice\arena\AnythingDamageArena;
-use bitrule\practice\arena\AttackDamageArena;
+use bitrule\practice\arena\listener\AnythingDamageArenaListener;
+use bitrule\practice\arena\listener\AttackDamageArenaListener;
 use bitrule\practice\duel\Duel;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
@@ -39,7 +39,7 @@ final class PlayingStage implements AbstractStage {
      */
     public function onAnythingDamageEvent(Duel $duel, Player $victim, EntityDamageEvent $ev): void {
         $arena = $duel->getArena();
-        if (!$arena instanceof AnythingDamageArena) return;
+        if (!$arena instanceof AnythingDamageArenaListener) return;
 
         $arena->onAnythingDamageEvent($duel, $victim, $ev);
     }
@@ -66,7 +66,7 @@ final class PlayingStage implements AbstractStage {
         $attackerDuelStatistics->increaseTotalHits();
 
         $arena = $duel->getArena();
-        if (!$arena instanceof AttackDamageArena) return;
+        if (!$arena instanceof AttackDamageArenaListener) return;
 
         $arena->onEntityDamageByEntityEvent($duel, $victim, $ev);
     }
