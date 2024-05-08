@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile;
 
-use bitrule\practice\match\AbstractMatch;
-use bitrule\practice\match\MatchStatistics;
+use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\DuelStatistics;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -17,18 +17,16 @@ final class DuelProfile {
     private bool $alive = true;
 
     /**
-     * @param string          $xuid
-     * @param string          $name
-     * @param string          $matchFullName
-     * @param bool            $playing
-     * @param MatchStatistics $matchStatistics
+     * @param string         $xuid
+     * @param string         $name
+     * @param bool           $playing
+     * @param DuelStatistics $duelStatistics
      */
     public function __construct(
         private readonly string $xuid,
         private readonly string $name,
-        private readonly string $matchFullName,
         private readonly bool $playing,
-        private readonly MatchStatistics $matchStatistics = new MatchStatistics()
+        private readonly DuelStatistics $duelStatistics = new DuelStatistics()
     ) {}
 
     /**
@@ -46,17 +44,10 @@ final class DuelProfile {
     }
 
     /**
-     * @return string
+     * @return DuelStatistics
      */
-    public function getMatchFullName(): string {
-        return $this->matchFullName;
-    }
-
-    /**
-     * @return MatchStatistics
-     */
-    public function getMatchStatistics(): MatchStatistics {
-        return $this->matchStatistics;
+    public function getDuelStatistics(): DuelStatistics {
+        return $this->duelStatistics;
     }
 
     /**
@@ -100,18 +91,18 @@ final class DuelProfile {
      * Convert the player to spectator.
      * If the player recently joined the match, they will be added to the match.
      *
-     * @param AbstractMatch $match
-     * @param bool          $joined
+     * @param Duel $duel
+     * @param bool $joined
      */
-    public function convertAsSpectator(AbstractMatch $match, bool $joined): void {
+    public function convertAsSpectator(Duel $duel, bool $joined): void {
         if (($player = $this->toPlayer()) === null) return;
 
         $this->alive = false;
 
         if ($joined) {
-            $match->joinSpectator($player);
-        } elseif (count($match->getAlive()) <= 1) {
-            $match->end();
+            $duel->joinSpectator($player);
+        } elseif (count($duel->getAlive()) <= 1) {
+            $duel->end();
         }
 
         LocalProfile::resetInventory($player);
@@ -119,5 +110,25 @@ final class DuelProfile {
         $player->setGamemode(GameMode::SPECTATOR);
         $player->setAllowFlight(true);
         $player->setFlying(true);
+    }
+
+    /**
+     * @param Player $player
+     *
+     * @return self
+     */
+    public static function normal(Player $player): self {
+        return new self($player->getXuid(), $player->getName(), true);
+    }
+
+    /**
+     * Create a spectator profile
+     *
+     * @param Player $source
+     *
+     * @return self
+     */
+    public static function spectator(Player $source): self {
+        return new self($source->getXuid(), $source->getName(), false);
     }
 }

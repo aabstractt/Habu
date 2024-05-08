@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\setup;
 
 use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\manager\ArenaManager;
 use bitrule\practice\Practice;
+use bitrule\practice\registry\ArenaRegistry;
 use InvalidArgumentException;
 use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;
@@ -142,7 +142,7 @@ abstract class AbstractArenaSetup {
             throw new RuntimeException('Arena name is not set');
         }
 
-        if (ArenaManager::getInstance()->getArena($this->name) !== null) {
+        if (ArenaRegistry::getInstance()->getArena($this->name) !== null) {
             throw new RuntimeException('Arena ' . $this->name . ' already exists');
         }
 
@@ -209,7 +209,7 @@ abstract class AbstractArenaSetup {
      */
     public static function from(string $type): self {
         return match (strtolower($type)) {
-            'normal' => new DefaultArenaSetup(),
+            'normal', 'boxing' => new DefaultArenaSetup($type), // BoxingArenaSetup
             'bridge' => new BridgeArenaSetup(),
             default => throw new InvalidArgumentException('Invalid arena setup type ' . $type),
         };

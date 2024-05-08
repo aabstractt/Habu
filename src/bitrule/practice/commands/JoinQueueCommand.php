@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace bitrule\practice\commands;
 
-use bitrule\practice\manager\KitManager;
-use bitrule\practice\manager\ProfileManager;
-use bitrule\practice\manager\QueueManager;
-use bitrule\practice\match\MatchQueue;
+use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
+use bitrule\practice\registry\KitRegistry;
+use bitrule\practice\registry\ProfileRegistry;
+use bitrule\practice\registry\QueueRegistry;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
@@ -41,20 +41,20 @@ final class JoinQueueCommand extends Command {
             return;
         }
 
-        $localProfile = ProfileManager::getInstance()->getLocalProfile($sender->getXuid());
+        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($sender->getXuid());
         if ($localProfile === null) {
             $sender->sendMessage(TextFormat::RED . 'Your profile has not loaded yet.');
 
             return;
         }
 
-        if ($localProfile->getMatchQueue() !== null) {
+        if ($localProfile->getQueue() !== null) {
             $sender->sendMessage(TextFormat::RED . 'You are already in a queue.');
 
             return;
         }
 
-        $kit = KitManager::getInstance()->getKit($args[0]);
+        $kit = KitRegistry::getInstance()->getKit($args[0]);
         if ($kit === null) {
             $sender->sendMessage(TextFormat::RED . 'Kit not found.');
 
@@ -63,15 +63,15 @@ final class JoinQueueCommand extends Command {
 
         $sender->sendMessage(TextFormat::GREEN . 'You have joined the queue for ' . TextFormat::AQUA . $kit->getName() . TextFormat::GREEN . '.');
 
-        QueueManager::getInstance()->createQueue(
+        QueueRegistry::getInstance()->createQueue(
             $localProfile,
             $kit->getName(),
             false,
-            function (MatchQueue $matchQueue) use ($sender, $localProfile): void {
+            function (Queue $matchQueue) use ($sender, $localProfile): void {
                 if (!$sender->isOnline()) return;
 
-                $localProfile->setMatchQueue($matchQueue);
-                Practice::setProfileScoreboard($sender, ProfileManager::QUEUE_SCOREBOARD);
+                $localProfile->setQueue($matchQueue);
+                Practice::setProfileScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
             }
         );
     }

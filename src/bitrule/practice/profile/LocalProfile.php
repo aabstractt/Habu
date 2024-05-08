@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace bitrule\practice\profile;
 
 use bitrule\practice\arena\setup\AbstractArenaSetup;
-use bitrule\practice\manager\ProfileManager;
-use bitrule\practice\match\MatchQueue;
+use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\scoreboard\Scoreboard;
+use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 
@@ -18,9 +18,26 @@ final class LocalProfile {
     private ?AbstractArenaSetup $arenaSetup = null;
     /** @var Scoreboard|null */
     private ?Scoreboard $scoreboard = null;
-    /** @var MatchQueue|null */
-    private ?MatchQueue $matchQueue = null;
+    /** @var Queue|null */
+    private ?Queue $queue = null;
+    /**
+     * @var string The knockback profile of the player.
+     */
+    private string $knockbackProfile = 'default';
 
+    /**
+     * @var bool Whether the player's knockback motion is the initial motion.
+     */
+    public bool $initialKnockbackMotion = false;
+    /**
+     * @var bool Whether the player's knockback motion should be cancelled.
+     */
+    public bool $cancelKnockbackMotion = false;
+
+    /**
+     * @param string $xuid
+     * @param string $name
+     */
     public function __construct(
         private readonly string $xuid,
         private readonly string $name
@@ -69,17 +86,17 @@ final class LocalProfile {
     }
 
     /**
-     * @return MatchQueue|null
+     * @return Queue|null
      */
-    public function getMatchQueue(): ?MatchQueue {
-        return $this->matchQueue;
+    public function getQueue(): ?Queue {
+        return $this->queue;
     }
 
     /**
-     * @param MatchQueue|null $matchQueue
+     * @param Queue|null $queue
      */
-    public function setMatchQueue(?MatchQueue $matchQueue): void {
-        $this->matchQueue = $matchQueue;
+    public function setQueue(?Queue $queue): void {
+        $this->queue = $queue;
     }
 
     /**
@@ -88,11 +105,26 @@ final class LocalProfile {
      */
     public function joinLobby(Player $player, bool $showScoreboard): void {
         self::setDefaultAttributes($player);
+        $this->setKnockbackProfile('default');
         // TODO: Give lobby items
 
         if (!$showScoreboard) return;
 
-        Practice::setProfileScoreboard($player, ProfileManager::LOBBY_SCOREBOARD);
+        Practice::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
+    }
+
+    /**
+     * @param string $knockbackProfile
+     */
+    public function setKnockbackProfile(string $knockbackProfile): void {
+        $this->knockbackProfile = $knockbackProfile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKnockbackProfile(): string {
+        return $this->knockbackProfile;
     }
 
     public static function setDefaultAttributes(Player $player): void {

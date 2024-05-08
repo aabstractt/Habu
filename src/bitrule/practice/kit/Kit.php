@@ -8,6 +8,9 @@ use pocketmine\item\Item;
 
 final class Kit {
 
+    public const BOXING = 'Boxing';
+    public const SUMO = 'Sumo';
+
     /**
      * @param string $name
      * @param array<int, Item>  $inventoryItems

@@ -6,19 +6,21 @@ namespace bitrule\practice;
 
 use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\JoinQueueCommand;
+use bitrule\practice\commands\KnockbackProfileCommand;
 use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
-use bitrule\practice\listener\EntityTeleportListener;
+use bitrule\practice\listener\entity\EntityDamageListener;
+use bitrule\practice\listener\entity\EntityMotionListener;
+use bitrule\practice\listener\entity\EntityTeleportListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
-use bitrule\practice\listener\MatchEndListener;
-use bitrule\practice\manager\ArenaManager;
-use bitrule\practice\manager\KitManager;
-use bitrule\practice\manager\MatchManager;
-use bitrule\practice\manager\ProfileManager;
-use bitrule\practice\manager\QueueManager;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
+use bitrule\practice\registry\ArenaRegistry;
+use bitrule\practice\registry\DuelRegistry;
+use bitrule\practice\registry\KitRegistry;
+use bitrule\practice\registry\ProfileRegistry;
+use bitrule\practice\registry\QueueRegistry;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
@@ -36,7 +38,10 @@ use function str_starts_with;
 use function time;
 
 final class Practice extends PluginBase {
-    use SingletonTrait;
+    use SingletonTrait {
+        setInstance as private;
+        reset as private;
+    }
 
     /** @var array<string, array<string, string>> */
     private array $scoreboardLines = [];
@@ -69,8 +74,8 @@ final class Practice extends PluginBase {
 
         $this->messagesConfig = new Config($this->getDataFolder() . 'messages.yml');
 
-        KitManager::getInstance()->loadAll();
-        ArenaManager::getInstance()->init();
+        KitRegistry::getInstance()->loadAll();
+        ArenaRegistry::getInstance()->loadAll();
 
         // TODO: Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
@@ -80,19 +85,31 @@ final class Practice extends PluginBase {
         // TODO: Match listeners
         $this->getServer()->getPluginManager()->registerEvents(new EntityTeleportListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
-        $this->getServer()->getPluginManager()->registerEvents(new MatchEndListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new EntityMotionListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new EntityDamageListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),
-        	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>')
+        	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
+            new KnockbackProfileCommand()
         ]);
 
-        $this->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
-            MatchManager::getInstance()->tickStages();
-            ProfileManager::getInstance()->tickScoreboard();
-        }), 20);
+        $this->getScheduler()->scheduleRepeatingTask(
+            new ClosureTask(function (): void {
+                DuelRegistry::getInstance()->tickStages();
+            }),
+            20
+        );
+
+        $this->getScheduler()->scheduleRepeatingTask(
+            new ClosureTask(function (): void {
+                ProfileRegistry::getInstance()->tickScoreboard();
+            }),
+            5
+        );
     }
 
+    // TODO: Make more clean this code
     public static function wrapMessage(string $messageKey, array $placeholders = []): string {
         $message = self::getInstance()->messagesConfig?->getNested($messageKey);
         if (!is_string($message)) {
@@ -121,17 +138,18 @@ final class Practice extends PluginBase {
      * @param string $identifier
      */
     public static function setProfileScoreboard(Player $player, string $identifier): void {
-        $localProfile = ProfileManager::getInstance()->getLocalProfile($player->getXuid());
+        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
         if ($localProfile === null) {
             throw new RuntimeException('Local profile not found for player: ' . $player->getName());
         }
 
         if (($scoreboard = $localProfile->getScoreboard()) !== null) {
-            $scoreboard->hide($player); // TODO: Yes
+            $scoreboard->hide($player); // TODO: Yes ??????
         }
 
         $localProfile->setScoreboard($scoreboard = new Scoreboard());
 
+        // TODO: Please make this more clean :sad:
         $scoreboard->load(self::getInstance()->scoreboardLines[$identifier] ?? throw new RuntimeException('Scoreboard not found: ' . $identifier));
         $scoreboard->show($player);
         $scoreboard->update($player, $localProfile);
@@ -147,20 +165,21 @@ final class Practice extends PluginBase {
      * @return string|null
      */
     public static function replacePlaceholders(Player $player, LocalProfile $localProfile, string $identifier): ?string {
-        if ($identifier === 'total_queue_count') return (string) (QueueManager::getInstance()->getQueueCount());
-        if ($identifier === 'total_match_count') return (string) (MatchManager::getInstance()->getMatchCount());
-        if ($identifier === 'online_players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
+        if ($identifier === 'total-queue-count') return (string) (QueueRegistry::getInstance()->getQueueCount());
+        if ($identifier === 'total-duel-count') return (string) (DuelRegistry::getInstance()->getDuelsCount());
+        if ($identifier === 'online-players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
 
-        if (str_starts_with($identifier, 'queue_')) {
-            if (($matchQueue = $localProfile->getMatchQueue()) === null) return null;
+        if (str_starts_with($identifier, 'queue-')) {
+            if (($queue = $localProfile->getQueue()) === null) return null;
 
-            if ($identifier === 'queue_type') return $matchQueue->isRanked() ? 'Ranked' : 'Unranked';
-            if ($identifier === 'queue_kit') return $matchQueue->getKitName();
-            if ($identifier === 'queue_duration') return gmdate('i:s', time() - $matchQueue->getTimestamp());
+            if ($identifier === 'queue-type') return $queue->isRanked() ? 'Ranked' : 'Unranked';
+            if ($identifier === 'queue-kit') return $queue->getKitName();
+            if ($identifier === 'queue-duration') return gmdate('i:s', time() - $queue->getTimestamp());
         }
 
-        return MatchManager::getInstance()
-            ->getMatchByPlayer($player->getXuid())
-            ?->replacePlaceholders($player, $identifier);
+        $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
+        if ($duel === null) return null;
+
+        return $duel->replacePlaceholders($player, $identifier);
     }
 }

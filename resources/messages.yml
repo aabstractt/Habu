@@ -1,11 +1,21 @@
-match:
-  end_statistics_normal: |-
-    §u&lYour Duel Statistics&r
-      &7Elo: <self_elo_changes>
-      &7Critics: §u<self_critics>
-      &7Damage Dealt: §u<self_damage_dealt>
-    §u&l<opponent> Duel Statistics&r
-      &7Elo: <opponent_elo_changes>
-      &7Critics: §u<opponent_critics>
-      &7Damage Dealt: §u<opponent_damage_dealt>
-  opponent_found: '&bPractice &8> &7Found a &f<type> <kit>&7 match against &c<player>'
+duel:
+  end-statistics-normal: |-
+    &b&lYour Duel Statistics&r
+      &7Elo: <self-elo-changes>
+      &7Critics: &b<self-critics>
+      &7Damage Dealt: &b<self-damage-dealt>
+    &b&l<opponent> Duel Statistics&r
+      &7Elo: <opponent-elo-changes>
+      &7Critics: &b<opponent-critics>
+      &7Damage Dealt: &b<opponent-damage-dealt>
+  opponent-found: '&bPractice &8> &7Found a &f<type> <kit>&7 match against &c<player>'
+
+  boxing:
+    hits-difference:
+      self: '&a(+<amount>)'
+      opponent: '(&c-<amount>)'
+      none: '&eNone'
+    current-combo:
+      opponent: '&c<amount> Combo'
+      self: '&a<amount> Combo'
+      none: '&fNo Combo'

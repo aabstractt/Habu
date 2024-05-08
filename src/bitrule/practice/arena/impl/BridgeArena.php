@@ -28,9 +28,10 @@ final class BridgeArena extends AbstractArena {
         Vector3 $secondPosition,
         private Vector3 $firstPortal,
         private Vector3 $secondPortal,
+        string $knockbackProfile,
         array $duelTypes
     ) {
-        parent::__construct($name, $firstPosition, $secondPosition, $duelTypes);
+        parent::__construct($name, $firstPosition, $secondPosition, $knockbackProfile, $duelTypes);
     }
 
     /**
@@ -95,6 +96,7 @@ final class BridgeArena extends AbstractArena {
             self::deserializeVector($data['second_position'] ?? []),
             self::deserializeVector($data['first_portal'] ?? []),
             self::deserializeVector($data['second_portal'] ?? []),
+            $data['knockback_profile'] ?? '',
             $data['kits'] ?? []
         );
     }
@@ -111,6 +113,7 @@ final class BridgeArena extends AbstractArena {
             Vector3::zero(),
             Vector3::zero(),
             Vector3::zero(),
+            'default',
             []
         );
     }

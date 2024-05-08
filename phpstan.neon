@@ -3,9 +3,11 @@ parameters:
     paths:
         - src
     checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
     checkExplicitMixed: true
     checkMissingCallableSignature: true
+    checkUninitializedProperties: true
+    rememberPossiblyImpureFunctionValues: false
+    reportAlwaysTrueInLastCondition: true
     treatPhpDocTypesAsCertain: false
 
 includes:

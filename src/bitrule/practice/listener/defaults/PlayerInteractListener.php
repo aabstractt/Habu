@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\defaults;
 
-use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\ItemTypeIds;
@@ -27,7 +27,7 @@ final class PlayerInteractListener implements Listener {
         if ($item->getTypeId() !== ItemTypeIds::STICK) return;
         if ($item->getNamedTag()->getTag('arena') === null) return;
 
-        $localProfile = ProfileManager::getInstance()->getLocalProfile($player->getXuid());
+        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
         if ($localProfile === null) return;
 
         $arenaSetup = $localProfile->getArenaSetup();
@@ -35,7 +35,9 @@ final class PlayerInteractListener implements Listener {
 
         $player->sendMessage(TextFormat::GREEN . 'Position for step ' . $arenaSetup->getSpawnStep() . ' set!');
 
-        $arenaSetup->setPositionByStep($arenaSetup->getSpawnStep(), $ev->getBlock()->getPosition());
+        $arenaSetup->setPositionByStep($arenaSetup->getSpawnStep(), $ev->getBlock()->getPosition()->add(0, 1, 0));
         $arenaSetup->increaseSpawnStep();
+
+        $ev->cancel();
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\defaults;
 
-use bitrule\practice\manager\ProfileManager;
+use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 
@@ -21,6 +21,6 @@ final class PlayerJoinListener implements Listener {
         // Prevent handle event if the player not is online
         if (!$player->isOnline()) return;
 
-        ProfileManager::getInstance()->addLocalProfile($player);
+        ProfileRegistry::getInstance()->addLocalProfile($player);
     }
 }

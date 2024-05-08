@@ -6,6 +6,15 @@ namespace bitrule\practice\arena\setup;
 
 final class DefaultArenaSetup extends AbstractArenaSetup {
 
+    /**
+     * DefaultArenaSetup constructor.
+     *
+     * @param string $type
+     */
+    public function __construct(
+        private readonly string $type
+    ) {}
+
     public function increaseSpawnStep(): void {
         parent::increaseSpawnStep();
 
@@ -20,6 +29,6 @@ final class DefaultArenaSetup extends AbstractArenaSetup {
      * @return string
      */
     public function getType(): string {
-        return 'normal';
+        return $this->type;
     }
 }

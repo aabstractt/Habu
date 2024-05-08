@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena;
 
+use bitrule\practice\arena\impl\BoxingArena;
 use bitrule\practice\arena\impl\BridgeArena;
 use bitrule\practice\arena\impl\DefaultArena;
 use pocketmine\math\Vector3;
@@ -17,13 +18,15 @@ abstract class AbstractArena {
      * @param string   $name
      * @param Vector3  $firstPosition
      * @param Vector3  $secondPosition
+     * @param string   $knockbackProfile
      * @param string[] $kits
      */
     public function __construct(
         protected readonly string $name,
-        private Vector3         $firstPosition,
-        private Vector3         $secondPosition,
-        private array $kits
+        protected Vector3         $firstPosition,
+        protected Vector3         $secondPosition,
+        protected string $knockbackProfile,
+        protected array $kits
     ) {}
 
     /**
@@ -59,6 +62,20 @@ abstract class AbstractArena {
      */
     public function setSecondPosition(Vector3 $secondPosition): void {
         $this->secondPosition = $secondPosition;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKnockbackProfile(): string {
+        return $this->knockbackProfile;
+    }
+
+    /**
+     * @param string $knockbackProfile
+     */
+    public function setKnockbackProfile(string $knockbackProfile): void {
+        $this->knockbackProfile = $knockbackProfile;
     }
 
     /**
@@ -140,6 +157,7 @@ abstract class AbstractArena {
         $arena = match ($data['type']) {
             'normal' => DefaultArena::parse($name, $data),
             'bridge' => BridgeArena::parse($name, $data),
+            'boxing' => BoxingArena::parse($name, $data),
             default => throw new RuntimeException('Invalid arena type'),
         };
         $arena->setup($data);
@@ -157,6 +175,7 @@ abstract class AbstractArena {
         return match ($type) {
             'normal' => DefaultArena::parseEmpty($name),
             'bridge' => BridgeArena::parseEmpty($name),
+            'boxing' => BoxingArena::parseEmpty($name),
             default => throw new RuntimeException('Invalid arena type'),
         };
     }

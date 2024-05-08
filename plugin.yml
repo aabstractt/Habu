@@ -1,11 +1,13 @@
 ---
 name: BitrulePractice
 author: bitrule
-version: "2023.11"
+version: "2024.505"
 api: 5.0.0
 main: bitrule\practice\Practice
 permissions:
   arena.command:
+    default: op
+  arena.command.knockback:
     default: op
   arena.command.createkit:
     default: op
@@ -15,4 +17,14 @@ permissions:
     default: op
   practice.command.joinqueue:
     default: true
+  kb.command:
+    default: op
+  kb.command.create:
+    default: op
+  kb.command.horizontal:
+    default: op
+  kb.command.vertical:
+    default: op
+  kb.command.highestlimit:
+    default: op
 ...
