@@ -22,7 +22,7 @@ use function is_int;
 final class ArenaSetupForm extends CustomForm {
 
     /**
-     * The type of arena to setup.
+     * The type of arena to set up.
      * @var string|null
      */
     private ?string $type = null;
@@ -50,7 +50,7 @@ final class ArenaSetupForm extends CustomForm {
      */
     public function setup(World $world): void {
         $this->addEntry(
-            new DropdownEntry(TextFormat::GRAY . 'Arena Type', $options = ['Normal', 'Bridge']),
+            new DropdownEntry(TextFormat::GRAY . 'Arena Type', $options = ['Normal', 'Bridge', 'Boxing']),
             function (Player $player, CustomFormEntry $entry, $value) use ($options): void {
                 if (!is_int($value)) {
                     throw new FormValidationException('Please select an arena type.');

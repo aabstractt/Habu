@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena;
 
+use bitrule\practice\arena\impl\BoxingArena;
 use bitrule\practice\arena\impl\BridgeArena;
 use bitrule\practice\arena\impl\DefaultArena;
 use pocketmine\math\Vector3;
@@ -140,6 +141,7 @@ abstract class AbstractArena {
         $arena = match ($data['type']) {
             'normal' => DefaultArena::parse($name, $data),
             'bridge' => BridgeArena::parse($name, $data),
+            'boxing' => BoxingArena::parse($name, $data),
             default => throw new RuntimeException('Invalid arena type'),
         };
         $arena->setup($data);
@@ -157,6 +159,7 @@ abstract class AbstractArena {
         return match ($type) {
             'normal' => DefaultArena::parseEmpty($name),
             'bridge' => BridgeArena::parseEmpty($name),
+            'boxing' => BoxingArena::parseEmpty($name),
             default => throw new RuntimeException('Invalid arena type'),
         };
     }

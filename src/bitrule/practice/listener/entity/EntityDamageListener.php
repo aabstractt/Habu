@@ -24,7 +24,11 @@ final class EntityDamageListener implements Listener {
         if ($duel === null) return;
 
         $stage = $duel->getStage();
-        if (!$stage instanceof PlayingStage) return;
+        if (!$stage instanceof PlayingStage) {
+            $ev->cancel();
+
+            return;
+        }
 
         if ($ev instanceof EntityDamageByEntityEvent) {
             $stage->onEntityDamageByEntityEvent($duel, $entity, $ev);
