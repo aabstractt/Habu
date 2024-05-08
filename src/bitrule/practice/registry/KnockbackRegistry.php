@@ -16,6 +16,7 @@ use function array_keys;
 use function count;
 use function is_array;
 use function is_string;
+use function strtolower;
 
 final class KnockbackRegistry {
     use SingletonTrait {
@@ -63,17 +64,17 @@ final class KnockbackRegistry {
     }
 
     /**
-     * @param KnockbackProfile $profile
+     * @param KnockbackProfile $knockbackProfile
      */
-    public function registerNew(KnockbackProfile $profile): void {
-        $this->knockbackProfiles[$profile->getName()] = $profile;
+    public function registerNew(KnockbackProfile $knockbackProfile): void {
+        $this->knockbackProfiles[strtolower($knockbackProfile->getName())] = $knockbackProfile;
     }
 
     /**
      * @param string $name
      */
     public function removeKnockback(string $name): void {
-        unset($this->knockbackProfiles[$name]);
+        unset($this->knockbackProfiles[strtolower($name)]);
     }
 
     /**
@@ -82,7 +83,7 @@ final class KnockbackRegistry {
      * @return KnockbackProfile|null
      */
     public function getKnockback(string $name): ?KnockbackProfile {
-        return $this->knockbackProfiles[$name] ?? null;
+        return $this->knockbackProfiles[strtolower($name)] ?? null;
     }
 
     public function saveAll(): void {
@@ -97,12 +98,12 @@ final class KnockbackRegistry {
 
 //        $config->save();
 
-        foreach ($this->knockbackProfiles as $profile) {
-            $config->set($profile->getName(), [
-            	'horizontal' => $profile->getHorizontal(),
-            	'vertical' => $profile->getVertical(),
-            	'highest_limit' => $profile->getHighestLimit(),
-            	'hit_delay' => $profile->getHitDelay()
+        foreach ($this->knockbackProfiles as $knockbackProfile) {
+            $config->set($knockbackProfile->getName(), [
+            	'horizontal' => $knockbackProfile->getHorizontal(),
+            	'vertical' => $knockbackProfile->getVertical(),
+            	'highest_limit' => $knockbackProfile->getHighestLimit(),
+            	'hit_delay' => $knockbackProfile->getHitDelay()
             ]);
         }
 

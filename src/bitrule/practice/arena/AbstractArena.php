@@ -18,13 +18,15 @@ abstract class AbstractArena {
      * @param string   $name
      * @param Vector3  $firstPosition
      * @param Vector3  $secondPosition
+     * @param string   $knockbackProfile
      * @param string[] $kits
      */
     public function __construct(
         protected readonly string $name,
-        private Vector3         $firstPosition,
-        private Vector3         $secondPosition,
-        private array $kits
+        protected Vector3         $firstPosition,
+        protected Vector3         $secondPosition,
+        protected string $knockbackProfile,
+        protected array $kits
     ) {}
 
     /**
@@ -60,6 +62,20 @@ abstract class AbstractArena {
      */
     public function setSecondPosition(Vector3 $secondPosition): void {
         $this->secondPosition = $secondPosition;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKnockbackProfile(): string {
+        return $this->knockbackProfile;
+    }
+
+    /**
+     * @param string $knockbackProfile
+     */
+    public function setKnockbackProfile(string $knockbackProfile): void {
+        $this->knockbackProfile = $knockbackProfile;
     }
 
     /**

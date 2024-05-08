@@ -7,6 +7,8 @@ main: bitrule\practice\Practice
 permissions:
   arena.command:
     default: op
+  arena.command.knockback:
+    default: op
   arena.command.createkit:
     default: op
   arena.command.create:
