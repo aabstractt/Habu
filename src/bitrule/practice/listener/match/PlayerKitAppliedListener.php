@@ -8,8 +8,12 @@ use bitrule\practice\arena\impl\FireballFightArena;
 use bitrule\practice\event\player\PlayerKitAppliedEvent;
 use bitrule\practice\registry\DuelRegistry;
 use pocketmine\block\utils\DyeColor;
+use pocketmine\block\VanillaBlocks;
+use pocketmine\block\Wool;
 use pocketmine\event\Listener;
 use pocketmine\item\Armor;
+use pocketmine\item\ItemBlock;
+use pocketmine\item\VanillaItems;
 use RuntimeException;
 
 final class PlayerKitAppliedListener implements Listener {
@@ -38,7 +42,18 @@ final class PlayerKitAppliedListener implements Listener {
             if (!$item instanceof Armor) continue;
 
             $item->setCustomColor($color->getRgbValue());
-            $player->getInventory()->setItem($slot, $item);
+            $player->getArmorInventory()->setItem($slot, $item);
+        }
+
+        $allWool = $player->getInventory()->all(VanillaBlocks::WOOL()->asItem());
+        foreach ($allWool as $slot => $item) {
+            if (!$item instanceof ItemBlock) continue;
+
+            $block = $item->getBlock();
+            if (!$block instanceof Wool) continue;
+
+            $block->setColor($color);
+            $player->getInventory()->setItem($slot, $block->asItem());
         }
     }
 }

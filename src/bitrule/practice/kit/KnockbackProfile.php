@@ -12,7 +12,6 @@ use pocketmine\player\Player;
 use function mt_getrandmax;
 use function mt_rand;
 use function sqrt;
-use function var_dump;
 
 final class KnockbackProfile {
 
@@ -131,22 +130,14 @@ final class KnockbackProfile {
         $diffZ = $victimPosition->getZ() - $attackerPosition->getZ();
 
         $force = sqrt($diffX * $diffX + $diffZ * $diffZ);
-        if ($force <= 0) {
-            echo 'Force is less than or equal to 0' . PHP_EOL;
-
-            return;
-        }
+        if ($force <= 0) return;
 
         $attribute = $victim->getAttributeMap()->get(Attribute::KNOCKBACK_RESISTANCE);
         if ($attribute === null) {
             throw new \RuntimeException('Victim does not have attack damage attribute');
         }
 
-        if (mt_rand() / mt_getrandmax() <= $attribute->getValue()) {
-            echo 'Critical hit' . PHP_EOL;
-
-            return;
-        }
+        if (mt_rand() / mt_getrandmax() <= $attribute->getValue()) return;
 
         $force = 1 / $force;
         $motion = clone $victim->getMotion();
@@ -165,10 +156,6 @@ final class KnockbackProfile {
 
         $victimProfile->initialKnockbackMotion = true;
         $victim->setMotion($motion);
-
-        var_dump($motion);
-
-        echo 'Applied knockback' . PHP_EOL;
     }
 
     /**

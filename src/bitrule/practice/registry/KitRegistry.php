@@ -8,6 +8,7 @@ use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
 use JsonException;
 use pocketmine\data\bedrock\EnchantmentIdMap;
+use pocketmine\item\Durable;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\StringToItemParser;
@@ -124,6 +125,10 @@ final class KitRegistry {
             $item->setCount($itemData['count']);
         }
 
+        if ($item instanceof Durable && isset($itemData['damage'])) {
+            $item->setDamage($itemData['damage']);
+        }
+
         if (isset($itemData['enchantments'])) {
             foreach ($itemData['enchantments'] as [$id, $level]) {
                 if (!is_int($id)) {
@@ -152,7 +157,7 @@ final class KitRegistry {
      * @return array
      */
     public static function writeItem(Item $item): array {
-        return [
+        $itemData = [
         	'name' => $item->getVanillaName(),
         	'customName' => $item->getCustomName(),
         	'count' => $item->getCount(),
@@ -162,5 +167,11 @@ final class KitRegistry {
         	    $item->getEnchantments()
         	)
         ];
+
+        if ($item instanceof Durable) {
+            $itemData['damage'] = $item->getDamage();
+        }
+
+        return $itemData;
     }
 }
