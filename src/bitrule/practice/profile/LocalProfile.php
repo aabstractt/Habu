@@ -143,5 +143,7 @@ final class LocalProfile {
         $player->getArmorInventory()->clearAll();
         $player->getCursorInventory()->clearAll();
         $player->getOffHandInventory()->clearAll();
+
+        $player->getEffects()->clear();
     }
 }

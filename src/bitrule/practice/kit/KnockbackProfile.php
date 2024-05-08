@@ -12,6 +12,7 @@ use pocketmine\player\Player;
 use function mt_getrandmax;
 use function mt_rand;
 use function sqrt;
+use function var_dump;
 
 final class KnockbackProfile {
 

@@ -9,11 +9,11 @@ use bitrule\practice\arena\listener\AttackDamageArenaListener;
 use bitrule\practice\arena\ScoreboardId;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\profile\LocalProfile;
-use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use function abs;
 
 final class BoxingArena extends AbstractArena implements AttackDamageArenaListener, ScoreboardId {
 

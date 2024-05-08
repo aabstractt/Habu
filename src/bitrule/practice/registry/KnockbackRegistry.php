@@ -11,7 +11,6 @@ use InvalidArgumentException;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
-use Symfony\Component\Filesystem\Path;
 use function array_keys;
 use function count;
 use function is_array;

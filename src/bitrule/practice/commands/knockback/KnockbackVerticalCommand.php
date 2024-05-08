@@ -11,7 +11,7 @@ use bitrule\practice\registry\KnockbackRegistry;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use function count;
-use function is_float;
+use function is_numeric;
 
 final class KnockbackVerticalCommand extends Argument {
     use PlayerArgumentTrait;
@@ -43,7 +43,7 @@ final class KnockbackVerticalCommand extends Argument {
 
         $sender->sendMessage(KnockbackProfileCommand::PREFIX . TextFormat::GREEN . 'Set vertical knockback for ' . $args[0] . ' to ' . $args[1] . '.');
 
-        $knockbackProfile->setVertical(floatval($args[1]));
+        $knockbackProfile->setVertical((float) ($args[1]));
         KnockbackRegistry::getInstance()->saveAll();
     }
 }

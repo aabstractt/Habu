@@ -11,7 +11,7 @@ use bitrule\practice\registry\KnockbackRegistry;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use function count;
-use function is_float;
+use function is_numeric;
 
 final class KnockbackHorizontalCommand extends Argument {
     use PlayerArgumentTrait;
@@ -43,7 +43,7 @@ final class KnockbackHorizontalCommand extends Argument {
 
         $sender->sendMessage(KnockbackProfileCommand::PREFIX . TextFormat::GREEN . 'Set horizontal knockback for ' . $args[0] . ' to ' . $args[1] . '.');
 
-        $knockbackProfile->setHorizontal(floatval($args[1]));
+        $knockbackProfile->setHorizontal((float) ($args[1]));
         KnockbackRegistry::getInstance()->saveAll();
     }
 }

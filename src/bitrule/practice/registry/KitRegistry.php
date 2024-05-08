@@ -155,7 +155,7 @@ final class KitRegistry {
         return [
         	'name' => $item->getVanillaName(),
         	'customName' => $item->getCustomName(),
-            'count' => $item->getCount(),
+        	'count' => $item->getCount(),
         	'lore' => $item->getLore(),
         	'enchantments' => array_map(
         	    fn(EnchantmentInstance $enchantment) => [EnchantmentIdMap::getInstance()->toId($enchantment->getType()), $enchantment->getLevel()],

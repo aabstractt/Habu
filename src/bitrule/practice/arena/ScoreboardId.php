@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace bitrule\practice\arena;
 
 use bitrule\practice\duel\Duel;

@@ -6,13 +6,11 @@ namespace bitrule\practice\duel\impl;
 
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\stage\StartingStage;
-use bitrule\practice\kit\Kit;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKey;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use RuntimeException;
-use function abs;
 use function count;
 use function str_starts_with;
 
