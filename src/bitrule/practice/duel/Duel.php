@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\duel;
 
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\duel\properties\DuelProperties;
 use bitrule\practice\duel\stage\AbstractStage;
 use bitrule\practice\duel\stage\EndingStage;
 use bitrule\practice\duel\stage\PlayingStage;
@@ -46,6 +47,11 @@ abstract class Duel {
     protected array $players = [];
     /** @var array<string, int> */
     protected array $playersSpawn = [];
+    /**
+     * The properties of the duel.
+     * @var DuelProperties|null
+     */
+    protected ?DuelProperties $properties = null;
 
     /**
      * @param AbstractArena    $arena
@@ -363,6 +369,20 @@ abstract class Duel {
      */
     public function setStage(AbstractStage $stage): void {
         $this->stage = $stage;
+    }
+
+    /**
+     * @return DuelProperties|null
+     */
+    public function getProperties(): ?DuelProperties {
+        return $this->properties;
+    }
+
+    /**
+     * @param DuelProperties $properties
+     */
+    public function setProperties(DuelProperties $properties): void {
+        $this->properties = $properties;
     }
 
     /**

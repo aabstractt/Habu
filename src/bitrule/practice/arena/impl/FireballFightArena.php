@@ -8,6 +8,8 @@ use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\listener\AnythingDamageArenaListener;
 use bitrule\practice\arena\listener\AttackDamageArenaListener;
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\properties\FireballFightProperties;
+use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
@@ -139,6 +141,12 @@ final class FireballFightArena extends AbstractArena implements AttackDamageAren
      * @param EntityDamageEvent $ev
      */
     public function onAnythingDamageEvent(Duel $duel, Player $victim, EntityDamageEvent $ev): void {
+        if (!$duel->getStage() instanceof PlayingStage) {
+            $ev->cancel();
+
+            return;
+        }
+
         if ($victim->getHealth() - $ev->getFinalDamage() > 0) return;
 
         $victimProfile = $duel->getPlayer($victim->getXuid());
@@ -149,16 +157,29 @@ final class FireballFightArena extends AbstractArena implements AttackDamageAren
         $attackerProfile = $attacker instanceof Player ? $duel->getPlayer($attacker->getXuid()) : null;
         if ($attacker !== null && ($attackerProfile === null || !$attackerProfile->isAlive())) return;
 
+        $victimSpawnId = $duel->getSpawnId($victim->getXuid());
+        if ($victimSpawnId > 1) {
+            throw new \LogicException('Invalid spawn id: ' . $victimSpawnId);
+        }
+
+        $properties = $duel->getProperties();
+        if (!$properties instanceof FireballFightProperties) {
+            throw new \LogicException('Invalid properties');
+        }
+
         $ev->cancel();
 
         $duel->teleportSpawn($victim);
         LocalProfile::resetInventory($victim);
 
-        $duel->getKit()->applyOn($victim);
+        $hasBeenBedDestroyed = $victimSpawnId === 0 ? $properties->isRedBedDestroyed() : $properties->isBlueBedDestroyed();
+        if ($hasBeenBedDestroyed) {
+            $victimProfile->convertAsSpectator($duel, false);
+        } else {
+            $duel->getKit()->applyOn($victim);
+        }
 
         $colorSupplier = fn(int $spawnId): string => $spawnId === 0 ? TextFormat::RED : TextFormat::BLUE;
-
-        $victimSpawnId = $duel->getSpawnId($victim->getXuid());
         if ($attackerProfile === null || $attacker === null) {
             $duel->broadcastMessage(TranslationKey::FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()->build(
                 $colorSupplier($victimSpawnId) . $victim->getName()
