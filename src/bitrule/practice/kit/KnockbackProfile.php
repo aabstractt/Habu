@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace bitrule\practice\kit;
 
 use bitrule\practice\profile\LocalProfile;
+use InvalidArgumentException;
 use pocketmine\entity\Attribute;
 use pocketmine\entity\Entity;
 use pocketmine\player\Player;
+use function mt_getrandmax;
+use function mt_rand;
+use function sqrt;
 
 final class KnockbackProfile {
 
@@ -103,7 +107,7 @@ final class KnockbackProfile {
      */
     public function applyOn(Player $victim, LocalProfile $victimProfile, ?Entity $attacker): void {
         if ($attacker === null) {
-            throw new \InvalidArgumentException('Attacker cannot be null');
+            throw new InvalidArgumentException('Attacker cannot be null');
         }
 
         $victimPosition = $victim->getPosition();
@@ -111,6 +115,9 @@ final class KnockbackProfile {
 
         $verticalKb = $this->vertical;
         $horizontalKb = $this->horizontal;
+        if ($verticalKb === 0.0 && $horizontalKb === 0.0) {
+            throw new InvalidArgumentException('Both vertical and horizontal knockback values cannot be 0');
+        }
 
         if ($this->highestLimit > 0.0 && !$victim->isOnGround()) {
             $dist = $victimPosition->getY() > $attackerPosition->getY() ? $victimPosition->getY() - $attackerPosition->getY() : $attackerPosition->getY() - $victimPosition->getY();
@@ -125,7 +132,7 @@ final class KnockbackProfile {
         $force = sqrt($diffX * $diffX + $diffZ * $diffZ);
         if ($force <= 0) return;
 
-        $attribute = $victim->getAttributeMap()->get(Attribute::ATTACK_DAMAGE);
+        $attribute = $victim->getAttributeMap()->get(Attribute::KNOCKBACK_RESISTANCE);
         if ($attribute === null) {
             throw new \RuntimeException('Victim does not have attack damage attribute');
         }

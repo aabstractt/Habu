@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace bitrule\practice;
 
+use bitrule\practice\arena\ScoreboardId;
 use bitrule\practice\commands\ArenaMainCommand;
+use bitrule\practice\commands\DurabilityCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
 use bitrule\practice\listener\defaults\PlayerInteractListener;
@@ -13,12 +15,15 @@ use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\listener\entity\EntityDamageListener;
 use bitrule\practice\listener\entity\EntityMotionListener;
 use bitrule\practice\listener\entity\EntityTeleportListener;
+use bitrule\practice\listener\match\DuelStartedListener;
+use bitrule\practice\listener\match\PlayerKitAppliedListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\KitRegistry;
+use bitrule\practice\registry\KnockbackRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\registry\QueueRegistry;
 use pocketmine\player\Player;
@@ -76,6 +81,7 @@ final class Practice extends PluginBase {
 
         KitRegistry::getInstance()->loadAll();
         ArenaRegistry::getInstance()->loadAll();
+        KnockbackRegistry::getInstance()->loadAll($this);
 
         // TODO: Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
@@ -83,15 +89,18 @@ final class Practice extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new PlayerQuitListener(), $this);
 
         // TODO: Match listeners
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerKitAppliedListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityTeleportListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityMotionListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityDamageListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new DuelStartedListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),
         	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
-            new KnockbackProfileCommand()
+        	new KnockbackProfileCommand(),
+            new DurabilityCommand('durability')
         ]);
 
         $this->getScheduler()->scheduleRepeatingTask(
@@ -180,6 +189,12 @@ final class Practice extends PluginBase {
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel === null) return null;
 
-        return $duel->replacePlaceholders($player, $identifier);
+        $result = $duel->replacePlaceholders($player, $identifier);
+        if ($result !== null) return $result;
+
+        $arena = $duel->getArena();
+        if ($arena instanceof ScoreboardId) return $arena->replacePlaceholders($duel, $player, $localProfile, $identifier);
+
+        return null;
     }
 }

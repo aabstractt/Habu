@@ -8,6 +8,8 @@ use InvalidArgumentException;
 use pocketmine\utils\EnumTrait;
 use function array_combine;
 use function count;
+use function str_replace;
+use function ucwords;
 
 /**
  * @method static self DUEL_END_STATISTICS_NORMAL()
@@ -20,6 +22,9 @@ use function count;
  * @method static self BOXING_DUEL_COMBO_OPPONENT()
  * @method static self BOXING_DUEL_COMBO_SELF()
  * @method static self BOXING_DUEL_COMBO_NONE()
+ *
+ * @method static self FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()
+ * @method static self FIREBALL_FIGHT_PLAYER_DEAD()
  */
 final class TranslationKey {
     use EnumTrait;
@@ -108,6 +113,21 @@ final class TranslationKey {
                 'BOXING_DUEL_COMBO_NONE',
                 'duel.boxing.current-combo.none',
                 []
+            ),
+            self::create(
+                'FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER',
+                'duel.fireball-fight.player-dead-without-killer',
+                [
+                	'player'
+                ]
+            ),
+            self::create(
+                'FIREBALL_FIGHT_PLAYER_DEAD',
+                'duel.fireball-fight.player-dead',
+                [
+                	'player',
+                	'killer'
+                ]
             )
         );
     }
@@ -142,5 +162,14 @@ final class TranslationKey {
         $self->arguments = $arguments;
 
         return $self;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public static function beautifulName(string $name): string {
+        return ucwords(str_replace(['-', '_'], ' ', $name));
     }
 }

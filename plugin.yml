@@ -1,5 +1,5 @@
 ---
-name: BitrulePractice
+name: Habu
 author: bitrule
 version: "2024.505"
 api: 5.0.0
@@ -26,5 +26,7 @@ permissions:
   kb.command.vertical:
     default: op
   kb.command.highestlimit:
+    default: op
+  practice.command.durability:
     default: op
 ...

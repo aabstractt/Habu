@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\listener\match;
 
 use bitrule\practice\duel\stage\PlayingStage;
+use bitrule\practice\kit\Kit;
 use bitrule\practice\registry\DuelRegistry;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerMoveEvent;
@@ -17,6 +18,8 @@ final class SumoPlayerMoveListener implements Listener {
 
     /**
      * @param PlayerMoveEvent $ev
+     *
+     * @priority NORMAL
      */
     public function onPlayerMoveEvent(PlayerMoveEvent $ev): void {
         $player = $ev->getPlayer();
@@ -26,6 +29,8 @@ final class SumoPlayerMoveListener implements Listener {
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel === null || !$duel->getStage() instanceof PlayingStage) return;
         // TODO: Kill player
+
+        if ($duel->getKit()->getName() !== Kit::SUMO) return;
 
         $duelProfile = $duel->getPlayer($player->getXuid());
         if ($duelProfile === null) {

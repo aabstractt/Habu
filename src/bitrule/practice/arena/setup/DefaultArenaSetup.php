@@ -15,6 +15,9 @@ final class DefaultArenaSetup extends AbstractArenaSetup {
         private readonly string $type
     ) {}
 
+    /**
+     * Increases the spawn step by 1.
+     */
     public function increaseSpawnStep(): void {
         parent::increaseSpawnStep();
 

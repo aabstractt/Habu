@@ -17,7 +17,6 @@ final class ProfileRegistry {
     public const QUEUE_SCOREBOARD = 'queue';
     public const MATCH_STARTING_SCOREBOARD = 'match-starting';
     public const MATCH_PLAYING_SCOREBOARD = 'match-playing';
-    public const MATCH_PLAYING_BOXING_SCOREBOARD = 'match-playing-boxing';
     public const MATCH_ENDING_SCOREBOARD = 'match-ending';
 
     /** @var array<string, LocalProfile> */
@@ -65,7 +64,7 @@ final class ProfileRegistry {
 
         QueueRegistry::getInstance()->removeQueue($localProfile);
 
-        unset($localProfile);
+        unset($this->localProfiles[$player->getXuid()]);
     }
 
     /**

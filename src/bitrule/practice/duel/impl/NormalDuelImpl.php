@@ -6,13 +6,11 @@ namespace bitrule\practice\duel\impl;
 
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\stage\StartingStage;
-use bitrule\practice\kit\Kit;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\TranslationKey;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use RuntimeException;
-use function abs;
 use function count;
 use function str_starts_with;
 
@@ -151,41 +149,6 @@ final class NormalDuelImpl extends Duel {
             if ($instance === null || !$instance->isOnline()) return null;
 
             return $identifier === 'duel-opponent-name' ? $opponent->getName() : (string) $instance->getNetworkSession()->getPing();
-        }
-
-        if ($this->kit->getName() === Kit::BOXING) {
-            $opponent = $this->getOpponent($player);
-            if ($opponent === null) return null;
-
-            $opponentDuelStatistics = $opponent->getDuelStatistics();
-            $duelStatistics = $duelProfile->getDuelStatistics();
-
-            if ($identifier === 'duel-hits-difference') {
-                $difference = $duelStatistics->getTotalHits() - $opponentDuelStatistics->getTotalHits();
-                if ($difference === 0) {
-                    return TranslationKey::BOXING_DUEL_HITS_DIFFERENCE_NONE()->build();
-                }
-
-                if ($difference > 0) {
-                    return TranslationKey::BOXING_DUEL_HITS_DIFFERENCE_SELF()->build((string) $difference);
-                }
-
-                return TranslationKey::BOXING_DUEL_HITS_DIFFERENCE_OPPONENT()->build((string) abs($difference));
-            }
-
-            if ($identifier === 'duel-hits-diff-self') return (string) $duelStatistics->getTotalHits();
-            if ($identifier === 'duel-hits-diff-opponent') return (string) $opponentDuelStatistics->getTotalHits();
-            if ($identifier === 'duel-hits-status') {
-                if ($opponentDuelStatistics->getCurrentCombo() > 0) {
-                    return TranslationKey::BOXING_DUEL_COMBO_OPPONENT()->build((string) $opponentDuelStatistics->getCurrentCombo());
-                }
-
-                if ($duelStatistics->getCurrentCombo() > 0) {
-                    return TranslationKey::BOXING_DUEL_COMBO_SELF()->build((string) $duelStatistics->getCurrentCombo());
-                }
-
-                return TranslationKey::BOXING_DUEL_COMBO_NONE()->build();
-            }
         }
 
         return null;

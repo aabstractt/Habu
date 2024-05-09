@@ -3,17 +3,17 @@ titles:
 
 lines:
   lobby:
-    nothing-0: '&7---------------------&d'
+    nothing-0: '&7-------------------&d'
     nothing-1: '&b&lServer'
     online-players: ' &fOnline: &b'
     total-queue-count: ' &fQueuing: &b'
     total-duel-count: ' &fFighting: &b'
     nothing-2: '&b&d&c'
     nothing-3: '&bplay.hyrium.com'
-    nothing-4: '&7---------------------&e'
+    nothing-4: '&7-------------------&e'
 
   queue:
-    nothing-0: '&7---------------------&d'
+    nothing-0: '&7-------------------&d'
     nothing-1: '&b&lServer'
     online-players: ' &fOnline: &b'
     total-queue-count: ' &fQueuing: &b'
@@ -25,10 +25,10 @@ lines:
     queue-duration: '&f Duration: &b'
     nothing-4: '&b&d'
     nothing-5: '&bplay.hyrium.com'
-    nothing-6: '&7---------------------&c'
+    nothing-6: '&7-------------------&c'
 
   match-starting:
-    nothing-0: '&7---------------------'
+    nothing-0: '&7-------------------'
     nothing-1: '&7&oStarting...'
     duel-opponent-name: '&fOpponent: &b'
     nothing-2: '&7'
@@ -36,10 +36,10 @@ lines:
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-3: '&b&d'
     nothing-4: '&bplay.hyrium.com'
-    nothing-5: '&7---------------------&d'
+    nothing-5: '&7-------------------&d'
 
   match-playing:
-    nothing-0: '&7---------------------'
+    nothing-0: '&7-------------------'
     duel-opponent-name: '&fOpponent: &b'
     duel-duration: '&fDuration: &b'
     nothing-1: '&7'
@@ -47,10 +47,10 @@ lines:
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-2: '&b&d'
     nothing-3: '&bplay.hyrium.com'
-    nothing-4: '&7---------------------&d'
+    nothing-4: '&7-------------------&d'
 
   match-playing-boxing:
-    nothing-0: '&7---------------------'
+    nothing-0: '&7-------------------'
     duel-hits-difference: '&fHits: '
     duel-hits-diff-self: ' &fYou: &b'
     duel-hits-diff-opponent: ' &fThem: &b'
@@ -60,10 +60,24 @@ lines:
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-2: '&b&d'
     nothing-3: '&bplay.hyrium.com'
-    nothing-4: '&7---------------------&d'
+    nothing-4: '&7-------------------&d'
+
+  match-playing-fireball:
+    nothing-0: '&7---------------------'
+    nothing-1: ' &b&lTeams'
+    duel-teams-red: '  &cR &fRed: &a'
+    duel-teams-blue: '  &9B &fBlue: &a'
+    nothing-2: '&7'
+    duel-self-kills: ' &fKills: &b'
+    nothing-3: ' &b&lMatch'
+    duel-opponent-name: '  &fOpponent: &b'
+    duel-duration: '  &fDuration: &b'
+    nothing-4: '&b&d'
+    nothing-5: '&bplay.hyrium.com'
+    nothing-6: '&7-------------------&d'
 
   match-ending:
-    nothing-0: '&7---------------------'
+    nothing-0: '&7-------------------'
     nothing-1: 'Match ended'
     duel-ending-defeat: '&c&lDEFEAT'
     duel-ending-victory: '&a&lVICTORY'
@@ -71,4 +85,4 @@ lines:
     duel-duration: '&fDuration: &b'
     nothing-3: '&b&d'
     nothing-4: '&bplay.hyrium.com'
-    nothing-5: '&7---------------------&d'
+    nothing-5: '&7-------------------&d'

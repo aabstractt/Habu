@@ -11,7 +11,7 @@ use bitrule\practice\registry\KnockbackRegistry;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use function count;
-use function is_float;
+use function is_numeric;
 
 final class KnockbackHighestLimitCommand extends Argument {
     use PlayerArgumentTrait;
@@ -35,7 +35,7 @@ final class KnockbackHighestLimitCommand extends Argument {
             return;
         }
 
-        if (!is_float($args[1])) {
+        if (!is_numeric($args[1])) {
             $sender->sendMessage(TextFormat::RED . 'Value must be a float');
 
             return;
@@ -43,7 +43,7 @@ final class KnockbackHighestLimitCommand extends Argument {
 
         $sender->sendMessage(KnockbackProfileCommand::PREFIX . TextFormat::GREEN . 'Set highest-limit knockback for ' . $args[0] . ' to ' . $args[1] . '.');
 
-        $knockbackProfile->setHighestLimit($args[1]);
+        $knockbackProfile->setHighestLimit((float) ($args[1]));
         KnockbackRegistry::getInstance()->saveAll();
     }
 }

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace bitrule\practice\form\arena;
 
+use bitrule\practice\arena\impl\FireballFightArena;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\ProfileRegistry;
+use cosmicpe\form\ClosableForm;
 use cosmicpe\form\CustomForm;
 use cosmicpe\form\entries\custom\CustomFormEntry;
 use cosmicpe\form\entries\custom\DropdownEntry;
@@ -19,7 +21,7 @@ use RuntimeException;
 use function array_keys;
 use function is_int;
 
-final class ArenaSetupForm extends CustomForm {
+final class ArenaSetupForm extends CustomForm implements ClosableForm {
 
     /**
      * The type of arena to set up.
@@ -50,7 +52,7 @@ final class ArenaSetupForm extends CustomForm {
      */
     public function setup(World $world): void {
         $this->addEntry(
-            new DropdownEntry(TextFormat::GRAY . 'Arena Type', $options = ['Normal', 'Bridge', 'Boxing']),
+            new DropdownEntry(TextFormat::GRAY . 'Arena Type', $options = ['Normal', 'Bridge', 'Boxing', FireballFightArena::NAME]),
             function (Player $player, CustomFormEntry $entry, $value) use ($options): void {
                 if (!is_int($value)) {
                     throw new FormValidationException('Please select an arena type.');
@@ -101,11 +103,11 @@ final class ArenaSetupForm extends CustomForm {
             throw new RuntimeException('Local player not found.');
         }
 
-        $arenaSetup = AbstractArenaSetup::from($this->type);
-        $arenaSetup->setName($this->world->getFolderName());
-        $arenaSetup->addKit($this->kitName);
-
         try {
+            $arenaSetup = AbstractArenaSetup::from($this->type);
+            $arenaSetup->setName($this->world->getFolderName());
+            $arenaSetup->addKit($this->kitName);
+
             $arenaSetup->setup($player);
 
             $localProfile->setArenaSetup($arenaSetup);

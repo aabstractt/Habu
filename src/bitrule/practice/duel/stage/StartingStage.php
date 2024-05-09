@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel\stage;
 
+use bitrule\practice\arena\ScoreboardId;
 use bitrule\practice\duel\Duel;
+use bitrule\practice\event\duel\DuelStartedEvent;
 use bitrule\practice\Practice;
 use bitrule\practice\registry\ProfileRegistry;
 use function count;
@@ -36,16 +38,18 @@ final class StartingStage implements AbstractStage {
 
         $duel->setStage(new PlayingStage());
 
+        (new DuelStartedEvent($duel))->call();
+
+        $arena = $duel->getArena();
+        $scoreboardId = $arena instanceof ScoreboardId ? $arena->getScoreboardId() : ProfileRegistry::MATCH_PLAYING_SCOREBOARD;
+
         foreach ($duel->getEveryone() as $duelProfile) {
             $player = $duelProfile->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
             Practice::setProfileScoreboard(
                 $player,
-                match ($duel->getKit()->getName()) {
-                    'Boxing' => ProfileRegistry::MATCH_PLAYING_BOXING_SCOREBOARD,
-                    default => ProfileRegistry::MATCH_PLAYING_SCOREBOARD
-                }
+                $scoreboardId
             );
         }
     }
