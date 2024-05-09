@@ -64,7 +64,7 @@ final class ProfileRegistry {
 
         QueueRegistry::getInstance()->removeQueue($localProfile);
 
-        unset($localProfile);
+        unset($this->localProfiles[$player->getXuid()]);
     }
 
     /**

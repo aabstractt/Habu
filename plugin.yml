@@ -27,4 +27,6 @@ permissions:
     default: op
   kb.command.highestlimit:
     default: op
+  practice.command.durability:
+    default: op
 ...
