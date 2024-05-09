@@ -13,7 +13,7 @@ duel:
   boxing:
     hits-difference:
       self: '&a(+<amount>)'
-      opponent: '(&c-<amount>)'
+      opponent: '&c(-<amount>)'
       none: '&eNone'
     current-combo:
       opponent: '&c<amount> Combo'
