@@ -38,5 +38,5 @@ final class KnockbackCreateCommand extends Argument {
         KnockbackRegistry::getInstance()->saveAll();
 
         $sender->sendMessage(KnockbackProfileCommand::PREFIX . TextFormat::GREEN . 'Knockback profile ' . $args[0] . ' successfully created!');
-    }
+   }
 }
