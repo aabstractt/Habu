@@ -39,6 +39,8 @@ final class ArenaSaveArgument extends Argument {
             return;
         }
 
+        $localProfile->setArenaSetup(null);
+
         Server::getInstance()->getAsyncPool()->submitTask(new FileCopyAsyncTask(
             Server::getInstance()->getDataPath() . 'worlds/' . $arenaSetup->getName(),
             Practice::getInstance()->getDataFolder() . 'backups/' . $arenaSetup->getName(),

@@ -175,7 +175,7 @@ abstract class AbstractArena {
      * @return AbstractArena
      */
     public static function createEmpty(string $name, string $type): self {
-        return match ($type) {
+        return match (strtolower($type)) {
             'normal' => DefaultArena::parseEmpty($name),
             'bridge' => BridgeArena::parseEmpty($name),
             'boxing' => BoxingArena::parseEmpty($name),

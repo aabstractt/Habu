@@ -11,6 +11,9 @@ use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\Durable;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
+use pocketmine\item\Potion;
+use pocketmine\item\PotionType;
+use pocketmine\item\SplashPotion;
 use pocketmine\item\StringToItemParser;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
@@ -129,6 +132,19 @@ final class KitRegistry {
             $item->setDamage($itemData['damage']);
         }
 
+        if ($item instanceof Potion || $item instanceof SplashPotion) {
+//            if (!isset($itemData['potion-type'])) {
+//                throw new RuntimeException('Potion type is not set');
+//            }
+
+            $potionTypeName = $itemData['potion-type'] ?? PotionType::STRONG_HEALING()->name;
+            if (!is_string($potionTypeName)) {
+                throw new RuntimeException('Potion type is not a string');
+            }
+
+            $item->setType(PotionType::getAll()[$potionTypeName] ?? throw new RuntimeException('Potion type ' . $potionTypeName . ' does not exist'));
+        }
+
         if (isset($itemData['enchantments'])) {
             foreach ($itemData['enchantments'] as [$id, $level]) {
                 if (!is_int($id)) {
@@ -170,6 +186,8 @@ final class KitRegistry {
 
         if ($item instanceof Durable) {
             $itemData['damage'] = $item->getDamage();
+        } elseif ($item instanceof Potion || $item instanceof SplashPotion) {
+            $itemData['potion-type'] = $item->getType()->name;
         }
 
         return $itemData;
