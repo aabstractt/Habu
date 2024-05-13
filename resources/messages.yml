@@ -9,6 +9,7 @@ duel:
       &7Critics: &b<opponent-critics>
       &7Damage Dealt: &b<opponent-damage-dealt>
   opponent-found: '&bPractice &8> &7Found a &f<type> <kit>&7 match against &c<player>'
+  winner-broadcast: '&a<winner>&7 has won a &e<kit>&7 duel against &c<loser>.'
 
   elo-changes:
     win: '&a+<amount>'

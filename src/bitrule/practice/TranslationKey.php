@@ -18,6 +18,7 @@ use function ucwords;
  *
  * @method static self DUEL_END_STATISTICS_POT()
  * @method static self DUEL_OPPONENT_FOUND()
+ * @method static self DUEL_WINNER_BROADCAST()
  *
  * @method static self BOXING_DUEL_HITS_DIFFERENCE_OPPONENT()
  * @method static self BOXING_DUEL_HITS_DIFFERENCE_SELF()
@@ -77,7 +78,7 @@ final class TranslationKey {
             ),
             self::create(
                 'DUEL_END_STATISTICS_POT',
-                'match.end-statistics-pot',
+                'duel.end-statistics-pot',
                 [
                 	'opponent',
                 	'self-elo-changes',
@@ -91,10 +92,19 @@ final class TranslationKey {
             ),
             self::create(
                 'DUEL_OPPONENT_FOUND',
-                'match.opponent-found',
+                'duel.opponent-found',
                 [
                 	'player',
                 	'type',
+                	'kit'
+                ]
+            ),
+            self::create(
+                'DUEL_WINNER_BROADCAST',
+                'duel.winner-broadcast',
+                [
+                	'winner',
+                	'loser',
                 	'kit'
                 ]
             ),

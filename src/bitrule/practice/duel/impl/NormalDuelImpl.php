@@ -11,6 +11,7 @@ use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use RuntimeException;
 use function abs;
@@ -31,6 +32,12 @@ final class NormalDuelImpl extends Duel {
 
             $opponent = $this->getOpponent($player);
             if ($opponent === null) continue;
+
+            Server::getInstance()->broadcastMessage(TranslationKey::DUEL_WINNER_BROADCAST()->build(
+                $player->getName(),
+                $opponent->getName(),
+                $this->kit->getName()
+            ));
 
             [$winElo, $lostElo] = $this->ranked ? DuelRegistry::calculateElo(
                 $duelProfile->getElo(),
@@ -110,8 +117,6 @@ final class NormalDuelImpl extends Duel {
             throw new RuntimeException('Player not found in the match.');
         }
 
-        // TODO: This going to give some issues
-        // TODO: Already fixed
         unset($this->playersSpawn[$player->getXuid()]);
 
         $duelPlayer = $this->getPlayer($player->getXuid());
