@@ -134,6 +134,8 @@ final class LocalProfile {
 
         $player->getXpManager()->setXpAndProgress(0, 0);
 
+        $player->setGamemode(GameMode::ADVENTURE);
+
         /** @var array<int, array<int, string|Item>> $items */
         $items = [
             0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],

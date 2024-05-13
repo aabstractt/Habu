@@ -68,7 +68,6 @@ final class BoxingArena extends AbstractArena implements AttackDamageArenaListen
             $name,
             self::deserializeVector($data['first_position'] ?? []),
             self::deserializeVector($data['second_position'] ?? []),
-            $data['knockback_profile'] ?? 'default',
             $data['kits'] ?? []
         );
     }
@@ -83,7 +82,6 @@ final class BoxingArena extends AbstractArena implements AttackDamageArenaListen
             $name,
             Vector3::zero(),
             Vector3::zero(),
-            'default',
             []
         );
     }

@@ -149,7 +149,7 @@ abstract class Duel {
                 throw new RuntimeException('Local profile not found for player: ' . $player->getName());
             }
 
-            $localPlayer->setKnockbackProfile($this->arena->getKnockbackProfile());
+            $localPlayer->setKnockbackProfile($this->kit->getKnockbackProfile());
         }
 
         $this->loaded = true;

@@ -9,6 +9,7 @@ use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\DurabilityCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
+use bitrule\practice\listener\defaults\PlayerExhaustListener;
 use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
@@ -86,6 +87,7 @@ final class Practice extends PluginBase {
         // TODO: Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerInteractListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerExhaustListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerQuitListener(), $this);
 
         // TODO: Match listeners

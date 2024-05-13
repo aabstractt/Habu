@@ -24,6 +24,10 @@ duel:
     player-dead: '<player>&e was slain by <killer>'
     player-dead-without-killer: '<player>&e was slain.'
 
+player:
+  joined-message: '&8[&s+&8] &e<player>'
+  left-message: '&8[&s-&8] &e<player>'
+
 items:
   competitive-duel:
     custom-name: "&r&9Competitive Duel"

@@ -30,17 +30,15 @@ final class FireballFightArena extends AbstractArena implements AttackDamageAren
      * @param Vector3 $firstBedPosition
      * @param Vector3 $secondPosition
      * @param Vector3 $secondBedPosition
-     * @param string  $knockbackProfile
      */
     public function __construct(
         string $name,
         Vector3 $firstPosition,
         private Vector3 $firstBedPosition,
         Vector3 $secondPosition,
-        private Vector3 $secondBedPosition,
-        string $knockbackProfile
+        private Vector3 $secondBedPosition
     ) {
-        parent::__construct($name, $firstPosition, $secondPosition, $knockbackProfile, [self::NAME]);
+        parent::__construct($name, $firstPosition, $secondPosition, [self::NAME]);
     }
 
     /**
@@ -101,8 +99,7 @@ final class FireballFightArena extends AbstractArena implements AttackDamageAren
             self::deserializeVector($data['first_position'] ?? []),
             self::deserializeVector($data['first_bed_position'] ?? []),
             self::deserializeVector($data['second_position'] ?? []),
-            self::deserializeVector($data['second_bed_position'] ?? []),
-            $data['knockback_profile'] ?? 'default'
+            self::deserializeVector($data['second_bed_position'] ?? [])
         );
     }
 
@@ -117,8 +114,7 @@ final class FireballFightArena extends AbstractArena implements AttackDamageAren
             Vector3::zero(),
             Vector3::zero(),
             Vector3::zero(),
-            Vector3::zero(),
-            'default'
+            Vector3::zero()
         );
     }
 

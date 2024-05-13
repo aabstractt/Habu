@@ -79,7 +79,7 @@ final class KitRegistry {
         $config->set($kit->getName(), [
         	'inventoryItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getInventoryItems()),
         	'armorItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getArmorItems()),
-        	'kbProfile' => $kit->getKbProfile()
+        	'kbProfile' => $kit->getKnockbackProfile()
         ]);
         $config->save();
     }

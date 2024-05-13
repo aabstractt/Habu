@@ -19,14 +19,12 @@ abstract class AbstractArena {
      * @param string   $name
      * @param Vector3  $firstPosition
      * @param Vector3  $secondPosition
-     * @param string   $knockbackProfile
      * @param string[] $kits
      */
     public function __construct(
         protected readonly string $name,
         protected Vector3         $firstPosition,
         protected Vector3         $secondPosition,
-        protected string $knockbackProfile,
         protected array $kits
     ) {}
 
@@ -63,20 +61,6 @@ abstract class AbstractArena {
      */
     public function setSecondPosition(Vector3 $secondPosition): void {
         $this->secondPosition = $secondPosition;
-    }
-
-    /**
-     * @return string
-     */
-    public function getKnockbackProfile(): string {
-        return $this->knockbackProfile;
-    }
-
-    /**
-     * @param string $knockbackProfile
-     */
-    public function setKnockbackProfile(string $knockbackProfile): void {
-        $this->knockbackProfile = $knockbackProfile;
     }
 
     /**
@@ -140,7 +124,6 @@ abstract class AbstractArena {
         	'type' => 'normal',
         	'first_position' => self::serializeVector($this->firstPosition),
         	'second_position' => self::serializeVector($this->secondPosition),
-        	'knockback_profile' => $this->knockbackProfile,
         	'kits' => $this->kits
         ];
     }

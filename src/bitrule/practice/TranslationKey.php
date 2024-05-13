@@ -25,6 +25,9 @@ use function ucwords;
  *
  * @method static self FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()
  * @method static self FIREBALL_FIGHT_PLAYER_DEAD()
+ *
+ * @method static self PLAYER_JOINED_MESSAGE()
+ * @method static self PLAYER_LEFT_MESSAGE()
  */
 final class TranslationKey {
     use EnumTrait;
@@ -127,6 +130,20 @@ final class TranslationKey {
                 [
                 	'player',
                 	'killer'
+                ]
+            ),
+            self::create(
+                'PLAYER_JOINED_MESSAGE',
+                'player.joined-message',
+                [
+                	'player'
+                ]
+            ),
+            self::create(
+                'PLAYER_LEFT_MESSAGE',
+                'player.left-message',
+                [
+                	'player'
                 ]
             )
         );
