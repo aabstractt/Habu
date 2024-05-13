@@ -187,8 +187,8 @@ final class TranslationKey {
                 'PLAYER_QUEUE_JOINED',
                 'player.queue-joined',
                 [
-                    'kit',
-                    'type'
+                	'kit',
+                	'type'
                 ]
             )
         );

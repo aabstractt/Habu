@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\impl;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\stage\StartingStage;
+use bitrule\practice\duel\impl\trait\OpponentDuelTrait;
+use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
 use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
@@ -14,12 +15,11 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use RuntimeException;
-use function abs;
 use function count;
-use function str_starts_with;
 
 final class NormalDuelImpl extends Duel {
     use SpectatingDuelTrait;
+    use OpponentDuelTrait;
 
     /**
      * Called when the duel stage changes
@@ -134,67 +134,5 @@ final class NormalDuelImpl extends Duel {
         if (count($this->getAlive()) > $expectedPlayersAlive) return;
 
         $this->end();
-    }
-
-    /**
-     * TODO: Move this to an trait
-     *
-     * @param string $xuid
-     *
-     * @return string|null
-     */
-    public function getOpponentName(string $xuid): ?string {
-        if ($this->getSpawnId($xuid) === -1) return null;
-
-        foreach ($this->getPlayers() as $duelProfile) {
-            if ($duelProfile->getXuid() === $xuid) continue;
-
-            return $duelProfile->getName();
-        }
-
-        return null;
-    }
-
-    /**
-     * @param Player $player
-     *
-     * @return DuelProfile|null
-     */
-    public function getOpponent(Player $player): ?DuelProfile {
-        if ($this->getSpawnId($player->getXuid()) === -1) return null;
-
-        foreach ($this->getPlayers() as $duelProfile) {
-            if ($duelProfile->getXuid() === $player->getXuid()) continue;
-
-            return $duelProfile;
-        }
-
-        return null;
-    }
-
-    /**
-     * @param Player $player
-     * @param string $identifier
-     *
-     * @return string|null
-     */
-    public function replacePlaceholders(Player $player, string $identifier): ?string {
-        $parent = parent::replacePlaceholders($player, $identifier);
-        if ($parent !== null) return $parent;
-
-        $duelProfile = $this->getPlayer($player->getXuid());
-        if ($duelProfile === null) return null;
-
-        if (str_starts_with($identifier, 'duel-opponent')) {
-            $opponent = $this->getOpponent($player);
-            if ($opponent === null) return null;
-
-            $instance = $opponent->toPlayer();
-            if ($instance === null || !$instance->isOnline()) return null;
-
-            return $identifier === 'duel-opponent-name' ? $opponent->getName() : (string) $instance->getNetworkSession()->getPing();
-        }
-
-        return null;
     }
 }

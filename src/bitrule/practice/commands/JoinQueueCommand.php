@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bitrule\practice\commands;
 
 use bitrule\practice\duel\queue\Queue;
-use bitrule\practice\Practice;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\registry\QueueRegistry;

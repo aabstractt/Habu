@@ -20,6 +20,7 @@ use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use RuntimeException;
 use function array_map;
+use function count;
 use function is_array;
 use function is_int;
 use function is_string;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\impl;
 
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
 use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 

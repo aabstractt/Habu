@@ -7,7 +7,7 @@ namespace bitrule\practice\duel\impl\round;
 use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\impl\SpectatingDuelTrait;
+use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\DuelProfile;

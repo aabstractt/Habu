@@ -7,7 +7,6 @@ namespace bitrule\practice\registry;
 use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\LocalProfile;
-use Closure;
 use Exception;
 use pocketmine\player\Player;
 use pocketmine\promise\Promise;

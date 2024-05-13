@@ -18,10 +18,12 @@ use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
+use function abs;
 use function array_filter;
 use function array_map;
 use function array_sum;
 use function count;
+use function pow;
 
 final class DuelRegistry {
     use SingletonTrait;
@@ -186,12 +188,12 @@ final class DuelRegistry {
         $expectedScoreA = 1 / (1 + (pow(10, ($loser - $winner) / 400)));
         $expectedScoreB = abs(1 / (1 + pow(10, ($winner - $loser) / 400)));
 
-        $winnerElo = $winner + intval(32 * (1 - $expectedScoreA));
-        $loserElo = $loser + intval(32 * (0 - $expectedScoreB));
+        $winnerElo = $winner + (int) (32 * (1 - $expectedScoreA));
+        $loserElo = $loser + (int) (32 * (0 - $expectedScoreB));
 
         return [
-            $winnerElo - $winner,
-            abs($loser - $loserElo)
+        	$winnerElo - $winner,
+        	abs($loser - $loserElo)
         ];
     }
 }
