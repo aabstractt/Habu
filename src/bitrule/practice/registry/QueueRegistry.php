@@ -8,8 +8,11 @@ use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\LocalProfile;
 use Closure;
+use Exception;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
 use RuntimeException;
 use function time;
 
@@ -53,6 +56,7 @@ final class QueueRegistry {
 
         $this->removeQueue($opponentLocalProfile);
 
+        /** @var Player[] $totalPlayers */
         $totalPlayers = [];
         foreach ([$sourceLocalProfile, $opponentLocalProfile] as $localProfile) {
             $player = Server::getInstance()->getPlayerExact($localProfile->getName());
@@ -61,18 +65,25 @@ final class QueueRegistry {
             $totalPlayers[] = $player;
         }
 
-        DuelRegistry::getInstance()->createDuel(
-            $totalPlayers,
-            [],
-            $kit,
-            $ranked
+        try {
+            DuelRegistry::getInstance()->createDuel(
+                $totalPlayers,
+                [],
+                $kit,
+                $ranked
 //            new RoundingInfo(
 //                0,
 //                3,
 //                [],
 //                []
 //            )
-        );
+            );
+        } catch (Exception $e) {
+            foreach ($totalPlayers as $player) {
+                $player->sendMessage(TextFormat::RED . 'Something went wrong while creating the duel.');
+                $player->sendMessage(TextFormat::RED . $e->getMessage());
+            }
+        }
     }
 
     /**

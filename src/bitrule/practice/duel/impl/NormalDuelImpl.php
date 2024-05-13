@@ -85,8 +85,10 @@ final class NormalDuelImpl extends Duel {
         $this->playersSpawn[$player->getXuid()] = count($this->playersSpawn);
 
         $opponentName = $this->getOpponentName($player->getXuid());
+        if ($opponentName === null) {
+            throw new RuntimeException('Opponent not found.');
+        }
 
-        // TODO: Idk for what using that xd
         $player->sendMessage(TranslationKey::DUEL_OPPONENT_FOUND()->build(
             $opponentName,
             $this->ranked ? 'Ranked' : 'Unranked',
