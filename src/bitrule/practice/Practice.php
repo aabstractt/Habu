@@ -27,6 +27,7 @@ use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\KnockbackRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\registry\QueueRegistry;
+use Exception;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
@@ -80,7 +81,15 @@ final class Practice extends PluginBase {
 
         $this->messagesConfig = new Config($this->getDataFolder() . 'messages.yml');
 
-        KitRegistry::getInstance()->loadAll();
+        try {
+            KitRegistry::getInstance()->loadAll();
+        } catch (Exception $e) {
+            $this->getLogger()->error('Error loading kits: ' . $e->getMessage());
+
+            $this->getServer()->shutdown();
+            return;
+        }
+
         ArenaRegistry::getInstance()->loadAll();
         KnockbackRegistry::getInstance()->loadAll($this);
 

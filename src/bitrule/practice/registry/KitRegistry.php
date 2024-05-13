@@ -17,6 +17,7 @@ use pocketmine\item\SplashPotion;
 use pocketmine\item\StringToItemParser;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
 use RuntimeException;
 use function array_map;
 use function is_array;
@@ -39,23 +40,19 @@ final class KitRegistry {
         $config = new Config(Practice::getInstance()->getDataFolder() . 'kits.yml');
         foreach ($config->getAll() as $kitName => $kitData) {
             if (!is_string($kitName) || !is_array($kitData)) {
-                Practice::getInstance()->getLogger()->error('Invalid kit data');
-                continue;
+                throw new RuntimeException('Kit name is not a string or kit data is not an array');
             }
 
             if (!isset($kitData['inventoryItems'])) {
-                Practice::getInstance()->getLogger()->error('Kit ' . $kitName . ' does not have inventory items');
-                continue;
+                throw new RuntimeException('Kit ' . $kitName . ' does not have inventory items');
             }
 
             if (!isset($kitData['armorItems'])) {
-                Practice::getInstance()->getLogger()->error('Kit ' . $kitName . ' does not have armor items');
-                continue;
+                throw new RuntimeException('Kit ' . $kitName . ' does not have armor items');
             }
 
             if (!isset($kitData['kbProfile'])) {
-                Practice::getInstance()->getLogger()->error('Kit ' . $kitName . ' does not have kb profile');
-                continue;
+                throw new RuntimeException('Kit ' . $kitName . ' does not have a knockback profile');
             }
 
             $this->kits[$kitName] = new Kit(
@@ -65,6 +62,8 @@ final class KitRegistry {
                 $kitData['kbProfile']
             );
         }
+
+        Practice::getInstance()->getLogger()->info(TextFormat::GREEN . 'Loaded ' . count($this->kits) . ' kit(s)');
     }
 
     /**
