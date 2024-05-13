@@ -6,9 +6,9 @@ namespace bitrule\practice\commands;
 
 use abstractplugin\command\BaseCommand;
 use bitrule\practice\commands\arena\ArenaCreateArgument;
-use bitrule\practice\commands\arena\KitKnockbackArgument;
 use bitrule\practice\commands\arena\ArenaSaveArgument;
 use bitrule\practice\commands\arena\KitCreateArgument;
+use bitrule\practice\commands\arena\KitKnockbackArgument;
 
 final class ArenaMainCommand extends BaseCommand {
 

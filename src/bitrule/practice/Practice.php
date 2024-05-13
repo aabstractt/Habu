@@ -102,7 +102,7 @@ final class Practice extends PluginBase {
         	new ArenaMainCommand(),
         	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
         	new KnockbackProfileCommand(),
-            new DurabilityCommand('durability')
+        	new DurabilityCommand('durability')
         ]);
 
         $this->getScheduler()->scheduleRepeatingTask(
@@ -128,7 +128,7 @@ final class Practice extends PluginBase {
         }
 
         foreach ($placeholders as $placeholder => $value) {
-            $message = str_replace('<' . $placeholder . '>', $value, $message);
+            $message = str_replace('<' . $placeholder . '>', (string) $value, $message);
         }
 
         return TextFormat::colorize($message);

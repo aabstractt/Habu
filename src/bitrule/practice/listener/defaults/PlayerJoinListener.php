@@ -8,6 +8,8 @@ use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\Server;
+use function count;
 
 final class PlayerJoinListener implements Listener {
 
@@ -23,6 +25,11 @@ final class PlayerJoinListener implements Listener {
 
         // Prevent handle event if the player not is online
         if (!$player->isOnline()) return;
+
+        $player->sendMessage(TranslationKey::PLAYER_WELCOME_MESSAGE()->build(
+            $player->getName(),
+            count(Server::getInstance()->getOnlinePlayers())
+        ));
 
         ProfileRegistry::getInstance()->addLocalProfile($player);
     }

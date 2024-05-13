@@ -6,7 +6,6 @@ namespace bitrule\practice\commands\arena;
 
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
-use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\KnockbackRegistry;
 use Exception;

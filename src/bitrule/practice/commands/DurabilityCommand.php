@@ -6,7 +6,6 @@ namespace bitrule\practice\commands;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\utils\CommandException;
 use pocketmine\item\Durable;
 use pocketmine\lang\Translatable;
 use pocketmine\player\Player;

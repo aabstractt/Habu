@@ -27,6 +27,7 @@ use function ucwords;
  * @method static self FIREBALL_FIGHT_PLAYER_DEAD()
  *
  * @method static self PLAYER_JOINED_MESSAGE()
+ * @method static self PLAYER_WELCOME_MESSAGE()
  * @method static self PLAYER_LEFT_MESSAGE()
  */
 final class TranslationKey {
@@ -140,6 +141,14 @@ final class TranslationKey {
                 ]
             ),
             self::create(
+                'PLAYER_WELCOME_MESSAGE',
+                'player.welcome-message',
+                [
+                	'player',
+                	'online-players'
+                ]
+            ),
+            self::create(
                 'PLAYER_LEFT_MESSAGE',
                 'player.left-message',
                 [
@@ -150,11 +159,11 @@ final class TranslationKey {
     }
 
     /**
-     * @param string ...$arguments
+     * @param mixed ...$arguments
      *
      * @return string
      */
-    public function build(string...$arguments): string {
+    public function build(mixed...$arguments): string {
         if (count($arguments) !== count($this->arguments)) {
             throw new InvalidArgumentException('Invalid number of arguments. Expected ' . count($this->arguments) . ' but got ' . count($arguments) . '.');
         }

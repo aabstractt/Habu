@@ -13,7 +13,6 @@ use pocketmine\block\Wool;
 use pocketmine\event\Listener;
 use pocketmine\item\Armor;
 use pocketmine\item\ItemBlock;
-use pocketmine\item\VanillaItems;
 use RuntimeException;
 
 final class PlayerKitAppliedListener implements Listener {

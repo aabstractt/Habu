@@ -27,6 +27,9 @@ duel:
 player:
   joined-message: '&8[&s+&8] &e<player>'
   left-message: '&8[&s-&8] &e<player>'
+  welcome-message: |-
+    &7Welcome to &bPractice&7, &e<player>&7!
+    &7Right-click the &b&l&nNether Star &7&7to queue for a duel.
 
 items:
   competitive-duel:

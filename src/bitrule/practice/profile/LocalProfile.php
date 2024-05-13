@@ -12,9 +12,10 @@ use bitrule\practice\registry\ProfileRegistry;
 use InvalidArgumentException;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
-use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
+use function explode;
+use function is_string;
 
 final class LocalProfile {
 
@@ -138,11 +139,11 @@ final class LocalProfile {
 
         /** @var array<int, array<int, string|Item>> $items */
         $items = [
-            0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],
-            1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
-            4 => ['spectate', VanillaItems::CLOCK()],
-            7 => ['parties', VanillaItems::PAPER()],
-            8 => ['settings', VanillaItems::COMPASS()]
+        	0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],
+        	1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
+        	4 => ['spectate', VanillaItems::CLOCK()],
+        	7 => ['parties', VanillaItems::PAPER()],
+        	8 => ['settings', VanillaItems::COMPASS()]
         ];
 
         foreach ($items as $inventorySlot => [$itemType, $item]) {

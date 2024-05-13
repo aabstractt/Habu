@@ -12,6 +12,7 @@ use pocketmine\math\Vector3;
 use RuntimeException;
 use function count;
 use function in_array;
+use function strtolower;
 
 abstract class AbstractArena {
 
