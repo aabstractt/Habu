@@ -36,10 +36,12 @@ final class LocalProfile {
     /**
      * @param string $xuid
      * @param string $name
+     * @param int    $elo
      */
     public function __construct(
         private readonly string $xuid,
-        private readonly string $name
+        private readonly string $name,
+        private int $elo
     ) {}
 
     /**
@@ -54,6 +56,20 @@ final class LocalProfile {
      */
     public function getName(): string {
         return $this->name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getElo(): int {
+        return $this->elo;
+    }
+
+    /**
+     * @param int $elo
+     */
+    public function setElo(int $elo): void {
+        $this->elo = $elo;
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\duel;
 
 use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\duel\impl\NormalDuelImpl;
 use bitrule\practice\duel\properties\DuelProperties;
 use bitrule\practice\duel\stage\AbstractStage;
 use bitrule\practice\duel\stage\EndingStage;
@@ -126,7 +127,23 @@ abstract class Duel {
                 throw new RuntimeException('Player ' . $player->getName() . ' is not online');
             }
 
-            $this->players[$player->getXuid()] = DuelProfile::normal($player);
+            $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
+            if ($localProfile === null) {
+                throw new RuntimeException('Local profile not found for player: ' . $player->getName());
+            }
+
+            $this->players[$player->getXuid()] = $duelProfile = DuelProfile::normal($player, $localProfile->getElo());
+
+            LocalProfile::setDefaultAttributes($player);
+
+            $this->processPlayerPrepare($player, $duelProfile);
+            $this->teleportSpawn($player);
+
+            $this->kit->applyOn($player);
+
+            Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
+
+            $localProfile->setKnockbackProfile($this->kit->getKnockbackProfile());
         }
 
         foreach ($this->players as $duelProfile) {
@@ -144,12 +161,12 @@ abstract class Duel {
 
             Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
 
-            $localPlayer = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-            if ($localPlayer === null) {
+            $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
+            if ($localProfile === null) {
                 throw new RuntimeException('Local profile not found for player: ' . $player->getName());
             }
 
-            $localPlayer->setKnockbackProfile($this->kit->getKnockbackProfile());
+            $localProfile->setKnockbackProfile($this->kit->getKnockbackProfile());
         }
 
         $this->loaded = true;

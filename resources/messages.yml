@@ -10,6 +10,10 @@ duel:
       &7Damage Dealt: &b<opponent-damage-dealt>
   opponent-found: '&bPractice &8> &7Found a &f<type> <kit>&7 match against &c<player>'
 
+  elo-changes:
+    win: '&a+<amount>'
+    lost: '&c-<amount>'
+
   boxing:
     hits-difference:
       self: '&a(+<amount>)'

@@ -165,4 +165,33 @@ final class DuelRegistry {
             $duel->getStage()->update($duel);
         }
     }
+
+    /**
+     * Calculate the new Elo ratings for a winner and a loser.
+     *
+     * This method uses the Elo rating system formula to calculate the new ratings for a winner and a loser.
+     * The Elo rating system is a method for calculating the relative skill levels of players in zero-sum games such as chess.
+     * It is named after its creator Arpad Elo, a Hungarian-American physics professor.
+     *
+     * @param int $winner The current Elo rating of the winner.
+     * @param int $loser The current Elo rating of the loser.
+     * @return array An array containing the change in Elo rating for the winner and the loser.
+     */
+    public static function calculateElo(int $winner, int $loser): array {
+        // The expected score of the winner and the loser
+        // The expected score is the probability of the winner winning the match.
+        // The probability is calculated using the formula 1 / (1 + 10^((L - W) / 400))
+        // where L is the Elo rating of the loser and W is the Elo rating of the winner.
+        // The expected score of the loser is the absolute value of 1 - the expected score of the winner.
+        $expectedScoreA = 1 / (1 + (pow(10, ($loser - $winner) / 400)));
+        $expectedScoreB = abs(1 / (1 + pow(10, ($winner - $loser) / 400)));
+
+        $winnerElo = $winner + intval(32 * (1 - $expectedScoreA));
+        $loserElo = $loser + intval(32 * (0 - $expectedScoreB));
+
+        return [
+            $winnerElo - $winner,
+            abs($loser - $loserElo)
+        ];
+    }
 }

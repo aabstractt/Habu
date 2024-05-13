@@ -13,6 +13,9 @@ use function ucwords;
 
 /**
  * @method static self DUEL_END_STATISTICS_NORMAL()
+ * @method static self DUEL_ELO_CHANGES_LOST()
+ * @method static self DUEL_ELO_CHANGES_WIN()
+ *
  * @method static self DUEL_END_STATISTICS_POT()
  * @method static self DUEL_OPPONENT_FOUND()
  *
@@ -34,7 +37,7 @@ final class TranslationKey {
     use EnumTrait;
 
     /** @var string|null The key of the message. */
-    private ?string $messageKey;
+    private ?string $messageKey = null;
     /** @var array The arguments of the message. */
     private array $arguments = [];
 
@@ -55,6 +58,20 @@ final class TranslationKey {
                 	'self-damage-dealt',
                 	'opponent-critics',
                 	'opponent-damage-dealt',
+                ]
+            ),
+            self::create(
+                'DUEL_ELO_CHANGES_LOST',
+                'duel.elo-changes.lost',
+                [
+                	'amount'
+                ]
+            ),
+            self::create(
+                'DUEL_ELO_CHANGES_WIN',
+                'duel.elo-changes.win',
+                [
+                	'amount'
                 ]
             ),
             self::create(
