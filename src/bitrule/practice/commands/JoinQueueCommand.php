@@ -9,6 +9,7 @@ use bitrule\practice\Practice;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\registry\QueueRegistry;
+use bitrule\practice\TranslationKey;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
@@ -61,18 +62,18 @@ final class JoinQueueCommand extends Command {
             return;
         }
 
-        $sender->sendMessage(TextFormat::GREEN . 'You have joined the queue for ' . TextFormat::AQUA . $kit->getName() . TextFormat::GREEN . '.');
+        QueueRegistry::getInstance()
+            ->createQueue($localProfile, $kit->getName(), isset($args[1]) && $args[1] === 'ranked')
+            ->onCompletion(
+                function (Queue $queue) use ($localProfile, $sender): void {
+                    $sender->sendMessage(TranslationKey::PLAYER_QUEUE_JOINED()->build(
+                        $queue->getKitName(),
+                        $queue->isRanked() ? 'Ranked' : 'Unranked'
+                    ));
 
-        QueueRegistry::getInstance()->createQueue(
-            $localProfile,
-            $kit->getName(),
-            false,
-            function (Queue $matchQueue) use ($sender, $localProfile): void {
-                if (!$sender->isOnline()) return;
-
-                $localProfile->setQueue($matchQueue);
-                Practice::setProfileScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
-            }
-        );
+                    $localProfile->setQueue($queue);
+                },
+                fn() => $sender->sendMessage(TextFormat::RED . 'An error occurred while joining the queue.')
+            );
     }
 }

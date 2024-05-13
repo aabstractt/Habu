@@ -10,6 +10,8 @@ use bitrule\practice\profile\LocalProfile;
 use Closure;
 use Exception;
 use pocketmine\player\Player;
+use pocketmine\promise\Promise;
+use pocketmine\promise\PromiseResolver;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
@@ -29,23 +31,28 @@ final class QueueRegistry {
      * Also checks if there is an opponent in the queue
      * If there is, it will remove both players from the queue
      *
-     * @param LocalProfile          $sourceLocalProfile
-     * @param string                $kitName
-     * @param bool                  $ranked
-     * @param Closure(Queue): void $onCompletion
+     * @param LocalProfile $sourceLocalProfile
+     * @param string       $kitName
+     * @param bool         $ranked
+     *
+     * @return Promise<Queue>
      */
-    public function createQueue(LocalProfile $sourceLocalProfile, string $kitName, bool $ranked, Closure $onCompletion): void {
+    public function createQueue(LocalProfile $sourceLocalProfile, string $kitName, bool $ranked): Promise {
+        $promiseResolver = new PromiseResolver();
+
         if (($kit = KitRegistry::getInstance()->getKit($kitName)) === null) {
-            throw new RuntimeException('Kit no exists.');
+            $promiseResolver->reject();
+
+            return $promiseResolver->getPromise();
         }
 
-        $this->queues[$sourceXuid = $sourceLocalProfile->getXuid()] = $matchQueue = new Queue($sourceXuid, $kitName, $ranked, time());
+        $this->queues[$sourceXuid = $sourceLocalProfile->getXuid()] = $queue = new Queue($sourceXuid, $kitName, $ranked, time());
 
-        $opponentMatchQueue = $this->lookupOpponent($matchQueue);
+        $opponentMatchQueue = $this->lookupOpponent($queue);
         if ($opponentMatchQueue === null) {
-            $onCompletion($matchQueue);
+            $promiseResolver->resolve($queue);
 
-            return;
+            return $promiseResolver->getPromise();
         }
 
         $this->removeQueue($sourceLocalProfile);
@@ -64,6 +71,8 @@ final class QueueRegistry {
 
             $totalPlayers[] = $player;
         }
+
+        $promiseResolver->resolve($queue);
 
         try {
             DuelRegistry::getInstance()->createDuel(
@@ -84,6 +93,8 @@ final class QueueRegistry {
                 $player->sendMessage(TextFormat::RED . $e->getMessage());
             }
         }
+
+        return $promiseResolver->getPromise();
     }
 
     /**
