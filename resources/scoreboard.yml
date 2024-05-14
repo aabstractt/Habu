@@ -1,15 +1,15 @@
 titles:
-  - '&d&lPRACTICE'
+  - '&d&lᴘʀᴀᴄᴛɪᴄᴇ'
 
 lines:
   lobby:
     nothing-0: '&7-----------------&d'
-    nothing-1: '&b&lServer'
-    online-players: ' &fOnline: &b'
-    total-queue-count: ' &fQueuing: &b'
-    total-duel-count: ' &fFighting: &b'
+    nothing-1: '&b&lꜱᴇʀᴠᴇʀ'
+    online-players: ' &fᴏɴʟɪɴᴇ: &b'
+    total-queue-count: ' &fǫᴜᴇᴜɪɴɢ: &b'
+    total-duel-count: ' &fꜰɪɢʜᴛɪɴɢ: &b'
     nothing-2: '&b&d&c'
-    nothing-3: '&bplay.hyrium.com'
+    nothing-3: '&bᴘʟᴀʏ.ʜʏʀɪᴜᴍ.ᴄᴏᴍ'
     nothing-4: '&7-----------------&e'
 
   queue:
@@ -24,7 +24,7 @@ lines:
     queue-kit: '&f Kit: &b'
     queue-duration: '&f Duration: &b'
     nothing-4: '&b&d'
-    nothing-5: '&bplay.hyrium.com'
+    nothing-5: '&bᴘʟᴀʏ.ʜʏʀɪᴜᴍ.ᴄᴏᴍ'
     nothing-6: '&7-----------------&c'
 
   match-starting:
@@ -35,7 +35,7 @@ lines:
     your-ping: '&fYour Ping: &b'
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-3: '&b&d'
-    nothing-4: '&bplay.hyrium.com'
+    nothing-4: '&bᴘʟᴀʏ.ʜʏʀɪᴜᴍ.ᴄᴏᴍ'
     nothing-5: '&7-----------------&d'
 
   match-playing:
@@ -46,7 +46,7 @@ lines:
     your-ping: '&fYour Ping: &b'
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-2: '&b&d'
-    nothing-3: '&bplay.hyrium.com'
+    nothing-3: '&bᴘʟᴀʏ.ʜʏʀɪᴜᴍ.ᴄᴏᴍ'
     nothing-4: '&7-----------------&d'
 
   match-playing-boxing:
@@ -59,7 +59,7 @@ lines:
     your-ping: '&fYour Ping: &b'
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-2: '&b&d'
-    nothing-3: '&bplay.hyrium.com'
+    nothing-3: '&bᴘʟᴀʏ.ʜʏʀɪᴜᴍ.ᴄᴏᴍ'
     nothing-4: '&7-----------------&d'
 
   match-playing-fireball:
@@ -73,7 +73,7 @@ lines:
     duel-opponent-name: '  &fOpponent: &b'
     duel-duration: '  &fDuration: &b'
     nothing-4: '&b&d'
-    nothing-5: '&bplay.hyrium.com'
+    nothing-5: '&bᴘʟᴀʏ.ʜʏʀɪᴜᴍ.ᴄᴏᴍ'
     nothing-6: '&7-----------------&d'
 
   match-ending:
@@ -84,5 +84,5 @@ lines:
     nothing-2: '&d'
     duel-duration: '&fDuration: &b'
     nothing-3: '&b&d'
-    nothing-4: '&bplay.hyrium.com'
+    nothing-4: '&bᴘʟᴀʏ.ʜʏʀɪᴜᴍ.ᴄᴏᴍ'
     nothing-5: '&7-----------------&d'
