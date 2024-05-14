@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bitrule\practice\form\arena;
 
 use bitrule\practice\arena\ArenaProperties;
-use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\ProfileRegistry;

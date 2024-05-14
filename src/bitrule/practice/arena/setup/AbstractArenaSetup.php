@@ -7,7 +7,6 @@ namespace bitrule\practice\arena\setup;
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use bitrule\practice\Practice;
-use bitrule\practice\registry\ArenaRegistry;
 use InvalidArgumentException;
 use pocketmine\entity\Location;
 use pocketmine\item\VanillaItems;
@@ -241,7 +240,7 @@ abstract class AbstractArenaSetup {
         return [
         	'first-position' => $this->firstPosition,
         	'second-position' => $this->secondPosition,
-            'primary-kit' => $this->primaryKit,
+        	'primary-kit' => $this->primaryKit,
         	'type' => $this->getType()
         ];
     }

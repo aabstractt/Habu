@@ -10,6 +10,8 @@ use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use pocketmine\entity\Location;
 use RuntimeException;
 use function count;
+use function is_array;
+use function strtolower;
 
 abstract class ArenaProperties {
 

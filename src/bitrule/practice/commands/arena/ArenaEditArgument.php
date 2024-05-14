@@ -8,12 +8,12 @@ use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
-use bitrule\practice\form\arena\ArenaSetupForm;
 use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use function count;
 
 final class ArenaEditArgument extends Argument {
     use PlayerArgumentTrait;

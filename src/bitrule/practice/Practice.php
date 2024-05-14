@@ -10,7 +10,6 @@ use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
 use bitrule\practice\duel\DuelScoreboard;
 use bitrule\practice\listener\defaults\PlayerExhaustListener;
-use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\listener\entity\EntityDamageListener;

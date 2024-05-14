@@ -10,6 +10,8 @@ use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\entity\Location;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use function count;
+use function is_numeric;
 
 final class ArenaYawArgument extends Argument {
     use PlayerArgumentTrait;

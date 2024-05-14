@@ -12,12 +12,12 @@ use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKey;
 use LogicException;
 use pocketmine\block\Bed;
-use pocketmine\block\BlockTypeIds;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use function str_starts_with;
 
 final class FireballFightPlayingStage extends PlayingStage implements AnythingDamageStageListener, AttackDamageStageListener, BlockBreakStageListener, DuelScoreboard {
 
