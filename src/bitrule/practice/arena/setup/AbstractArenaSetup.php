@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\setup;
 
+use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use bitrule\practice\Practice;
 use bitrule\practice\registry\ArenaRegistry;
 use InvalidArgumentException;
+use pocketmine\entity\Location;
 use pocketmine\item\VanillaItems;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
@@ -24,9 +26,9 @@ abstract class AbstractArenaSetup {
     private ?string $name = null;
 
     /** @var Vector3|null */
-    private ?Vector3 $firstPosition = null;
+    private ?Location $firstPosition = null;
     /** @var Vector3|null */
-    private ?Vector3 $secondPosition = null;
+    private ?Location $secondPosition = null;
     /** @var string|null */
     private ?string $primaryKit = null;
 
@@ -57,30 +59,30 @@ abstract class AbstractArenaSetup {
     }
 
     /**
-     * @return Vector3|null
+     * @return Location|null
      */
-    public function getFirstPosition(): ?Vector3 {
+    public function getFirstPosition(): ?Location {
         return $this->firstPosition;
     }
 
     /**
-     * @param Vector3|null $firstPosition
+     * @param Location|null $firstPosition
      */
-    public function setFirstPosition(?Vector3 $firstPosition): void {
+    public function setFirstPosition(?Location $firstPosition): void {
         $this->firstPosition = $firstPosition;
     }
 
     /**
      * @return Vector3|null
      */
-    public function getSecondPosition(): ?Vector3 {
+    public function getSecondPosition(): ?Location {
         return $this->secondPosition;
     }
 
     /**
-     * @param Vector3|null $secondPosition
+     * @param Location|null $secondPosition
      */
-    public function setSecondPosition(?Vector3 $secondPosition): void {
+    public function setSecondPosition(?Location $secondPosition): void {
         $this->secondPosition = $secondPosition;
     }
 
@@ -99,10 +101,10 @@ abstract class AbstractArenaSetup {
     }
 
     /**
-     * @param int     $step
-     * @param Vector3 $position
+     * @param int      $step
+     * @param Location $position
      */
-    public function setPositionByStep(int $step, Vector3 $position): void {
+    public function setPositionByStep(int $step, Location $position): void {
         if ($step === 0) {
             $this->setFirstPosition($position);
         } else {
@@ -160,10 +162,6 @@ abstract class AbstractArenaSetup {
             throw new RuntimeException('Arena name is not set');
         }
 
-        if (ArenaRegistry::getInstance()->getArena($this->name) !== null) {
-            throw new RuntimeException('Arena ' . $this->name . ' already exists');
-        }
-
         $worldManager = Server::getInstance()->getWorldManager();
         if (!$worldManager->isWorldGenerated($this->name)) {
             Practice::getInstance()->getLogger()->info('Generating world ' . $this->name);
@@ -193,7 +191,24 @@ abstract class AbstractArenaSetup {
 
         $player->teleport($world->getSpawnLocation());
 
+        $player->sendMessage(TextFormat::GREEN . 'Setup started. Use the stick to select the spawns.');
+        $player->sendMessage(TextFormat::YELLOW . 'Shift + Break Block to increase the spawn step');
+        $player->sendMessage(TextFormat::YELLOW . 'Break Block to decrease the spawn step');
+        $player->sendMessage(TextFormat::YELLOW . 'Break block with stick to set the spawn step');
+
         $this->started = true;
+    }
+
+    /**
+     * Loads the arena properties.
+     *
+     * @param ArenaProperties $properties
+     */
+    public function load(ArenaProperties $properties): void {
+        $this->name = $properties->getOriginalName();
+        $this->firstPosition = $properties->getFirstPosition();
+        $this->secondPosition = $properties->getSecondPosition();
+        $this->primaryKit = $properties->getPrimaryKit();
     }
 
     /**
@@ -226,7 +241,7 @@ abstract class AbstractArenaSetup {
         return [
         	'first-position' => $this->firstPosition,
         	'second-position' => $this->secondPosition,
-            'kit' => $this->primaryKit,
+            'primary-kit' => $this->primaryKit,
         	'type' => $this->getType()
         ];
     }
@@ -240,7 +255,7 @@ abstract class AbstractArenaSetup {
         return match (strtolower($type)) {
             'normal', 'boxing' => new DefaultArenaSetup($type), // BoxingArenaSetup
             'bridge' => new BridgeArenaSetup(),
-            FireballFightArenaProperties::IDENTIFIER => new FireballFightArenaSetup(),
+            strtolower(FireballFightArenaProperties::IDENTIFIER) => new FireballFightArenaSetup(),
             default => throw new InvalidArgumentException('Invalid arena setup type ' . $type),
         };
     }

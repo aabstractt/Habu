@@ -18,6 +18,7 @@ use bitrule\practice\listener\entity\EntityMotionListener;
 use bitrule\practice\listener\entity\EntityTeleportListener;
 use bitrule\practice\listener\match\PlayerKitAppliedListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
+use bitrule\practice\listener\world\BlockBreakListener;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ArenaRegistry;
@@ -94,7 +95,7 @@ final class Practice extends PluginBase {
 
         // TODO: Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
-        $this->getServer()->getPluginManager()->registerEvents(new PlayerInteractListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new BlockBreakListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerExhaustListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerQuitListener(), $this);
 

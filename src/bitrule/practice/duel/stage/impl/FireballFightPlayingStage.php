@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel\stage\impl;
 
+use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelScoreboard;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKey;
 use LogicException;
+use pocketmine\block\BlockTypeIds;
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
-final class FireballFightPlayingStage extends PlayingStage implements AnythingDamageStageListener, AttackDamageStageListener, DuelScoreboard {
+final class FireballFightPlayingStage extends PlayingStage implements AnythingDamageStageListener, AttackDamageStageListener, BlockBreakStageListener, DuelScoreboard {
 
     /**
      * These properties allow us to know if some bed has been destroyed.
@@ -108,5 +111,43 @@ final class FireballFightPlayingStage extends PlayingStage implements AnythingDa
         } else {
             $duel->getKit()->applyOn($victim);
         }
+    }
+
+    /**
+     * @param Duel            $duel
+     * @param Player          $player
+     * @param BlockBreakEvent $ev
+     */
+    public function onBlockBreakEvent(Duel $duel, Player $player, BlockBreakEvent $ev): void {
+        $block = $ev->getBlock();
+        if ($block->getTypeId() !== BlockTypeIds::BED) return;
+
+        $arenaProperties = $duel->getArenaProperties();
+        if (!$arenaProperties instanceof FireballFightArenaProperties) {
+            throw new LogicException('Invalid arena properties');
+        }
+
+        $spawnId = $duel->getSpawnId($player->getXuid());
+        $opponentSpawnId = $spawnId === FireballFightArenaProperties::TEAM_RED_ID ? FireballFightArenaProperties::TEAM_BLUE_ID : FireballFightArenaProperties::TEAM_RED_ID;
+
+        $bedSpawn = $spawnId === FireballFightArenaProperties::TEAM_RED_ID ? $arenaProperties->getFirstBedPosition() : $arenaProperties->getSecondBedPosition();
+        if ($bedSpawn->equals($block->getPosition())) {
+            $ev->cancel();
+
+            $player->sendMessage(TextFormat::RED . 'You cannot break your own bed');
+
+            return;
+        }
+
+        if ($spawnId === FireballFightArenaProperties::TEAM_RED_ID) {
+            $this->blueBedDestroyed = true;
+        } else {
+            $this->redBedDestroyed = true;
+        }
+
+        $colorSupplier = fn(int $spawnId): string => $spawnId === 0 ? TextFormat::RED : TextFormat::BLUE;
+        $duel->broadcastMessage(TextFormat::GOLD . TextFormat::BOLD . 'BED DESTROYED! ' . TextFormat::RESET . TextFormat::GOLD . 'The ' . $colorSupplier($opponentSpawnId) . 'team\'s bed has been destroyed by ' . $colorSupplier($spawnId) . $player->getName());
+
+        $ev->setDrops([]);
     }
 }

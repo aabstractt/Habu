@@ -67,10 +67,6 @@ abstract class ArenaProperties {
      * @param array $properties
      */
     public function setup(array $properties): void {
-        if (!isset($properties['name'])) {
-            throw new RuntimeException('Name not set');
-        }
-
         if (!isset($properties['first-position'])) {
             throw new RuntimeException('First position not set');
         }
@@ -79,11 +75,23 @@ abstract class ArenaProperties {
             throw new RuntimeException('Second position not set');
         }
 
+        if (!isset($properties['primary-kit'])) {
+            throw new RuntimeException('Primary kit not set');
+        }
+
         if (!$properties['first-position'] instanceof Location) {
+            if (!is_array($properties['first-position'])) {
+                throw new RuntimeException('Invalid first position data');
+            }
+
             $properties['first-position'] = self::deserializeVector($properties['first-position']);
         }
 
         if (!$properties['second-position'] instanceof Location) {
+            if (!is_array($properties['second-position'])) {
+                throw new RuntimeException('Invalid second position data');
+            }
+
             $properties['second-position'] = self::deserializeVector($properties['second-position']);
         }
 
@@ -101,11 +109,11 @@ abstract class ArenaProperties {
             throw new RuntimeException('Type not set');
         }
 
-        return match ($properties['type']) {
+        return match (strtolower($properties['type'])) {
             'default' => new DefaultArenaProperties($arenaName),
-            FireballFightArenaProperties::IDENTIFIER => new FireballFightArenaProperties($arenaName),
-            BridgeArenaProperties::IDENTIFIER => new BridgeArenaProperties($arenaName),
-            default => throw new RuntimeException('Invalid arena type')
+            strtolower(FireballFightArenaProperties::IDENTIFIER) => new FireballFightArenaProperties($arenaName),
+            strtolower(BridgeArenaProperties::IDENTIFIER) => new BridgeArenaProperties($arenaName),
+            default => throw new RuntimeException('Invalid arena type: ' . $properties['type'])
         };
     }
 

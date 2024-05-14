@@ -49,6 +49,8 @@ final class ArenaSaveArgument extends Argument {
                     $arenaProperties = ArenaProperties::parse($arenaSetup->getName(), $properties = $arenaSetup->getProperties());
                     $arenaProperties->setup($properties);
 
+                    echo 'Creating' . PHP_EOL;
+
                     ArenaRegistry::getInstance()->createArena($arenaProperties);
                     ArenaRegistry::getInstance()->saveAll();
 
@@ -57,6 +59,9 @@ final class ArenaSaveArgument extends Argument {
                     Server::getInstance()->getLogger()->info('Arena backup saved successfully!');
                 } catch (Exception $e) {
                     $sender->sendMessage(TextFormat::RED . 'An error occurred while saving the arena: ' . $e->getMessage());
+
+                    Server::getInstance()->getLogger()->error('An error occurred while saving the arena: ' . $e->getMessage());
+                    Server::getInstance()->getLogger()->logException($e);
                 }
             }
         ));

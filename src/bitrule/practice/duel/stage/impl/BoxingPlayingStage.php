@@ -8,7 +8,6 @@ use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelScoreboard;
 use bitrule\practice\duel\impl\NormalDuelImpl;
 use bitrule\practice\duel\impl\round\NormalRoundingDuelImpl;
-use bitrule\practice\duel\impl\trait\OpponentDuelTrait;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKey;

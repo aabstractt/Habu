@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\setup;
 
+use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use InvalidArgumentException;
+use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 
 final class FireballFightArenaSetup extends AbstractArenaSetup {
@@ -16,10 +18,10 @@ final class FireballFightArenaSetup extends AbstractArenaSetup {
     private ?Vector3 $secondBedPosition = null;
 
     /**
-     * @param int     $step
-     * @param Vector3 $position
+     * @param int      $step
+     * @param Location $position
      */
-    public function setPositionByStep(int $step, Vector3 $position): void {
+    public function setPositionByStep(int $step, Location $position): void {
         if ($step < 2) {
             parent::setPositionByStep($step, $position);
         } elseif ($step === 2) {
@@ -56,6 +58,22 @@ final class FireballFightArenaSetup extends AbstractArenaSetup {
         $properties['second-bed-position'] = $this->secondBedPosition;
 
         return $properties;
+    }
+
+    /**
+     * Loads the arena properties.
+     *
+     * @param ArenaProperties $properties
+     */
+    public function load(ArenaProperties $properties): void {
+        parent::load($properties);
+
+        if (!$properties instanceof FireballFightArenaProperties) {
+            throw new InvalidArgumentException('Invalid arena properties');
+        }
+
+        $this->firstBedPosition = $properties->getFirstBedPosition();
+        $this->secondBedPosition = $properties->getSecondBedPosition();
     }
 
     /**

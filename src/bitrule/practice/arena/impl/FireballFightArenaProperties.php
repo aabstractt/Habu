@@ -30,6 +30,19 @@ final class FireballFightArenaProperties extends ArenaProperties {
     }
 
     /**
+     * Returns the original properties of the arena.
+     *
+     * @return array
+     */
+    public function getOriginalProperties(): array {
+        $properties = parent::getOriginalProperties();
+        $properties['first-bed-position'] = self::serializeVector($properties['first-bed-position']);
+        $properties['second-bed-position'] = self::serializeVector($properties['second-bed-position']);
+
+        return $properties;
+    }
+
+    /**
      * @param array $properties
      */
     public function setup(array $properties): void {
