@@ -32,8 +32,8 @@ abstract class ArenaProperties {
     /**
      * @return string
      */
-    public function getArenaType(): string {
-        return $this->properties['type'];
+    public function getPrimaryKit(): string {
+        return $this->properties['primary-kit'] ?? throw new RuntimeException('Primary kit not set');
     }
 
     /**
@@ -56,7 +56,11 @@ abstract class ArenaProperties {
      * @return array
      */
     public function getOriginalProperties(): array {
-        return $this->properties;
+        $properties = $this->properties;
+        $properties['first-position'] = self::serializeVector($properties['first-position']);
+        $properties['second-position'] = self::serializeVector($properties['second-position']);
+
+        return $properties;
     }
 
     /**
@@ -106,6 +110,19 @@ abstract class ArenaProperties {
     }
 
     /**
+     * @param string $kitName
+     *
+     * @return string
+     */
+    public static function getArenaTypeByKit(string $kitName): string {
+        return match ($kitName) {
+            'bridge' => BridgeArenaProperties::IDENTIFIER,
+            FireballFightArenaProperties::IDENTIFIER => FireballFightArenaProperties::IDENTIFIER,
+            default => 'default'
+        };
+    }
+
+    /**
      * @param array $data
      *
      * @return Location
@@ -128,7 +145,7 @@ abstract class ArenaProperties {
     /**
      * @param Location $location
      *
-     * @return int[]
+     * @return numeric[]
      */
     public static function serializeVector(Location $location): array {
         return [

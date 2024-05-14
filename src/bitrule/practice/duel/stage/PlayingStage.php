@@ -44,7 +44,7 @@ abstract class PlayingStage implements AbstractStage {
      * @return self
      */
     public static function create(ArenaProperties $arenaProperties): self {
-        if ($arenaProperties->getArenaType() === 'Boxing') return new BoxingPlayingStage();
+        if ($arenaProperties->getPrimaryKit() === 'Boxing') return new BoxingPlayingStage();
         if ($arenaProperties instanceof BridgeArenaProperties) return new BridgePlayingStage();
         if ($arenaProperties instanceof FireballFightArenaProperties) return new FireballFightPlayingStage();
 

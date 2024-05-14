@@ -27,6 +27,8 @@ abstract class AbstractArenaSetup {
     private ?Vector3 $firstPosition = null;
     /** @var Vector3|null */
     private ?Vector3 $secondPosition = null;
+    /** @var string|null */
+    private ?string $primaryKit = null;
 
     /**
      * Whether the setup has started.
@@ -83,10 +85,17 @@ abstract class AbstractArenaSetup {
     }
 
     /**
-     * @param string $kitName
+     * @return string|null
      */
-    public function addKit(string $kitName): void {
-        $this->kits[] = $kitName;
+    public function getPrimaryKit(): ?string {
+        return $this->primaryKit;
+    }
+
+    /**
+     * @param string|null $primaryKit
+     */
+    public function setPrimaryKit(?string $primaryKit): void {
+        $this->primaryKit = $primaryKit;
     }
 
     /**
@@ -210,9 +219,14 @@ abstract class AbstractArenaSetup {
             throw new RuntimeException('Second position is not set');
         }
 
+        if ($this->primaryKit === null) {
+            throw new RuntimeException('Primary kit is not set');
+        }
+
         return [
         	'first-position' => $this->firstPosition,
         	'second-position' => $this->secondPosition,
+            'kit' => $this->primaryKit,
         	'type' => $this->getType()
         ];
     }

@@ -101,7 +101,7 @@ final class ArenaRegistry {
         $arenasFiltered = [];
 
         foreach ($this->arenas as $arena) {
-            if ($arena->getArenaType() !== $kit->getName()) continue;
+            if ($arena->getPrimaryKit() !== $kit->getName()) continue;
 
             $arenasFiltered[] = $arena;
         }

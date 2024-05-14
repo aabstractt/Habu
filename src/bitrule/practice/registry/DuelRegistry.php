@@ -143,7 +143,7 @@ final class DuelRegistry {
         $playersCounter = 0;
 
         foreach ($this->duels as $duel) {
-            if ($kitName !== null && $duel->getArenaProperties()->getArenaType() !== $kitName) continue;
+            if ($kitName !== null && $duel->getArenaProperties()->getPrimaryKit() !== $kitName) continue;
 
             $playersCounter += count($duel->getAlive());
         }

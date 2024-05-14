@@ -6,6 +6,9 @@ namespace bitrule\practice\duel\stage\impl;
 
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelScoreboard;
+use bitrule\practice\duel\impl\NormalDuelImpl;
+use bitrule\practice\duel\impl\round\NormalRoundingDuelImpl;
+use bitrule\practice\duel\impl\trait\OpponentDuelTrait;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKey;
@@ -56,6 +59,8 @@ final class BoxingPlayingStage extends PlayingStage implements AttackDamageStage
      * @return string|null
      */
     public function replacePlaceholders(Duel $duel, Player $source, LocalProfile $localProfile, string $identifier): ?string {
+        if (!$duel instanceof NormalDuelImpl && !$duel instanceof NormalRoundingDuelImpl) return null;
+
         $duelProfile = $duel->getPlayer($source->getXuid());
         if ($duelProfile === null) return null;
 
