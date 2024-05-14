@@ -9,6 +9,11 @@ duel:
       &7Critics: &b<opponent-critics>
       &7Damage Dealt: &b<opponent-damage-dealt>
   opponent-found: '&bPractice &8> &7Found a &f<type> <kit>&7 match against &c<player>'
+  winner-broadcast: '&a<winner>&7 has won a &e<kit>&7 duel against &c<loser>.'
+
+  elo-changes:
+    win: '&a+<amount>'
+    lost: '&c-<amount>'
 
   boxing:
     hits-difference:
@@ -23,3 +28,38 @@ duel:
   fireball-fight:
     player-dead: '<player>&e was slain by <killer>'
     player-dead-without-killer: '<player>&e was slain.'
+
+player:
+  joined-message: '&8[&s+&8] &e<player>'
+  left-message: '&8[&s-&8] &e<player>'
+  welcome-message: |-
+    &7Welcome to &bPractice&7, &e<player>&7!
+    &7Right-click the &b&l&nNether Star &7&7to queue for a duel.
+  queue-joined: '&aYou have joined the &b<type> <kit>&a queue.'
+
+items:
+  competitive-duel:
+    custom-name: "&r&9Competitive Duel"
+    lore: |-
+      &7Right-click to queue for a competitive duel.
+      &7You will be matched against a player with a similar skill level.
+  unranked-duel:
+    custom-name: "&r&eDuel"
+    lore: |-
+      &7Right-click to queue for a duel.
+      &7You will be matched against a random player.
+  spectate:
+    custom-name: "&r&aSpectate"
+    lore: |-
+      &7Right-click to spectate a duel.
+      &7You will be teleported to a random duel.
+  parties:
+    custom-name: "&r&dParties"
+    lore: |-
+      &7Right-click to open the parties menu.
+      &7You can create or join a party here.
+  settings:
+    custom-name: "&r&sProfile Settings"
+    lore: |-
+      &7Right-click to open the profile settings menu.
+      &7You can change your settings here.

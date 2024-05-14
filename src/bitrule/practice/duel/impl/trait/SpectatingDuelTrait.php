@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\duel\impl;
+namespace bitrule\practice\duel\impl\trait;
 
 use bitrule\practice\duel\Duel;
 use pocketmine\player\Player;

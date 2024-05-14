@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\entity;
 
+use bitrule\practice\duel\stage\impl\AnythingDamageStageListener;
+use bitrule\practice\duel\stage\impl\AttackDamageStageListener;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\KnockbackRegistry;
@@ -12,19 +14,22 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\player\Player;
+use RuntimeException;
 
 final class EntityDamageListener implements Listener {
 
     /**
      * @param EntityDamageEvent $ev
+     *
+     * @priority NORMAL
      */
     public function onEntityDamageEvent(EntityDamageEvent $ev): void {
-        $entity = $ev->getEntity();
-        if (!$entity instanceof Player) return;
+        $victim = $ev->getEntity();
+        if (!$victim instanceof Player) return;
 
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($entity->getXuid());
+        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($victim->getXuid());
         if ($localProfile === null) {
-            throw new \RuntimeException('LocalProfile is null');
+            throw new RuntimeException('LocalProfile is null');
         }
 
         if ($ev instanceof EntityDamageByEntityEvent) {
@@ -38,7 +43,7 @@ final class EntityDamageListener implements Listener {
 
             $knockbackProfile = KnockbackRegistry::getInstance()->getKnockback($localProfile->getKnockbackProfile());
             if ($knockbackProfile === null) {
-                throw new \RuntimeException('KnockbackProfile for ' . $localProfile->getKnockbackProfile() . ' is null');
+                throw new RuntimeException('KnockbackProfile for ' . $localProfile->getKnockbackProfile() . ' is null');
             }
 
             $ev->setKnockBack(0.0);
@@ -47,10 +52,10 @@ final class EntityDamageListener implements Listener {
                 $ev->setAttackCooldown($knockbackProfile->getHitDelay());
             }
 
-            $knockbackProfile->applyOn($entity, $localProfile, $ev->getDamager());
+            $knockbackProfile->applyOn($victim, $localProfile, $ev->getDamager());
         }
 
-        $duel = DuelRegistry::getInstance()->getDuelByPlayer($entity->getXuid());
+        $duel = DuelRegistry::getInstance()->getDuelByPlayer($victim->getXuid());
         if ($duel === null) return;
 
         $stage = $duel->getStage();
@@ -61,9 +66,28 @@ final class EntityDamageListener implements Listener {
         }
 
         if ($ev instanceof EntityDamageByEntityEvent) {
-            $stage->onEntityDamageByEntityEvent($duel, $entity, $ev);
-        } else {
-            $stage->onAnythingDamageEvent($duel, $entity, $ev);
+            $victimProfile = $duel->getPlayer($victim->getXuid());
+            if ($victimProfile === null || !$victimProfile->isAlive()) return;
+
+            $attacker = $ev->getDamager();
+            if (!$attacker instanceof Player) return;
+
+            $attackerProfile = $duel->getPlayer($attacker->getXuid());
+            if ($attackerProfile === null || !$attackerProfile->isAlive()) return;
+
+            $attackerDuelStatistics = $attackerProfile->getDuelStatistics();
+            $attackerDuelStatistics->increaseDamageDealt($ev->getFinalDamage());
+            $attackerDuelStatistics->increaseTotalHits();
+
+            if ($stage instanceof AttackDamageStageListener) {
+                $stage->onEntityDamageByEntityEvent($duel, $victim, $ev);
+            }
+
+            return;
+        }
+
+        if ($stage instanceof AnythingDamageStageListener) {
+            $stage->onAnythingDamageEvent($duel, $victim, $ev);
         }
     }
 }

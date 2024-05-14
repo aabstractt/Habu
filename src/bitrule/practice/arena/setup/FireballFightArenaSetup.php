@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\setup;
 
-use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\arena\impl\FireballFightArena;
+use bitrule\practice\arena\ArenaProperties;
+use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use InvalidArgumentException;
+use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 
 final class FireballFightArenaSetup extends AbstractArenaSetup {
@@ -17,10 +18,10 @@ final class FireballFightArenaSetup extends AbstractArenaSetup {
     private ?Vector3 $secondBedPosition = null;
 
     /**
-     * @param int     $step
-     * @param Vector3 $position
+     * @param int      $step
+     * @param Location $position
      */
-    public function setPositionByStep(int $step, Vector3 $position): void {
+    public function setPositionByStep(int $step, Location $position): void {
         if ($step < 2) {
             parent::setPositionByStep($step, $position);
         } elseif ($step === 2) {
@@ -45,21 +46,34 @@ final class FireballFightArenaSetup extends AbstractArenaSetup {
      * This method is called when the arena is created into the arena manager.
      * This is where you should set the arena's properties.
      *
-     * @param AbstractArena $arena
+     * @return array
      */
-    public function submit(AbstractArena $arena): void {
-        if (!$arena instanceof FireballFightArena) {
-            throw new InvalidArgumentException('Arena must be a FireballFightArena');
-        }
-
+    public function getProperties(): array {
         if ($this->firstBedPosition === null || $this->secondBedPosition === null) {
             throw new InvalidArgumentException('Bed positions are not set');
         }
 
-        $arena->setFirstBedPosition($this->firstBedPosition);
-        $arena->setSecondBedPosition($this->secondBedPosition);
+        $properties = parent::getProperties();
+        $properties['first-bed-position'] = $this->firstBedPosition;
+        $properties['second-bed-position'] = $this->secondBedPosition;
 
-        parent::submit($arena);
+        return $properties;
+    }
+
+    /**
+     * Loads the arena properties.
+     *
+     * @param ArenaProperties $properties
+     */
+    public function load(ArenaProperties $properties): void {
+        parent::load($properties);
+
+        if (!$properties instanceof FireballFightArenaProperties) {
+            throw new InvalidArgumentException('Invalid arena properties');
+        }
+
+        $this->firstBedPosition = $properties->getFirstBedPosition();
+        $this->secondBedPosition = $properties->getSecondBedPosition();
     }
 
     /**
@@ -68,6 +82,6 @@ final class FireballFightArenaSetup extends AbstractArenaSetup {
      * @return string
      */
     public function getType(): string {
-        return FireballFightArena::NAME;
+        return FireballFightArenaProperties::IDENTIFIER;
     }
 }

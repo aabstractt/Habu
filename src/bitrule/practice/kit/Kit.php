@@ -17,16 +17,16 @@ final class Kit {
     public const SUMO = 'Sumo';
 
     /**
-     * @param string $name
-     * @param array<int, Item>  $inventoryItems
-     * @param array<int, Item>  $armorItems
-     * @param string $kbProfile
+     * @param string           $name
+     * @param array<int, Item> $inventoryItems
+     * @param array<int, Item> $armorItems
+     * @param string           $knockbackProfile
      */
     public function __construct(
         private readonly string $name,
         private array $inventoryItems,
         private array $armorItems,
-        private string $kbProfile
+        private string $knockbackProfile
     ) {}
 
     /**
@@ -67,15 +67,15 @@ final class Kit {
     /**
      * @return string
      */
-    public function getKbProfile(): string {
-        return $this->kbProfile;
+    public function getKnockbackProfile(): string {
+        return $this->knockbackProfile;
     }
 
     /**
-     * @param string $kbProfile
+     * @param string $knockbackProfile
      */
-    public function setKbProfile(string $kbProfile): void {
-        $this->kbProfile = $kbProfile;
+    public function setKnockbackProfile(string $knockbackProfile): void {
+        $this->knockbackProfile = $knockbackProfile;
     }
 
     /**

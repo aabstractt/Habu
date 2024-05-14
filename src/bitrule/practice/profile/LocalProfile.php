@@ -9,8 +9,13 @@ use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ProfileRegistry;
+use InvalidArgumentException;
+use pocketmine\item\Item;
+use pocketmine\item\VanillaItems;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
+use function explode;
+use function is_string;
 
 final class LocalProfile {
 
@@ -31,10 +36,12 @@ final class LocalProfile {
     /**
      * @param string $xuid
      * @param string $name
+     * @param int    $elo
      */
     public function __construct(
         private readonly string $xuid,
-        private readonly string $name
+        private readonly string $name,
+        private int $elo
     ) {}
 
     /**
@@ -49,6 +56,20 @@ final class LocalProfile {
      */
     public function getName(): string {
         return $this->name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getElo(): int {
+        return $this->elo;
+    }
+
+    /**
+     * @param int $elo
+     */
+    public function setElo(int $elo): void {
+        $this->elo = $elo;
     }
 
     /**
@@ -124,14 +145,42 @@ final class LocalProfile {
     public static function setDefaultAttributes(Player $player): void {
         self::resetInventory($player);
 
-        $player->setGamemode(GameMode::SURVIVAL);
-        $player->setNoClientPredictions(false);
-
         $player->setHealth($player->getMaxHealth());
         $player->getHungerManager()->setFood(20);
         $player->getHungerManager()->setSaturation(20);
 
         $player->getXpManager()->setXpAndProgress(0, 0);
+
+        $player->setGamemode(GameMode::ADVENTURE);
+
+        /** @var array<int, array<int, string|Item>> $items */
+        $items = [
+        	0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],
+        	1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
+        	4 => ['spectate', VanillaItems::CLOCK()],
+        	7 => ['parties', VanillaItems::PAPER()],
+        	8 => ['settings', VanillaItems::COMPASS()]
+        ];
+
+        foreach ($items as $inventorySlot => [$itemType, $item]) {
+            if (!is_string($itemType)) {
+                throw new InvalidArgumentException('Item type must be a string');
+            }
+
+            if (!$item instanceof Item) {
+                throw new InvalidArgumentException('Item must be an instance of Item');
+            }
+
+            $item->setCustomName(Practice::wrapMessage('items.' . $itemType . '.custom-name'));
+            $item->setLore(explode("\n", Practice::wrapMessage('items.' . $itemType . '.lore')));
+
+            $nbt = $item->getNamedTag();
+
+            $nbt->setString('ItemType', $itemType);
+            $item->setNamedTag($nbt);
+
+            $player->getInventory()->setItem($inventorySlot, $item);
+        }
     }
 
     /**
@@ -143,6 +192,14 @@ final class LocalProfile {
         $player->getArmorInventory()->clearAll();
         $player->getCursorInventory()->clearAll();
         $player->getOffHandInventory()->clearAll();
+
+        $player->setHealth($player->getMaxHealth());
+
+        $player->setGamemode(GameMode::SURVIVAL);
+        $player->setNoClientPredictions(false);
+
+        $player->setAllowFlight(false);
+        $player->setFlying(false);
 
         $player->getEffects()->clear();
     }

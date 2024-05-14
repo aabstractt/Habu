@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\arena\listener;
+namespace bitrule\practice\duel\stage\impl;
 
 use bitrule\practice\duel\Duel;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\player\Player;
 
-interface AnythingDamageArenaListener {
+interface AnythingDamageStageListener {
 
     /**
      * This method is called when a player is damaged by anything

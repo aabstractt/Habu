@@ -19,12 +19,14 @@ final class DuelProfile {
     /**
      * @param string         $xuid
      * @param string         $name
+     * @param int            $elo
      * @param bool           $playing
      * @param DuelStatistics $duelStatistics
      */
     public function __construct(
         private readonly string $xuid,
         private readonly string $name,
+        private readonly int $elo,
         private readonly bool $playing,
         private readonly DuelStatistics $duelStatistics = new DuelStatistics()
     ) {}
@@ -41,6 +43,13 @@ final class DuelProfile {
      */
     public function getName(): string {
         return $this->name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getElo(): int {
+        return $this->elo;
     }
 
     /**
@@ -114,11 +123,12 @@ final class DuelProfile {
 
     /**
      * @param Player $player
+     * @param int    $elo
      *
      * @return self
      */
-    public static function normal(Player $player): self {
-        return new self($player->getXuid(), $player->getName(), true);
+    public static function normal(Player $player, int $elo): self {
+        return new self($player->getXuid(), $player->getName(), $elo, true);
     }
 
     /**
@@ -129,6 +139,6 @@ final class DuelProfile {
      * @return self
      */
     public static function spectator(Player $source): self {
-        return new self($source->getXuid(), $source->getName(), false);
+        return new self($source->getXuid(), $source->getName(), 0, false);
     }
 }

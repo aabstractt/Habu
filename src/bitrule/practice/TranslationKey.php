@@ -13,8 +13,12 @@ use function ucwords;
 
 /**
  * @method static self DUEL_END_STATISTICS_NORMAL()
+ * @method static self DUEL_ELO_CHANGES_LOST()
+ * @method static self DUEL_ELO_CHANGES_WIN()
+ *
  * @method static self DUEL_END_STATISTICS_POT()
  * @method static self DUEL_OPPONENT_FOUND()
+ * @method static self DUEL_WINNER_BROADCAST()
  *
  * @method static self BOXING_DUEL_HITS_DIFFERENCE_OPPONENT()
  * @method static self BOXING_DUEL_HITS_DIFFERENCE_SELF()
@@ -25,12 +29,17 @@ use function ucwords;
  *
  * @method static self FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()
  * @method static self FIREBALL_FIGHT_PLAYER_DEAD()
+ *
+ * @method static self PLAYER_JOINED_MESSAGE()
+ * @method static self PLAYER_WELCOME_MESSAGE()
+ * @method static self PLAYER_LEFT_MESSAGE()
+ * @method static self PLAYER_QUEUE_JOINED()
  */
 final class TranslationKey {
     use EnumTrait;
 
     /** @var string|null The key of the message. */
-    private ?string $messageKey;
+    private ?string $messageKey = null;
     /** @var array The arguments of the message. */
     private array $arguments = [];
 
@@ -54,8 +63,22 @@ final class TranslationKey {
                 ]
             ),
             self::create(
+                'DUEL_ELO_CHANGES_LOST',
+                'duel.elo-changes.lost',
+                [
+                	'amount'
+                ]
+            ),
+            self::create(
+                'DUEL_ELO_CHANGES_WIN',
+                'duel.elo-changes.win',
+                [
+                	'amount'
+                ]
+            ),
+            self::create(
                 'DUEL_END_STATISTICS_POT',
-                'match.end-statistics-pot',
+                'duel.end-statistics-pot',
                 [
                 	'opponent',
                 	'self-elo-changes',
@@ -69,10 +92,19 @@ final class TranslationKey {
             ),
             self::create(
                 'DUEL_OPPONENT_FOUND',
-                'match.opponent-found',
+                'duel.opponent-found',
                 [
                 	'player',
                 	'type',
+                	'kit'
+                ]
+            ),
+            self::create(
+                'DUEL_WINNER_BROADCAST',
+                'duel.winner-broadcast',
+                [
+                	'winner',
+                	'loser',
                 	'kit'
                 ]
             ),
@@ -128,16 +160,46 @@ final class TranslationKey {
                 	'player',
                 	'killer'
                 ]
+            ),
+            self::create(
+                'PLAYER_JOINED_MESSAGE',
+                'player.joined-message',
+                [
+                	'player'
+                ]
+            ),
+            self::create(
+                'PLAYER_WELCOME_MESSAGE',
+                'player.welcome-message',
+                [
+                	'player',
+                	'online-players'
+                ]
+            ),
+            self::create(
+                'PLAYER_LEFT_MESSAGE',
+                'player.left-message',
+                [
+                	'player'
+                ]
+            ),
+            self::create(
+                'PLAYER_QUEUE_JOINED',
+                'player.queue-joined',
+                [
+                	'kit',
+                	'type'
+                ]
             )
         );
     }
 
     /**
-     * @param string ...$arguments
+     * @param mixed ...$arguments
      *
      * @return string
      */
-    public function build(string...$arguments): string {
+    public function build(mixed...$arguments): string {
         if (count($arguments) !== count($this->arguments)) {
             throw new InvalidArgumentException('Invalid number of arguments. Expected ' . count($this->arguments) . ' but got ' . count($arguments) . '.');
         }

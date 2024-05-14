@@ -6,9 +6,11 @@ namespace bitrule\practice\commands;
 
 use abstractplugin\command\BaseCommand;
 use bitrule\practice\commands\arena\ArenaCreateArgument;
-use bitrule\practice\commands\arena\ArenaKnockbackArgument;
+use bitrule\practice\commands\arena\ArenaEditArgument;
 use bitrule\practice\commands\arena\ArenaSaveArgument;
+use bitrule\practice\commands\arena\ArenaYawArgument;
 use bitrule\practice\commands\arena\KitCreateArgument;
+use bitrule\practice\commands\arena\KitKnockbackArgument;
 
 final class ArenaMainCommand extends BaseCommand {
 
@@ -20,8 +22,10 @@ final class ArenaMainCommand extends BaseCommand {
         $this->registerParent(
             new ArenaCreateArgument('create', 'arena.command.create'),
             new ArenaSaveArgument('save', 'arena.command.save'),
+            new ArenaYawArgument('yaw', 'arena.command.yaw'),
+            new ArenaEditArgument('edit', 'arena.command.edit'),
             new KitCreateArgument('createkit', 'arena.command.createkit'),
-            new ArenaKnockbackArgument('knockback', 'arena.command.knockback')
+            new KitKnockbackArgument('knockback', 'arena.command.knockback')
         );
     }
 

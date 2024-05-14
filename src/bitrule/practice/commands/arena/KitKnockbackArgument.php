@@ -6,14 +6,14 @@ namespace bitrule\practice\commands\arena;
 
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
-use bitrule\practice\registry\ArenaRegistry;
+use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\KnockbackRegistry;
 use Exception;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use function count;
 
-final class ArenaKnockbackArgument extends Argument {
+final class KitKnockbackArgument extends Argument {
     use PlayerArgumentTrait;
 
     /**
@@ -28,9 +28,9 @@ final class ArenaKnockbackArgument extends Argument {
             return;
         }
 
-        $arena = ArenaRegistry::getInstance()->getArena($args[0]);
-        if ($arena === null) {
-            $sender->sendMessage(TextFormat::RED . 'Arena with that name does not exist');
+        $kit = KitRegistry::getInstance()->getKit($args[0]);
+        if ($kit === null) {
+            $sender->sendMessage(TextFormat::RED . 'Kit with that name does not exist');
 
             return;
         }
@@ -43,12 +43,12 @@ final class ArenaKnockbackArgument extends Argument {
         }
 
         try {
-            $arena->setKnockbackProfile($knockbackProfile->getName());
-            ArenaRegistry::getInstance()->saveAll();
+            $kit->setKnockbackProfile($knockbackProfile->getName());
+            KitRegistry::getInstance()->createKit($kit);
 
-            $sender->sendMessage(TextFormat::GREEN . 'Knockback profile set to ' . $knockbackProfile->getName() . ' for arena ' . $arena->getName());
+            $sender->sendMessage(TextFormat::GREEN . 'Knockback profile set to ' . $knockbackProfile->getName() . ' for kit ' . $kit->getName());
         } catch (Exception $e) {
-            $sender->sendMessage(TextFormat::RED . 'An error occurred while saving the arena: ' . $e->getMessage());
+            $sender->sendMessage(TextFormat::RED . 'An error occurred while saving the kit: ' . $e->getMessage());
         }
     }
 }

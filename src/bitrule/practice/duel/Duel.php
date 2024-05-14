@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel;
 
-use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\duel\properties\DuelProperties;
+use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\duel\stage\AbstractStage;
 use bitrule\practice\duel\stage\EndingStage;
 use bitrule\practice\duel\stage\PlayingStage;
@@ -47,23 +46,18 @@ abstract class Duel {
     protected array $players = [];
     /** @var array<string, int> */
     protected array $playersSpawn = [];
-    /**
-     * The properties of the duel.
-     * @var DuelProperties|null
-     */
-    protected ?DuelProperties $properties = null;
 
     /**
-     * @param AbstractArena    $arena
-     * @param Kit              $kit
-     * @param int              $id
-     * @param bool             $ranked
+     * @param ArenaProperties $arenaProperties
+     * @param Kit             $kit
+     * @param int             $id
+     * @param bool            $ranked
      */
     public function __construct(
-        protected readonly AbstractArena $arena,
-        protected readonly Kit $kit,
-        protected readonly int $id,
-        protected readonly bool $ranked
+        protected readonly ArenaProperties $arenaProperties,
+        protected readonly Kit             $kit,
+        protected readonly int             $id,
+        protected readonly bool            $ranked
     ) {
         $this->stage = new StartingStage();
     }
@@ -105,8 +99,8 @@ abstract class Duel {
 
         $player->teleport(Position::fromObject(
             match ($spawnId) {
-                self::FIRST_SPAWN_ID => $this->arena->getFirstPosition(),
-                self::SECOND_SPAWN_ID => $this->arena->getSecondPosition(),
+                self::FIRST_SPAWN_ID => $this->arenaProperties->getFirstPosition(),
+                self::SECOND_SPAWN_ID => $this->arenaProperties->getSecondPosition(),
                 default => $this->getWorld()->getSpawnLocation()
             },
             $this->getWorld()
@@ -126,7 +120,16 @@ abstract class Duel {
                 throw new RuntimeException('Player ' . $player->getName() . ' is not online');
             }
 
-            $this->players[$player->getXuid()] = DuelProfile::normal($player);
+            $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
+            if ($localProfile === null) {
+                throw new RuntimeException('Local profile not found for player: ' . $player->getName());
+            }
+
+            $this->players[$player->getXuid()] = DuelProfile::normal($player, $localProfile->getElo());
+
+            LocalProfile::setDefaultAttributes($player);
+
+            $localProfile->setKnockbackProfile($this->kit->getKnockbackProfile());
         }
 
         foreach ($this->players as $duelProfile) {
@@ -135,21 +138,12 @@ abstract class Duel {
                 throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
             }
 
-            LocalProfile::setDefaultAttributes($player);
-
             $this->processPlayerPrepare($player, $duelProfile);
             $this->teleportSpawn($player);
 
             $this->kit->applyOn($player);
 
             Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
-
-            $localPlayer = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-            if ($localPlayer === null) {
-                throw new RuntimeException('Local profile not found for player: ' . $player->getName());
-            }
-
-            $localPlayer->setKnockbackProfile($this->arena->getKnockbackProfile());
         }
 
         $this->loaded = true;
@@ -179,13 +173,17 @@ abstract class Duel {
      * to Ending.
      */
     public function end(): void {
+        if ($this->ending) return;
+
+        echo 'This game already end!' . PHP_EOL;
+
+        $this->ending = true;
+
         $this->stage = EndingStage::create($this->stage instanceof PlayingStage ? $this->stage->getSeconds() : 0);
 
         foreach ($this->getEveryone() as $duelProfile) {
             $player = $duelProfile->toPlayer();
-            if ($player === null || !$player->isOnline()) {
-                throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
-            }
+            if ($player === null) continue;
 
             $this->processPlayerEnd($player, $duelProfile);
         }
@@ -325,7 +323,7 @@ abstract class Duel {
      * @return string
      */
     public function getFullName(): string {
-        return $this->arena->getName() . '-' . $this->id;
+        return $this->arenaProperties->getOriginalName() . '-' . $this->id;
     }
 
     /**
@@ -344,10 +342,10 @@ abstract class Duel {
     }
 
     /**
-     * @return AbstractArena
+     * @return ArenaProperties
      */
-    public function getArena(): AbstractArena {
-        return $this->arena;
+    public function getArenaProperties(): ArenaProperties {
+        return $this->arenaProperties;
     }
 
     /**
@@ -369,20 +367,6 @@ abstract class Duel {
      */
     public function setStage(AbstractStage $stage): void {
         $this->stage = $stage;
-    }
-
-    /**
-     * @return DuelProperties|null
-     */
-    public function getProperties(): ?DuelProperties {
-        return $this->properties;
-    }
-
-    /**
-     * @param DuelProperties $properties
-     */
-    public function setProperties(DuelProperties $properties): void {
-        $this->properties = $properties;
     }
 
     /**

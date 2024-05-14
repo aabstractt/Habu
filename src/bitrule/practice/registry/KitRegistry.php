@@ -17,11 +17,14 @@ use pocketmine\item\SplashPotion;
 use pocketmine\item\StringToItemParser;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
 use RuntimeException;
 use function array_map;
+use function count;
 use function is_array;
 use function is_int;
 use function is_string;
+use function strtolower;
 
 final class KitRegistry {
     use SingletonTrait {
@@ -39,32 +42,30 @@ final class KitRegistry {
         $config = new Config(Practice::getInstance()->getDataFolder() . 'kits.yml');
         foreach ($config->getAll() as $kitName => $kitData) {
             if (!is_string($kitName) || !is_array($kitData)) {
-                Practice::getInstance()->getLogger()->error('Invalid kit data');
-                continue;
+                throw new RuntimeException('Kit name is not a string or kit data is not an array');
             }
 
             if (!isset($kitData['inventoryItems'])) {
-                Practice::getInstance()->getLogger()->error('Kit ' . $kitName . ' does not have inventory items');
-                continue;
+                throw new RuntimeException('Kit ' . $kitName . ' does not have inventory items');
             }
 
             if (!isset($kitData['armorItems'])) {
-                Practice::getInstance()->getLogger()->error('Kit ' . $kitName . ' does not have armor items');
-                continue;
+                throw new RuntimeException('Kit ' . $kitName . ' does not have armor items');
             }
 
             if (!isset($kitData['kbProfile'])) {
-                Practice::getInstance()->getLogger()->error('Kit ' . $kitName . ' does not have kb profile');
-                continue;
+                throw new RuntimeException('Kit ' . $kitName . ' does not have a knockback profile');
             }
 
-            $this->kits[$kitName] = new Kit(
+            $this->kits[strtolower($kitName)] = new Kit(
                 $kitName,
                 array_map(fn(array $itemData) => self::parseItem($itemData), $kitData['inventoryItems']),
                 array_map(fn(array $itemData) => self::parseItem($itemData), $kitData['armorItems']),
                 $kitData['kbProfile']
             );
         }
+
+        Practice::getInstance()->getLogger()->info(TextFormat::GREEN . 'Loaded ' . count($this->kits) . ' kit(s)');
     }
 
     /**
@@ -73,13 +74,13 @@ final class KitRegistry {
      * @throws JsonException
      */
     public function createKit(Kit $kit): void {
-        $this->kits[$kit->getName()] = $kit;
+        $this->kits[strtolower($kit->getName())] = $kit;
 
         $config = new Config(Practice::getInstance()->getDataFolder() . 'kits.yml');
         $config->set($kit->getName(), [
         	'inventoryItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getInventoryItems()),
         	'armorItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getArmorItems()),
-        	'kbProfile' => $kit->getKbProfile()
+        	'kbProfile' => $kit->getKnockbackProfile()
         ]);
         $config->save();
     }
@@ -90,7 +91,7 @@ final class KitRegistry {
      * @return Kit|null
      */
     public function getKit(string $name): ?Kit {
-        return $this->kits[$name] ?? null;
+        return $this->kits[strtolower($name)] ?? null;
     }
 
     /**

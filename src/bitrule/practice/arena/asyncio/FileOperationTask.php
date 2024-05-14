@@ -7,13 +7,14 @@ namespace bitrule\practice\arena\asyncio;
 use bitrule\practice\Practice;
 use Exception;
 use pocketmine\scheduler\AsyncTask;
+use RuntimeException;
 use function is_callable;
 use function microtime;
 
 abstract class FileOperationTask extends AsyncTask {
 
-    /** @var float */
-    protected float $taskTime;
+    /** @var float|null */
+    protected ?float $taskTime = null;
     /** @var bool */
     protected bool $success = false;
 
@@ -38,6 +39,10 @@ abstract class FileOperationTask extends AsyncTask {
     }
 
     public function onCompletion(): void {
+        if ($this->taskTime === null) {
+            throw new RuntimeException('Task time is not set');
+        }
+
         $this->taskTime = microtime(true) - $this->taskTime;
 
         if (!$this->success) return;

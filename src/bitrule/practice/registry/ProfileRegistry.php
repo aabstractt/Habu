@@ -39,7 +39,7 @@ final class ProfileRegistry {
             throw new RuntimeException('Player already exists in local players list');
         }
 
-        $this->localProfiles[$player->getXuid()] = $localProfile = new LocalProfile($player->getXuid(), $player->getName());
+        $this->localProfiles[$player->getXuid()] = $localProfile = new LocalProfile($player->getXuid(), $player->getName(), 1_000);
 
         $localProfile->joinLobby($player, true);
     }

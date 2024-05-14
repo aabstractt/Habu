@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\listener\defaults;
 
 use bitrule\practice\registry\ProfileRegistry;
+use bitrule\practice\TranslationKey;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerQuitEvent;
 
@@ -19,6 +20,8 @@ final class PlayerQuitListener implements Listener {
      */
     public function onPlayerQuitEvent(PlayerQuitEvent $ev): void {
         $player = $ev->getPlayer();
+
+        $ev->setQuitMessage(TranslationKey::PLAYER_LEFT_MESSAGE()->build($player->getName()));
 
         ProfileRegistry::getInstance()->quitPlayer($player);
     }
