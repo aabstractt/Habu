@@ -193,6 +193,8 @@ final class LocalProfile {
         $player->getCursorInventory()->clearAll();
         $player->getOffHandInventory()->clearAll();
 
+        $player->setHealth($player->getMaxHealth());
+
         $player->setGamemode(GameMode::SURVIVAL);
         $player->setNoClientPredictions(false);
 

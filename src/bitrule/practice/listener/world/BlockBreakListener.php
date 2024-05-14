@@ -60,7 +60,9 @@ final class BlockBreakListener implements Listener {
         $player->sendMessage(TextFormat::GREEN . 'Position for step ' . $arenaSetup->getSpawnStep() . ' set!');
 
         $position = $ev->getBlock()->getPosition();
-        $arenaSetup->setPositionByStep($arenaSetup->getSpawnStep(), Location::fromObject($position->add(0, 1, 0), $player->getWorld()));
+        if ($arenaSetup->getSpawnStep() < 2) $position = $position->add(0, 1, 0);
+
+        $arenaSetup->setPositionByStep($arenaSetup->getSpawnStep(), Location::fromObject($position, $player->getWorld()));
         $arenaSetup->increaseSpawnStep();
 
         $player->sendMessage(TextFormat::YELLOW . 'You are now setting position for step ' . $arenaSetup->getSpawnStep());

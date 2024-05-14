@@ -36,12 +36,11 @@ final class StartingStage implements AbstractStage {
 
         if ($this->countdown > 1) return;
 
-        $duel->setStage(PlayingStage::create($duel->getArenaProperties()));
+        $duel->setStage($stage = PlayingStage::create($duel->getArenaProperties()));
 
         (new DuelStartedEvent($duel))->call();
 
-        $arena = $duel->getArenaProperties();
-        $scoreboardId = $arena instanceof DuelScoreboard ? $arena->getScoreboardId() : ProfileRegistry::MATCH_PLAYING_SCOREBOARD;
+        $scoreboardId = $stage instanceof DuelScoreboard ? $stage->getScoreboardId() : ProfileRegistry::MATCH_PLAYING_SCOREBOARD;
 
         foreach ($duel->getEveryone() as $duelProfile) {
             $player = $duelProfile->toPlayer();

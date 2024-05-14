@@ -202,8 +202,8 @@ final class Practice extends PluginBase {
         $result = $duel->replacePlaceholders($player, $identifier);
         if ($result !== null) return $result;
 
-        $arena = $duel->getArenaProperties();
-        if ($arena instanceof DuelScoreboard) return $arena->replacePlaceholders($duel, $player, $localProfile, $identifier);
+        $stage = $duel->getStage();
+        if ($stage instanceof DuelScoreboard) return $stage->replacePlaceholders($duel, $player, $localProfile, $identifier);
 
         return null;
     }

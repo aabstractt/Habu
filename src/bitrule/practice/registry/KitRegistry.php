@@ -56,7 +56,7 @@ final class KitRegistry {
                 throw new RuntimeException('Kit ' . $kitName . ' does not have a knockback profile');
             }
 
-            $this->kits[$kitName] = new Kit(
+            $this->kits[strtolower($kitName)] = new Kit(
                 $kitName,
                 array_map(fn(array $itemData) => self::parseItem($itemData), $kitData['inventoryItems']),
                 array_map(fn(array $itemData) => self::parseItem($itemData), $kitData['armorItems']),
@@ -73,7 +73,7 @@ final class KitRegistry {
      * @throws JsonException
      */
     public function createKit(Kit $kit): void {
-        $this->kits[$kit->getName()] = $kit;
+        $this->kits[strtolower($kit->getName())] = $kit;
 
         $config = new Config(Practice::getInstance()->getDataFolder() . 'kits.yml');
         $config->set($kit->getName(), [
@@ -90,7 +90,7 @@ final class KitRegistry {
      * @return Kit|null
      */
     public function getKit(string $name): ?Kit {
-        return $this->kits[$name] ?? null;
+        return $this->kits[strtolower($name)] ?? null;
     }
 
     /**

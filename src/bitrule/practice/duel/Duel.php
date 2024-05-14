@@ -125,16 +125,9 @@ abstract class Duel {
                 throw new RuntimeException('Local profile not found for player: ' . $player->getName());
             }
 
-            $this->players[$player->getXuid()] = $duelProfile = DuelProfile::normal($player, $localProfile->getElo());
+            $this->players[$player->getXuid()] = DuelProfile::normal($player, $localProfile->getElo());
 
             LocalProfile::setDefaultAttributes($player);
-
-            $this->processPlayerPrepare($player, $duelProfile);
-            $this->teleportSpawn($player);
-
-            $this->kit->applyOn($player);
-
-            Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
 
             $localProfile->setKnockbackProfile($this->kit->getKnockbackProfile());
         }
@@ -145,21 +138,12 @@ abstract class Duel {
                 throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
             }
 
-            LocalProfile::setDefaultAttributes($player);
-
             $this->processPlayerPrepare($player, $duelProfile);
             $this->teleportSpawn($player);
 
             $this->kit->applyOn($player);
 
             Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
-
-            $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-            if ($localProfile === null) {
-                throw new RuntimeException('Local profile not found for player: ' . $player->getName());
-            }
-
-            $localProfile->setKnockbackProfile($this->kit->getKnockbackProfile());
         }
 
         $this->loaded = true;
@@ -189,13 +173,17 @@ abstract class Duel {
      * to Ending.
      */
     public function end(): void {
+        if ($this->ending) return;
+
+        echo 'This game already end!' . PHP_EOL;
+
+        $this->ending = true;
+
         $this->stage = EndingStage::create($this->stage instanceof PlayingStage ? $this->stage->getSeconds() : 0);
 
         foreach ($this->getEveryone() as $duelProfile) {
             $player = $duelProfile->toPlayer();
-            if ($player === null || !$player->isOnline()) {
-                throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
-            }
+            if ($player === null) continue;
 
             $this->processPlayerEnd($player, $duelProfile);
         }

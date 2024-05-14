@@ -13,6 +13,7 @@ use pocketmine\block\Wool;
 use pocketmine\event\Listener;
 use pocketmine\item\Armor;
 use pocketmine\item\ItemBlock;
+use pocketmine\player\GameMode;
 use RuntimeException;
 
 final class PlayerKitAppliedListener implements Listener {
@@ -35,6 +36,8 @@ final class PlayerKitAppliedListener implements Listener {
             throw new RuntimeException('Spawn ID not found');
         }
 
+        $player->setGamemode(GameMode::SURVIVAL);
+
         $color = $spawnId === FireballFightArenaProperties::TEAM_RED_ID ? DyeColor::RED() : DyeColor::BLUE();
 
         foreach ($player->getArmorInventory()->getContents() as $slot => $item) {
@@ -52,7 +55,7 @@ final class PlayerKitAppliedListener implements Listener {
             if (!$block instanceof Wool) continue;
 
             $block->setColor($color);
-            $player->getInventory()->setItem($slot, $block->asItem());
+            $player->getInventory()->setItem($slot, $block->asItem()->setCount($item->getCount()));
         }
     }
 }

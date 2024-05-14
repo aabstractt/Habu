@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\commands;
 
 use bitrule\practice\duel\queue\Queue;
+use bitrule\practice\Practice;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\registry\QueueRegistry;
@@ -71,6 +72,8 @@ final class JoinQueueCommand extends Command {
                     ));
 
                     $localProfile->setQueue($queue);
+
+                    Practice::setProfileScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
                 },
                 fn() => $sender->sendMessage(TextFormat::RED . 'An error occurred while joining the queue.')
             );

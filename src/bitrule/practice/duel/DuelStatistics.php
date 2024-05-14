@@ -18,6 +18,8 @@ final class DuelStatistics {
     private int $totalPotions = 0;
     /** @var float */
     private float $damageDealt = 0.0;
+    /** @var int */
+    private int $kills = 0;
     /**
      * Total hits given to other players.
      * @var int
@@ -79,6 +81,20 @@ final class DuelStatistics {
      */
     public function increaseDamageDealt(float $damageDealt): void {
         $this->damageDealt += $damageDealt;
+    }
+
+    /**
+     * @return int
+     */
+    public function getKills(): int {
+        return $this->kills;
+    }
+
+    /**
+     * @param int $kills
+     */
+    public function setKills(int $kills): void {
+        $this->kills = $kills;
     }
 
     /**

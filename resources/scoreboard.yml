@@ -63,14 +63,14 @@ lines:
     nothing-4: '&7-----------------&d'
 
   match-playing-fireball:
-    nothing-0: '&7-------------------'
+    nothing-0: '&7-----------------'
     nothing-1: ' &b&lTeams'
     duel-teams-red: '  &cR &fRed: &a'
     duel-teams-blue: '  &9B &fBlue: &a'
     nothing-2: '&7'
-    duel-self-kills: ' &fKills: &b'
     nothing-3: ' &b&lMatch'
     duel-opponent-name: '  &fOpponent: &b'
+    duel-self-kills: '  &fKills: &b'
     duel-duration: '  &fDuration: &b'
     nothing-4: '&b&d'
     nothing-5: '&bᴘʟᴀʏ.ʜʏʀɪᴜᴍ.ᴄᴏᴍ'
