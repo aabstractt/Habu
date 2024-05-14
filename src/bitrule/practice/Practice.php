@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace bitrule\practice;
 
-use bitrule\practice\arena\ScoreboardId;
 use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\DurabilityCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
+use bitrule\practice\duel\DuelScoreboard;
 use bitrule\practice\listener\defaults\PlayerExhaustListener;
 use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
@@ -204,7 +204,7 @@ final class Practice extends PluginBase {
         if ($result !== null) return $result;
 
         $arena = $duel->getArena();
-        if ($arena instanceof ScoreboardId) return $arena->replacePlaceholders($duel, $player, $localProfile, $identifier);
+        if ($arena instanceof DuelScoreboard) return $arena->replacePlaceholders($duel, $player, $localProfile, $identifier);
 
         return null;
     }

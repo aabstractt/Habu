@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\setup;
 
 use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\arena\impl\FireballFightArena;
+use bitrule\practice\arena\impl\FireballFightStage;
 use InvalidArgumentException;
 use pocketmine\math\Vector3;
 
@@ -48,8 +48,8 @@ final class FireballFightArenaSetup extends AbstractArenaSetup {
      * @param AbstractArena $arena
      */
     public function submit(AbstractArena $arena): void {
-        if (!$arena instanceof FireballFightArena) {
-            throw new InvalidArgumentException('Arena must be a FireballFightArena');
+        if (!$arena instanceof FireballFightStage) {
+            throw new InvalidArgumentException('Arena must be a FireballFightStage');
         }
 
         if ($this->firstBedPosition === null || $this->secondBedPosition === null) {
@@ -68,6 +68,6 @@ final class FireballFightArenaSetup extends AbstractArenaSetup {
      * @return string
      */
     public function getType(): string {
-        return FireballFightArena::NAME;
+        return FireballFightStage::NAME;
     }
 }

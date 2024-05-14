@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena;
 
-use bitrule\practice\arena\impl\BoxingArena;
+use bitrule\practice\arena\impl\BoxingStage;
 use bitrule\practice\arena\impl\BridgeArena;
-use bitrule\practice\arena\impl\DefaultArena;
-use bitrule\practice\arena\impl\FireballFightArena;
+use bitrule\practice\arena\impl\DefaultArenaProperties;
+use bitrule\practice\arena\impl\FireballFightStage;
 use pocketmine\math\Vector3;
 use RuntimeException;
 use function count;
@@ -141,10 +141,10 @@ abstract class AbstractArena {
         }
 
         $arena = match ($data['type']) {
-            'normal' => DefaultArena::parse($name, $data),
+            'normal' => DefaultArenaProperties::parse($name, $data),
             'bridge' => BridgeArena::parse($name, $data),
-            'boxing' => BoxingArena::parse($name, $data),
-            FireballFightArena::NAME => FireballFightArena::parse($name, $data),
+            'boxing' => BoxingStage::parse($name, $data),
+            FireballFightStage::NAME => FireballFightStage::parse($name, $data),
             default => throw new RuntimeException('Invalid arena type'),
         };
         $arena->setup($data);
@@ -160,10 +160,10 @@ abstract class AbstractArena {
      */
     public static function createEmpty(string $name, string $type): self {
         return match (strtolower($type)) {
-            'normal' => DefaultArena::parseEmpty($name),
+            'normal' => DefaultArenaProperties::parseEmpty($name),
             'bridge' => BridgeArena::parseEmpty($name),
-            'boxing' => BoxingArena::parseEmpty($name),
-            FireballFightArena::NAME => FireballFightArena::parseEmpty($name),
+            'boxing' => BoxingStage::parseEmpty($name),
+            FireballFightStage::NAME => FireballFightStage::parseEmpty($name),
             default => throw new RuntimeException('Invalid arena type'),
         };
     }

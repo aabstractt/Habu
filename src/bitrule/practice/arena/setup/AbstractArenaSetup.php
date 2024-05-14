@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\setup;
 
 use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\arena\impl\FireballFightArena;
+use bitrule\practice\arena\impl\FireballFightStage;
 use bitrule\practice\Practice;
 use bitrule\practice\registry\ArenaRegistry;
 use InvalidArgumentException;
@@ -227,7 +227,7 @@ abstract class AbstractArenaSetup {
         return match (strtolower($type)) {
             'normal', 'boxing' => new DefaultArenaSetup($type), // BoxingArenaSetup
             'bridge' => new BridgeArenaSetup(),
-            FireballFightArena::NAME => new FireballFightArenaSetup(),
+            FireballFightStage::NAME => new FireballFightArenaSetup(),
             default => throw new InvalidArgumentException('Invalid arena setup type ' . $type),
         };
     }

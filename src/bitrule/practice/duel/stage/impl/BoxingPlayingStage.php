@@ -2,20 +2,17 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\arena\impl;
+namespace bitrule\practice\duel\stage\impl;
 
-use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\arena\listener\AttackDamageArenaListener;
-use bitrule\practice\arena\ScoreboardId;
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\DuelScoreboard;
+use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\math\Vector3;
 use pocketmine\player\Player;
-use function abs;
 
-final class BoxingArena extends AbstractArena implements AttackDamageArenaListener, ScoreboardId {
+final class BoxingPlayingStage extends PlayingStage implements AttackDamageStageListener, DuelScoreboard {
 
     /**
      * This method is called when a player is damaged by another player.
@@ -41,49 +38,10 @@ final class BoxingArena extends AbstractArena implements AttackDamageArenaListen
     }
 
     /**
-     * @return array<string, mixed>
-     */
-    public function serialize(): array {
-        $serialized = parent::serialize();
-        $serialized['type'] = 'boxing';
-
-        return $serialized;
-    }
-
-    /**
      * @return string
      */
     public function getScoreboardId(): string {
         return 'match-playing-boxing';
-    }
-
-    /**
-     * @param string $name
-     * @param array  $data
-     *
-     * @return BoxingArena
-     */
-    protected static function parse(string $name, array $data): self {
-        return new self(
-            $name,
-            self::deserializeVector($data['first_position'] ?? []),
-            self::deserializeVector($data['second_position'] ?? []),
-            $data['kits'] ?? []
-        );
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return BoxingArena
-     */
-    protected static function parseEmpty(string $name): self {
-        return new self(
-            $name,
-            Vector3::zero(),
-            Vector3::zero(),
-            []
-        );
     }
 
     /**

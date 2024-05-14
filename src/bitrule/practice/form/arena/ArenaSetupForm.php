@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\form\arena;
 
-use bitrule\practice\arena\impl\FireballFightArena;
+use bitrule\practice\arena\impl\FireballFightStage;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\ProfileRegistry;
@@ -52,7 +52,7 @@ final class ArenaSetupForm extends CustomForm implements ClosableForm {
      */
     public function setup(World $world): void {
         $this->addEntry(
-            new DropdownEntry(TextFormat::GRAY . 'Arena Type', $options = ['Normal', 'Bridge', 'Boxing', FireballFightArena::NAME]),
+            new DropdownEntry(TextFormat::GRAY . 'Arena Type', $options = ['Normal', 'Bridge', 'Boxing', FireballFightStage::NAME]),
             function (Player $player, CustomFormEntry $entry, $value) use ($options): void {
                 if (!is_int($value)) {
                     throw new FormValidationException('Please select an arena type.');

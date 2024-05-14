@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\match;
 
-use bitrule\practice\arena\impl\FireballFightArena;
+use bitrule\practice\arena\impl\FireballFightStage;
 use bitrule\practice\event\player\PlayerKitAppliedEvent;
 use bitrule\practice\registry\DuelRegistry;
 use pocketmine\block\utils\DyeColor;
@@ -28,7 +28,7 @@ final class PlayerKitAppliedListener implements Listener {
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel === null) return;
-        if (!$duel->getArena() instanceof FireballFightArena) return;
+        if (!$duel->getArena() instanceof FireballFightStage) return;
 
         $spawnId = $duel->getSpawnId($player->getXuid());
         if ($spawnId === -1) {
