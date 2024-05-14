@@ -16,7 +16,6 @@ use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\listener\entity\EntityDamageListener;
 use bitrule\practice\listener\entity\EntityMotionListener;
 use bitrule\practice\listener\entity\EntityTeleportListener;
-use bitrule\practice\listener\match\DuelStartedListener;
 use bitrule\practice\listener\match\PlayerKitAppliedListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\profile\LocalProfile;

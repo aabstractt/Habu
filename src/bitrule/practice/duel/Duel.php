@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bitrule\practice\duel;
 
 use bitrule\practice\arena\ArenaProperties;
-use bitrule\practice\duel\properties\DuelProperties;
 use bitrule\practice\duel\stage\AbstractStage;
 use bitrule\practice\duel\stage\EndingStage;
 use bitrule\practice\duel\stage\PlayingStage;
