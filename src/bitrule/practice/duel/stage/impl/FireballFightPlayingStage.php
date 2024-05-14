@@ -6,7 +6,6 @@ namespace bitrule\practice\duel\stage\impl;
 
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelScoreboard;
-use bitrule\practice\duel\properties\FireballFightProperties;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKey;
@@ -17,6 +16,16 @@ use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 final class FireballFightPlayingStage extends PlayingStage implements AnythingDamageStageListener, AttackDamageStageListener, DuelScoreboard {
+
+    /**
+     * These properties allow us to know if some bed has been destroyed.
+     * When a bed is destroyed, the player will be converted as a spectator
+     * After his death.
+     * @var bool
+     */
+    private bool $redBedDestroyed = false;
+    /** @var bool */
+    private bool $blueBedDestroyed = false;
 
     /**
      * This is the scoreboard identifier of the arena.
@@ -76,11 +85,6 @@ final class FireballFightPlayingStage extends PlayingStage implements AnythingDa
             throw new LogicException('Invalid spawn id: ' . $victimSpawnId);
         }
 
-        $properties = $duel->getProperties();
-        if (!$properties instanceof FireballFightProperties) {
-            throw new LogicException('Invalid properties');
-        }
-
         $ev->cancel();
 
         $duel->teleportSpawn($victim);
@@ -98,7 +102,7 @@ final class FireballFightPlayingStage extends PlayingStage implements AnythingDa
             ));
         }
 
-        $hasBeenBedDestroyed = $victimSpawnId === 0 ? $properties->isRedBedDestroyed() : $properties->isBlueBedDestroyed();
+        $hasBeenBedDestroyed = $victimSpawnId === 0 ? $this->redBedDestroyed : $this->blueBedDestroyed;
         if ($hasBeenBedDestroyed) {
             $victimProfile->convertAsSpectator($duel, false);
         } else {

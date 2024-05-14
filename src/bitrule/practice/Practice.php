@@ -105,7 +105,6 @@ final class Practice extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityMotionListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityDamageListener(), $this);
-        $this->getServer()->getPluginManager()->registerEvents(new DuelStartedListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),

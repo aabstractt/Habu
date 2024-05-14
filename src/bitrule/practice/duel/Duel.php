@@ -47,11 +47,6 @@ abstract class Duel {
     protected array $players = [];
     /** @var array<string, int> */
     protected array $playersSpawn = [];
-    /**
-     * The properties of the duel.
-     * @var DuelProperties|null
-     */
-    protected ?DuelProperties $properties = null;
 
     /**
      * @param ArenaProperties $arenaProperties
@@ -385,20 +380,6 @@ abstract class Duel {
      */
     public function setStage(AbstractStage $stage): void {
         $this->stage = $stage;
-    }
-
-    /**
-     * @return DuelProperties|null
-     */
-    public function getProperties(): ?DuelProperties {
-        return $this->properties;
-    }
-
-    /**
-     * @param DuelProperties $properties
-     */
-    public function setProperties(DuelProperties $properties): void {
-        $this->properties = $properties;
     }
 
     /**
