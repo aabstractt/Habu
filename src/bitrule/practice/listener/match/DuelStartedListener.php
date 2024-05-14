@@ -18,7 +18,7 @@ final class DuelStartedListener implements Listener {
      */
     public function onDuelStartedEvent(DuelStartedEvent $ev): void {
         $duel = $ev->getDuel();
-        if ($duel->getArena() instanceof FireballFightStage) {
+        if ($duel->getArenaProperties() instanceof FireballFightStage) {
             $duel->setProperties(new FireballFightProperties());
         }
     }

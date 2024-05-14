@@ -8,21 +8,32 @@ use bitrule\practice\arena\impl\BridgeArenaProperties;
 use bitrule\practice\arena\impl\DefaultArenaProperties;
 use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use pocketmine\entity\Location;
-use pocketmine\math\Vector3;
 use RuntimeException;
+use function count;
 
 abstract class ArenaProperties {
 
     /**
-     * @param array $properties
+     * @param string $originalName
+     * @param array  $properties
      */
-    public function __construct(protected array $properties = []) {}
+    public function __construct(
+        protected string $originalName,
+        protected array $properties = []
+    ) {}
 
     /**
      * @return string
      */
     public function getOriginalName(): string {
-        return $this->properties['name'];
+        return $this->originalName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getArenaType(): string {
+        return $this->properties['type'];
     }
 
     /**
@@ -37,6 +48,15 @@ abstract class ArenaProperties {
      */
     public function getSecondPosition(): Location {
         return $this->properties['second-position'] ?? throw new RuntimeException('Second position not set');
+    }
+
+    /**
+     * Returns the original properties of the arena.
+     *
+     * @return array
+     */
+    public function getOriginalProperties(): array {
+        return $this->properties;
     }
 
     /**
@@ -67,24 +87,22 @@ abstract class ArenaProperties {
     }
 
     /**
-     * @param array $properties
+     * @param string $arenaName
+     * @param array  $properties
      *
      * @return self
      */
-    public static function parse(array $properties): self {
+    public static function parse(string $arenaName, array $properties): self {
         if (!isset($properties['type'])) {
             throw new RuntimeException('Type not set');
         }
 
-        $arenaProperties = match ($properties['type']) {
-            'default' => new DefaultArenaProperties(),
-            FireballFightArenaProperties::IDENTIFIER => new FireballFightArenaProperties(),
-            BridgeArenaProperties::IDENTIFIER => new BridgeArenaProperties(),
+        return match ($properties['type']) {
+            'default' => new DefaultArenaProperties($arenaName),
+            FireballFightArenaProperties::IDENTIFIER => new FireballFightArenaProperties($arenaName),
+            BridgeArenaProperties::IDENTIFIER => new BridgeArenaProperties($arenaName),
             default => throw new RuntimeException('Invalid arena type')
         };
-        $arenaProperties->setup($properties);
-
-        return $arenaProperties;
     }
 
     /**
@@ -114,11 +132,11 @@ abstract class ArenaProperties {
      */
     public static function serializeVector(Location $location): array {
         return [
-            $location->getFloorX(),
-            $location->getFloorY(),
-            $location->getFloorZ(),
-            $location->getYaw(),
-            $location->getPitch()
+        	$location->getFloorX(),
+        	$location->getFloorY(),
+        	$location->getFloorZ(),
+        	$location->getYaw(),
+        	$location->getPitch()
         ];
     }
 }

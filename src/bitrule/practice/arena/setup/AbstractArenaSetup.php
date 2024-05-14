@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\setup;
 
-use bitrule\practice\arena\AbstractArena;
-use bitrule\practice\arena\impl\FireballFightStage;
+use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use bitrule\practice\Practice;
 use bitrule\practice\registry\ArenaRegistry;
 use InvalidArgumentException;
@@ -28,8 +27,6 @@ abstract class AbstractArenaSetup {
     private ?Vector3 $firstPosition = null;
     /** @var Vector3|null */
     private ?Vector3 $secondPosition = null;
-    /** @var string[] */
-    private array $kits = [];
 
     /**
      * Whether the setup has started.
@@ -194,9 +191,9 @@ abstract class AbstractArenaSetup {
      * This method is called when the arena is created into the arena manager.
      * This is where you should set the arena's properties.
      *
-     * @param AbstractArena $arena
+     * @return array
      */
-    public function submit(AbstractArena $arena): void {
+    public function getProperties(): array {
         if (!$this->started) {
             throw new RuntimeException('Setup has not started');
         }
@@ -213,9 +210,11 @@ abstract class AbstractArenaSetup {
             throw new RuntimeException('Second position is not set');
         }
 
-        $arena->setFirstPosition($this->firstPosition);
-        $arena->setSecondPosition($this->secondPosition);
-        $arena->setKits($this->kits);
+        return [
+        	'first-position' => $this->firstPosition,
+        	'second-position' => $this->secondPosition,
+        	'type' => $this->getType()
+        ];
     }
 
     /**
@@ -227,7 +226,7 @@ abstract class AbstractArenaSetup {
         return match (strtolower($type)) {
             'normal', 'boxing' => new DefaultArenaSetup($type), // BoxingArenaSetup
             'bridge' => new BridgeArenaSetup(),
-            FireballFightStage::NAME => new FireballFightArenaSetup(),
+            FireballFightArenaProperties::IDENTIFIER => new FireballFightArenaSetup(),
             default => throw new InvalidArgumentException('Invalid arena setup type ' . $type),
         };
     }

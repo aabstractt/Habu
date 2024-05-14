@@ -6,7 +6,7 @@ namespace bitrule\practice\commands\arena;
 
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
-use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
 use bitrule\practice\Practice;
 use bitrule\practice\registry\ArenaRegistry;
@@ -46,9 +46,10 @@ final class ArenaSaveArgument extends Argument {
             Practice::getInstance()->getDataFolder() . 'backups/' . $arenaSetup->getName(),
             function () use ($arenaSetup, $sender): void {
                 try {
-                    $arenaSetup->submit($arena = AbstractArena::createEmpty($arenaSetup->getName(), $arenaSetup->getType()));
+                    $arenaProperties = ArenaProperties::parse($arenaSetup->getName(), $properties = $arenaSetup->getProperties());
+                    $arenaProperties->setup($properties);
 
-                    ArenaRegistry::getInstance()->createArena($arena);
+                    ArenaRegistry::getInstance()->createArena($arenaProperties);
                     ArenaRegistry::getInstance()->saveAll();
 
                     $sender->sendMessage(TextFormat::GREEN . 'Arena saved successfully!');

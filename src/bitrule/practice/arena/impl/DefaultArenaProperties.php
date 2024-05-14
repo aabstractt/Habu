@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\impl;
 
-use bitrule\practice\arena\AbstractArena;
 use bitrule\practice\arena\ArenaProperties;
 
 /**

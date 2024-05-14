@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
-use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\impl\NormalDuelImpl;
@@ -19,9 +19,6 @@ use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
 use function abs;
-use function array_filter;
-use function array_map;
-use function array_sum;
 use function count;
 use function pow;
 
@@ -36,12 +33,12 @@ final class DuelRegistry {
     private array $playersDuel = [];
 
     /**
-     * @param Player[]           $players
-     * @param Player[]           $spectators
-     * @param Kit                $kit
-     * @param bool               $ranked
-     * @param RoundingInfo|null  $roundingInfo
-     * @param AbstractArena|null $arena
+     * @param Player[]             $players
+     * @param Player[]             $spectators
+     * @param Kit                  $kit
+     * @param bool                 $ranked
+     * @param RoundingInfo|null    $roundingInfo
+     * @param ArenaProperties|null $arenaProperties
      *
      * @return Duel
      */
@@ -51,17 +48,17 @@ final class DuelRegistry {
         Kit $kit,
         bool $ranked,
         ?RoundingInfo $roundingInfo = null,
-        ?AbstractArena $arena = null
+        ?ArenaProperties $arenaProperties = null
     ): Duel {
-        $arena ??= ArenaRegistry::getInstance()->getRandomArena($kit);
-        if ($arena === null) {
+        $arenaProperties ??= ArenaRegistry::getInstance()->getRandomArena($kit);
+        if ($arenaProperties === null) {
             throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
 
         if ($roundingInfo === null) {
-            $duel = new NormalDuelImpl($arena, $kit, $this->duelsPlayed++, $ranked);
+            $duel = new NormalDuelImpl($arenaProperties, $kit, $this->duelsPlayed++, $ranked);
         } else {
-            $duel = new NormalRoundingDuelImpl($arena, $kit, $roundingInfo, $this->duelsPlayed++, $ranked);
+            $duel = new NormalRoundingDuelImpl($arenaProperties, $kit, $roundingInfo, $this->duelsPlayed++, $ranked);
         }
 
         // TODO: Cache the player duel to prevent make many iterations for only a player
@@ -73,7 +70,7 @@ final class DuelRegistry {
         // TODO: Copy the world from the backup to the worlds folder
         // after that, load the world and prepare our duel!
         ArenaRegistry::getInstance()->loadWorld(
-            $arena->getName(),
+            $arenaProperties->getOriginalName(),
             $duel->getFullName(),
             function() use ($spectators, $players, $duel): void {
                 $duel->prepare($players);
@@ -143,20 +140,15 @@ final class DuelRegistry {
      * @return int
      */
     public function getDuelsCount(?string $kitName = null): int {
-        $duels = $this->duels;
-        if ($kitName !== null) {
-            $duels = array_filter(
-                $duels,
-                fn(Duel $duel) => $duel->getArena()->hasKit($kitName)
-            );
+        $playersCounter = 0;
+
+        foreach ($this->duels as $duel) {
+            if ($kitName !== null && $duel->getArenaProperties()->getArenaType() !== $kitName) continue;
+
+            $playersCounter += count($duel->getAlive());
         }
 
-        return array_sum(
-            array_map(
-                fn(Duel $duel) => count($duel->getAlive()),
-                $duels
-            )
-        );
+        return $playersCounter;
     }
 
     /**

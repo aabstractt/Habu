@@ -11,6 +11,7 @@ use bitrule\practice\profile\LocalProfile;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\player\Player;
+use function abs;
 
 final class BoxingPlayingStage extends PlayingStage implements AttackDamageStageListener, DuelScoreboard {
 

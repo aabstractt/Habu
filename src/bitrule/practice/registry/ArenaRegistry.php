@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
-use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
 use Closure;
 use Exception;
-use JsonException;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use RuntimeException;
-use function array_filter;
 use function array_rand;
 use function count;
 use function is_array;
@@ -27,7 +25,7 @@ final class ArenaRegistry {
         reset as private;
     }
 
-    /** @var array<string, AbstractArena> */
+    /** @var array<string, ArenaProperties> */
     private array $arenas = [];
 
     /**
@@ -35,13 +33,15 @@ final class ArenaRegistry {
      */
     public function loadAll(): void {
         $config = new Config(Practice::getInstance()->getDataFolder() . 'arenas.yml', Config::YAML);
-        foreach ($config->getAll() as $arenaName => $arenaData) {
-            if (!is_string($arenaName) || !is_array($arenaData)) {
+        foreach ($config->getAll() as $arenaName => $properties) {
+            if (!is_string($arenaName) || !is_array($properties)) {
                 throw new RuntimeException('Invalid arena data');
             }
 
             try {
-                $this->createArena(AbstractArena::createFromArray($arenaName, $arenaData));
+                $this->createArena($arenaProperties = ArenaProperties::parse($arenaName, $properties));
+
+                $arenaProperties->setup($properties);
             } catch (Exception $e) {
                 Practice::getInstance()->getLogger()->error('Failed to load arena ' . $arenaName . ': ' . $e->getMessage());
             }
@@ -50,25 +50,28 @@ final class ArenaRegistry {
 
     /**
      * Save all arenas to the arenas.yml file.
-     * @throws JsonException
      */
     public function saveAll(): void {
         $config = new Config(Practice::getInstance()->getDataFolder() . 'arenas.yml');
 
         foreach ($this->arenas as $arena) {
-            $config->set($arena->getName(), $arena->serialize());
+            $config->set($arena->getOriginalName(), $arena->getOriginalProperties());
         }
 
-        $config->save();
+        try {
+            $config->save();
+        } catch (Exception $e) {
+            Practice::getInstance()->getLogger()->error('Failed to save arenas: ' . $e->getMessage());
+        }
     }
 
     /**
      * Add the arena to the arenas list.
      *
-     * @param AbstractArena $arena
+     * @param ArenaProperties $arenaProperties
      */
-    public function createArena(AbstractArena $arena): void {
-        $this->arenas[$arena->getName()] = $arena;
+    public function createArena(ArenaProperties $arenaProperties): void {
+        $this->arenas[$arenaProperties->getOriginalName()] = $arenaProperties;
     }
 
     /**
@@ -81,9 +84,9 @@ final class ArenaRegistry {
     /**
      * @param string $name
      *
-     * @return AbstractArena|null
+     * @return ArenaProperties|null
      */
-    public function getArena(string $name): ?AbstractArena {
+    public function getArena(string $name): ?ArenaProperties {
         return $this->arenas[$name] ?? null;
     }
 
@@ -92,13 +95,20 @@ final class ArenaRegistry {
      *
      * @param Kit $kit
      *
-     * @return AbstractArena|null
+     * @return ArenaProperties|null
      */
-    public function getRandomArena(Kit $kit): ?AbstractArena {
-        $arenas = array_filter($this->arenas, fn(AbstractArena $arena) => $arena->hasKit($kit->getName()));
-        if (count($arenas) === 0) return null;
+    public function getRandomArena(Kit $kit): ?ArenaProperties {
+        $arenasFiltered = [];
 
-        return $arenas[array_rand($arenas)] ?? null;
+        foreach ($this->arenas as $arena) {
+            if ($arena->getArenaType() !== $kit->getName()) continue;
+
+            $arenasFiltered[] = $arena;
+        }
+
+        if (count($arenasFiltered) === 0) return null;
+
+        return $arenasFiltered[array_rand($arenasFiltered)] ?? null;
     }
 
     /**

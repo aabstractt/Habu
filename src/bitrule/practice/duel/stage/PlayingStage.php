@@ -4,9 +4,16 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel\stage;
 
+use bitrule\practice\arena\ArenaProperties;
+use bitrule\practice\arena\impl\BridgeArenaProperties;
+use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\stage\impl\AnythingDamageStageListener;
 use bitrule\practice\duel\stage\impl\AttackDamageStageListener;
+use bitrule\practice\duel\stage\impl\BoxingPlayingStage;
+use bitrule\practice\duel\stage\impl\BridgePlayingStage;
+use bitrule\practice\duel\stage\impl\DefaultPlayingStage;
+use bitrule\practice\duel\stage\impl\FireballFightPlayingStage;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\player\Player;
@@ -38,7 +45,7 @@ abstract class PlayingStage implements AbstractStage {
      * @param EntityDamageEvent $ev
      */
     public function onAnythingDamageEvent(Duel $duel, Player $victim, EntityDamageEvent $ev): void {
-        $arena = $duel->getArena();
+        $arena = $duel->getArenaProperties();
         if (!$arena instanceof AnythingDamageStageListener) return;
 
         $arena->onAnythingDamageEvent($duel, $victim, $ev);
@@ -65,7 +72,7 @@ abstract class PlayingStage implements AbstractStage {
         $attackerDuelStatistics->increaseDamageDealt($ev->getFinalDamage());
         $attackerDuelStatistics->increaseTotalHits();
 
-        $arena = $duel->getArena();
+        $arena = $duel->getArenaProperties();
         if (!$arena instanceof AttackDamageStageListener) return;
 
         $arena->onEntityDamageByEntityEvent($duel, $victim, $ev);
@@ -76,5 +83,18 @@ abstract class PlayingStage implements AbstractStage {
      */
     public function getSeconds(): int {
         return $this->seconds;
+    }
+
+    /**
+     * @param ArenaProperties $arenaProperties
+     *
+     * @return self
+     */
+    public static function create(ArenaProperties $arenaProperties): self {
+        if ($arenaProperties->getArenaType() === 'Boxing') return new BoxingPlayingStage();
+        if ($arenaProperties instanceof BridgeArenaProperties) return new BridgePlayingStage();
+        if ($arenaProperties instanceof FireballFightArenaProperties) return new FireballFightPlayingStage();
+
+        return new DefaultPlayingStage();
     }
 }

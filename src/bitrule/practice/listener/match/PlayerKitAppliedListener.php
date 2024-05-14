@@ -28,7 +28,7 @@ final class PlayerKitAppliedListener implements Listener {
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel === null) return;
-        if (!$duel->getArena() instanceof FireballFightStage) return;
+        if (!$duel->getArenaProperties() instanceof FireballFightStage) return;
 
         $spawnId = $duel->getSpawnId($player->getXuid());
         if ($spawnId === -1) {

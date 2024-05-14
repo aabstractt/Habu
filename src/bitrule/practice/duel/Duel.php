@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel;
 
-use bitrule\practice\arena\AbstractArena;
+use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\duel\properties\DuelProperties;
 use bitrule\practice\duel\stage\AbstractStage;
 use bitrule\practice\duel\stage\EndingStage;
@@ -54,16 +54,16 @@ abstract class Duel {
     protected ?DuelProperties $properties = null;
 
     /**
-     * @param AbstractArena    $arena
-     * @param Kit              $kit
-     * @param int              $id
-     * @param bool             $ranked
+     * @param ArenaProperties $arenaProperties
+     * @param Kit             $kit
+     * @param int             $id
+     * @param bool            $ranked
      */
     public function __construct(
-        protected readonly AbstractArena $arena,
-        protected readonly Kit $kit,
-        protected readonly int $id,
-        protected readonly bool $ranked
+        protected readonly ArenaProperties $arenaProperties,
+        protected readonly Kit             $kit,
+        protected readonly int             $id,
+        protected readonly bool            $ranked
     ) {
         $this->stage = new StartingStage();
     }
@@ -105,8 +105,8 @@ abstract class Duel {
 
         $player->teleport(Position::fromObject(
             match ($spawnId) {
-                self::FIRST_SPAWN_ID => $this->arena->getFirstPosition(),
-                self::SECOND_SPAWN_ID => $this->arena->getSecondPosition(),
+                self::FIRST_SPAWN_ID => $this->arenaProperties->getFirstPosition(),
+                self::SECOND_SPAWN_ID => $this->arenaProperties->getSecondPosition(),
                 default => $this->getWorld()->getSpawnLocation()
             },
             $this->getWorld()
@@ -341,7 +341,7 @@ abstract class Duel {
      * @return string
      */
     public function getFullName(): string {
-        return $this->arena->getName() . '-' . $this->id;
+        return $this->arenaProperties->getOriginalName() . '-' . $this->id;
     }
 
     /**
@@ -360,10 +360,10 @@ abstract class Duel {
     }
 
     /**
-     * @return AbstractArena
+     * @return ArenaProperties
      */
-    public function getArena(): AbstractArena {
-        return $this->arena;
+    public function getArenaProperties(): ArenaProperties {
+        return $this->arenaProperties;
     }
 
     /**
