@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\impl;
 
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
-use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 
 final class PartySplitDuelImpl extends Duel {
@@ -15,10 +15,10 @@ final class PartySplitDuelImpl extends Duel {
     /**
      * Process the player when they are preparing for the match.
      *
-     * @param Player      $player      The player who is preparing for the match.
-     * @param DuelProfile $duelProfile The profile of the duel that the player is preparing for.
+     * @param Player                            $player      The player who is preparing for the match.
+     * @param DuelMember $duelMember The profile of the duel that the player is preparing for.
      */
-    public function processPlayerPrepare(Player $player, DuelProfile $duelProfile): void {
+    public function processPlayerPrepare(Player $player, DuelMember $duelMember): void {
         // TODO: Implement processPlayerPrepare() method.
     }
 
@@ -33,10 +33,10 @@ final class PartySplitDuelImpl extends Duel {
     /**
      * Process the player when the match ends.
      *
-     * @param Player      $player      The player who has finished the match.
-     * @param DuelProfile $duelProfile The profile of the duel that the player has finished.
+     * @param Player     $player      The player who has finished the match.
+     * @param DuelMember $duelMember The profile of the duel that the player has finished.
      */
-    public function processPlayerEnd(Player $player, DuelProfile $duelProfile): void {
+    public function processPlayerEnd(Player $player, DuelMember $duelMember): void {
         // TODO: Implement processPlayerEnd() method.
     }
 

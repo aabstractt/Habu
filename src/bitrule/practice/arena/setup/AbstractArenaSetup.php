@@ -10,7 +10,6 @@ use bitrule\practice\Practice;
 use InvalidArgumentException;
 use pocketmine\entity\Location;
 use pocketmine\item\VanillaItems;
-use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
@@ -24,9 +23,9 @@ abstract class AbstractArenaSetup {
     /** @var string|null */
     private ?string $name = null;
 
-    /** @var Vector3|null */
+    /** @var Location|null */
     private ?Location $firstPosition = null;
-    /** @var Vector3|null */
+    /** @var Location|null */
     private ?Location $secondPosition = null;
     /** @var string|null */
     private ?string $primaryKit = null;
@@ -72,7 +71,7 @@ abstract class AbstractArenaSetup {
     }
 
     /**
-     * @return Vector3|null
+     * @return Location|null
      */
     public function getSecondPosition(): ?Location {
         return $this->secondPosition;

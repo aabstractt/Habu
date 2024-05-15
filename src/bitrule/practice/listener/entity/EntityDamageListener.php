@@ -27,9 +27,9 @@ final class EntityDamageListener implements Listener {
         $victim = $ev->getEntity();
         if (!$victim instanceof Player) return;
 
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($victim->getXuid());
-        if ($localProfile === null) {
-            throw new RuntimeException('LocalProfile is null');
+        $profile = ProfileRegistry::getInstance()->getprofile($victim->getXuid());
+        if ($profile === null) {
+            throw new RuntimeException('Profile is null');
         }
 
         if ($ev instanceof EntityDamageByEntityEvent) {
@@ -41,9 +41,9 @@ final class EntityDamageListener implements Listener {
                 return;
             }
 
-            $knockbackProfile = KnockbackRegistry::getInstance()->getKnockback($localProfile->getKnockbackProfile());
+            $knockbackProfile = KnockbackRegistry::getInstance()->getKnockback($profile->getKnockbackProfile());
             if ($knockbackProfile === null) {
-                throw new RuntimeException('KnockbackProfile for ' . $localProfile->getKnockbackProfile() . ' is null');
+                throw new RuntimeException('KnockbackProfile for ' . $profile->getKnockbackProfile() . ' is null');
             }
 
             $ev->setKnockBack(0.0);
@@ -52,7 +52,7 @@ final class EntityDamageListener implements Listener {
                 $ev->setAttackCooldown($knockbackProfile->getHitDelay());
             }
 
-            $knockbackProfile->applyOn($victim, $localProfile, $ev->getDamager());
+            $knockbackProfile->applyOn($victim, $profile, $ev->getDamager());
         }
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($victim->getXuid());
@@ -66,13 +66,13 @@ final class EntityDamageListener implements Listener {
         }
 
         if ($ev instanceof EntityDamageByEntityEvent) {
-            $victimProfile = $duel->getPlayer($victim->getXuid());
+            $victimProfile = $duel->getMember($victim->getXuid());
             if ($victimProfile === null || !$victimProfile->isAlive()) return;
 
             $attacker = $ev->getDamager();
             if (!$attacker instanceof Player) return;
 
-            $attackerProfile = $duel->getPlayer($attacker->getXuid());
+            $attackerProfile = $duel->getMember($attacker->getXuid());
             if ($attackerProfile === null || !$attackerProfile->isAlive()) return;
 
             $attackerDuelStatistics = $attackerProfile->getDuelStatistics();

@@ -32,10 +32,10 @@ final class BlockBreakListener implements Listener {
             $stage->onBlockBreakEvent($duel, $player, $ev);
         }
 
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-        if ($localProfile === null) return;
+        $profile = ProfileRegistry::getInstance()->getprofile($player->getXuid());
+        if ($profile === null) return;
 
-        $arenaSetup = $localProfile->getArenaSetup();
+        $arenaSetup = $profile->getArenaSetup();
         if ($arenaSetup === null || !$arenaSetup->isStarted()) return;
 
         $item = $ev->getItem();

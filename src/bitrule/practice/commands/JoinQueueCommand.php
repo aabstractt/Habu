@@ -42,14 +42,14 @@ final class JoinQueueCommand extends Command {
             return;
         }
 
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($sender->getXuid());
-        if ($localProfile === null) {
+        $profile = ProfileRegistry::getInstance()->getprofile($sender->getXuid());
+        if ($profile === null) {
             $sender->sendMessage(TextFormat::RED . 'Your profile has not loaded yet.');
 
             return;
         }
 
-        if ($localProfile->getQueue() !== null) {
+        if ($profile->getQueue() !== null) {
             $sender->sendMessage(TextFormat::RED . 'You are already in a queue.');
 
             return;
@@ -63,15 +63,15 @@ final class JoinQueueCommand extends Command {
         }
 
         QueueRegistry::getInstance()
-            ->createQueue($localProfile, $kit->getName(), isset($args[1]) && $args[1] === 'ranked')
+            ->createQueue($profile, $kit->getName(), isset($args[1]) && $args[1] === 'ranked')
             ->onCompletion(
-                function (Queue $queue) use ($localProfile, $sender): void {
+                function (Queue $queue) use ($profile, $sender): void {
                     $sender->sendMessage(TranslationKey::PLAYER_QUEUE_JOINED()->build(
                         $queue->getKitName(),
                         $queue->isRanked() ? 'Ranked' : 'Unranked'
                     ));
 
-                    $localProfile->setQueue($queue);
+                    $profile->setQueue($queue);
 
                     Practice::setProfileScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
                 },

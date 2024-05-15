@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel;
 
-use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\profile\Profile;
 use pocketmine\player\Player;
 
 interface DuelScoreboard {
@@ -19,12 +19,12 @@ interface DuelScoreboard {
     /**
      * Replace placeholders in the text.
      *
-     * @param Duel         $duel
-     * @param Player       $source
-     * @param LocalProfile $localProfile
-     * @param string       $identifier
+     * @param Duel    $duel
+     * @param Player  $source
+     * @param Profile $profile
+     * @param string  $identifier
      *
      * @return string|null
      */
-    public function replacePlaceholders(Duel $duel, Player $source, LocalProfile $localProfile, string $identifier): ?string;
+    public function replacePlaceholders(Duel $duel, Player $source, Profile $profile, string $identifier): ?string;
 }

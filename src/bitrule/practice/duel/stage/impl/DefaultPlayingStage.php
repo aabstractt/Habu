@@ -34,7 +34,7 @@ final class DefaultPlayingStage extends PlayingStage implements AnythingDamageSt
      * @param EntityDamageEvent $ev
      */
     public function onAnythingDamageEvent(Duel $duel, Player $victim, EntityDamageEvent $ev): void {
-        $victimProfile = $duel->getPlayer($victim->getXuid());
+        $victimProfile = $duel->getMember($victim->getXuid());
         if ($victimProfile === null || !$victimProfile->isAlive()) {
             $ev->cancel();
 
@@ -49,7 +49,7 @@ final class DefaultPlayingStage extends PlayingStage implements AnythingDamageSt
 
         $attacker = $ev instanceof EntityDamageByEntityEvent ? $ev->getDamager() : null;
 
-        $attackerProfile = $attacker instanceof Player ? $duel->getPlayer($attacker->getXuid()) : null;
+        $attackerProfile = $attacker instanceof Player ? $duel->getMember($attacker->getXuid()) : null;
         if ($attacker !== null && ($attackerProfile === null || !$attackerProfile->isAlive())) {
             $ev->cancel();
 

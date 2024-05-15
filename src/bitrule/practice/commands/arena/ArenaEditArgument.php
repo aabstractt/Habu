@@ -30,14 +30,14 @@ final class ArenaEditArgument extends Argument {
             return;
         }
 
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($sender->getXuid());
-        if ($localProfile === null) {
+        $profile = ProfileRegistry::getInstance()->getprofile($sender->getXuid());
+        if ($profile === null) {
             $sender->sendMessage(TextFormat::RED . 'Error code 1');
 
             return;
         }
 
-        if ($localProfile->getArenaSetup() !== null) {
+        if ($profile->getArenaSetup() !== null) {
             $sender->sendMessage(TextFormat::RED . 'You are already editing an arenaProperties');
 
             return;
@@ -62,7 +62,7 @@ final class ArenaEditArgument extends Argument {
             $arenaSetup->load($arenaProperties);
             $arenaSetup->setup($sender);
 
-            $localProfile->setArenaSetup($arenaSetup);
+            $profile->setArenaSetup($arenaSetup);
 
             $sender->sendMessage(TextFormat::GREEN . 'Arena setup for ' . $world->getFolderName() . ' started.');
         } catch (\Exception $e) {

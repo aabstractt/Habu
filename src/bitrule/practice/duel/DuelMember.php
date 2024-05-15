@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\profile;
+namespace bitrule\practice\duel;
 
-use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\DuelStatistics;
+use bitrule\practice\profile\Profile;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -13,7 +12,7 @@ use function count;
 use function microtime;
 use function round;
 
-final class DuelProfile {
+final class DuelMember {
 
     /** @var bool */
     private bool $alive = true;
@@ -139,7 +138,7 @@ final class DuelProfile {
             $duel->end();
         }
 
-        LocalProfile::resetInventory($player);
+        Profile::resetInventory($player);
 
         $player->setGamemode(GameMode::SPECTATOR);
         $player->setAllowFlight(true);

@@ -22,14 +22,14 @@ final class ArenaYawArgument extends Argument {
      * @param array  $args
      */
     public function onPlayerExecute(Player $sender, string $label, array $args): void {
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($sender->getXuid());
-        if ($localProfile === null) {
+        $profile = ProfileRegistry::getInstance()->getprofile($sender->getXuid());
+        if ($profile === null) {
             $sender->sendMessage(TextFormat::RED . 'Error code 1');
 
             return;
         }
 
-        $arenaSetup = $localProfile->getArenaSetup();
+        $arenaSetup = $profile->getArenaSetup();
         if ($arenaSetup === null) {
             $sender->sendMessage(TextFormat::RED . 'You are not editing an arena');
 

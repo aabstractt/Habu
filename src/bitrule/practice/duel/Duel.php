@@ -11,8 +11,7 @@ use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
-use bitrule\practice\profile\DuelProfile;
-use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\player\Player;
@@ -42,8 +41,8 @@ abstract class Duel {
     /** @var bool */
     protected bool $ending = false;
 
-    /** @var array<string, DuelProfile> */
-    protected array $players = [];
+    /** @var array<string, DuelMember> */
+    protected array $members = [];
     /** @var array<string, int> */
     protected array $playersSpawn = [];
 
@@ -83,7 +82,7 @@ abstract class Duel {
             throw new RuntimeException('Match not loaded.');
         }
 
-        $this->players[$player->getXuid()] = DuelProfile::spectator($player);
+        $this->members[$player->getXuid()] = DuelMember::spectator($player);
 
         $this->teleportSpawn($player);
     }
@@ -120,25 +119,25 @@ abstract class Duel {
                 throw new RuntimeException('Player ' . $player->getName() . ' is not online');
             }
 
-            $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-            if ($localProfile === null) {
+            $profile = ProfileRegistry::getInstance()->getprofile($player->getXuid());
+            if ($profile === null) {
                 throw new RuntimeException('Local profile not found for player: ' . $player->getName());
             }
 
-            $this->players[$player->getXuid()] = DuelProfile::normal($player, $localProfile->getElo());
+            $this->members[$player->getXuid()] = DuelMember::normal($player, $profile->getElo());
 
-            LocalProfile::setDefaultAttributes($player);
+            Profile::setDefaultAttributes($player);
 
-            $localProfile->setKnockbackProfile($this->kit->getKnockbackProfile());
+            $profile->setKnockbackProfile($this->kit->getKnockbackProfile());
         }
 
-        foreach ($this->players as $duelProfile) {
-            $player = $duelProfile->toPlayer();
+        foreach ($this->members as $duelMember) {
+            $player = $duelMember->toPlayer();
             if ($player === null || !$player->isOnline()) {
-                throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
+                throw new RuntimeException('Player ' . $duelMember->getName() . ' is not online');
             }
 
-            $this->processPlayerPrepare($player, $duelProfile);
+            $this->processPlayerPrepare($player, $duelMember);
             $this->teleportSpawn($player);
 
             $this->kit->applyOn($player);
@@ -150,10 +149,10 @@ abstract class Duel {
     }
 
     /**
-     * @param Player      $player
-     * @param DuelProfile $duelProfile
+     * @param Player     $player
+     * @param DuelMember $duelMember
      */
-    abstract public function processPlayerPrepare(Player $player, DuelProfile $duelProfile): void;
+    abstract public function processPlayerPrepare(Player $player, DuelMember $duelMember): void;
 
     /**
      * Get the spawn id of the player
@@ -179,11 +178,11 @@ abstract class Duel {
 
         $this->stage = EndingStage::create($this->stage instanceof PlayingStage ? $this->stage->getSeconds() : 0);
 
-        foreach ($this->getEveryone() as $duelProfile) {
-            $player = $duelProfile->toPlayer();
+        foreach ($this->getEveryone() as $duelMember) {
+            $player = $duelMember->toPlayer();
             if ($player === null) continue;
 
-            $this->processPlayerEnd($player, $duelProfile);
+            $this->processPlayerEnd($player, $duelMember);
         }
     }
 
@@ -193,10 +192,10 @@ abstract class Duel {
      * and teleport the players to the spawn point.
      */
     public function postEnd(): void {
-        foreach ($this->getEveryone() as $duelProfile) {
-            $player = $duelProfile->toPlayer();
+        foreach ($this->getEveryone() as $duelMember) {
+            $player = $duelMember->toPlayer();
             if ($player === null || !$player->isOnline()) {
-                throw new RuntimeException('Player ' . $duelProfile->getName() . ' is not online');
+                throw new RuntimeException('Player ' . $duelMember->getName() . ' is not online');
             }
 
             $this->removePlayer($player, false);
@@ -211,10 +210,10 @@ abstract class Duel {
     /**
      * Process the player when the match ends.
      *
-     * @param Player      $player
-     * @param DuelProfile $duelProfile
+     * @param Player     $player
+     * @param DuelMember $duelMember
      */
-    public function processPlayerEnd(Player $player, DuelProfile $duelProfile): void {
+    public function processPlayerEnd(Player $player, DuelMember $duelMember): void {
         Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_ENDING_SCOREBOARD);
     }
 
@@ -234,65 +233,65 @@ abstract class Duel {
      * @param Player $player
      */
     public function postRemovePlayer(Player $player): void {
-        $duelProfile = $this->players[$player->getXuid()] ?? null;
-        if ($duelProfile === null) return;
+        $duelMember = $this->members[$player->getXuid()] ?? null;
+        if ($duelMember === null) return;
 
-        unset($this->players[$player->getXuid()]);
+        unset($this->members[$player->getXuid()]);
 
         DuelRegistry::getInstance()->quitPlayer($player->getXuid());
 
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-        if ($localProfile === null) {
+        $profile = ProfileRegistry::getInstance()->getprofile($player->getXuid());
+        if ($profile === null) {
             throw new RuntimeException('Local profile not found for player: ' . $player->getName());
         }
 
-        $localProfile->joinLobby($player, true);
+        $profile->joinLobby($player, true);
     }
 
     /**
-     * @return DuelProfile[]
+     * @return DuelMember[]
      */
     public function getEveryone(): array {
-        return $this->players;
+        return $this->members;
     }
 
     /**
-     * @return DuelProfile[]
+     * @return DuelMember[]
      */
-    public function getPlayers(): array {
+    public function getMembers(): array {
         return array_filter(
-            $this->players,
-            fn(DuelProfile $duelProfile) => $duelProfile->isPlaying()
+            $this->members,
+            fn(DuelMember $duelMember) => $duelMember->isPlaying()
         );
     }
 
     /**
-     * @return DuelProfile[]
+     * @return DuelMember[]
      */
     public function getAlive(): array {
         return array_filter(
-            $this->players,
-            fn(DuelProfile $duelProfile) => $duelProfile->isAlive()
+            $this->members,
+            fn(DuelMember $duelMember) => $duelMember->isAlive()
         );
     }
 
     /**
-     * @return DuelProfile[]
+     * @return DuelMember[]
      */
     public function getSpectators(): array {
         return array_filter(
-            $this->players,
-            fn(DuelProfile $duelProfile) => !$duelProfile->isAlive()
+            $this->members,
+            fn(DuelMember $duelMember) => !$duelMember->isAlive()
         );
     }
 
     /**
      * @param string $xuid
      *
-     * @return DuelProfile|null
+     * @return DuelMember|null
      */
-    public function getPlayer(string $xuid): ?DuelProfile {
-        return $this->players[$xuid] ?? null;
+    public function getMember(string $xuid): ?DuelMember {
+        return $this->members[$xuid] ?? null;
     }
 
     /**
@@ -300,10 +299,10 @@ abstract class Duel {
      * @param bool   $includeSpectators
      */
     public function broadcastMessage(string $message, bool $includeSpectators = true): void {
-        foreach ($this->getEveryone() as $duelProfile) {
-            if (!$duelProfile->isAlive() && !$includeSpectators) continue;
+        foreach ($this->getEveryone() as $duelMember) {
+            if (!$duelMember->isAlive() && !$includeSpectators) continue;
 
-            $duelProfile->sendMessage($message);
+            $duelMember->sendMessage($message);
         }
     }
 
@@ -312,8 +311,8 @@ abstract class Duel {
      */
     public function hasSomeoneDisconnected(): bool {
         return count(array_filter(
-            $this->getPlayers(),
-            fn(DuelProfile $duelProfile): bool => ($player = $duelProfile->toPlayer()) === null || !$player->isOnline()
+            $this->getMembers(),
+            fn(DuelMember $duelMember): bool => ($player = $duelMember->toPlayer()) === null || !$player->isOnline()
             )) > 0;
     }
 
@@ -382,15 +381,15 @@ abstract class Duel {
     }
 
     /**
-     * @return DuelProfile|null
+     * @return DuelMember|null
      */
-    public function getWinner(): ?DuelProfile {
+    public function getWinner(): ?DuelMember {
         if (count($this->getAlive()) !== 1) return null;
 
         $firstKey = array_key_first($this->getAlive());
         if ($firstKey === null) return null;
 
-        return $this->players[$firstKey] ?? null;
+        return $this->members[$firstKey] ?? null;
     }
 
     /**
@@ -406,7 +405,7 @@ abstract class Duel {
 
         if ($identifier === 'your-ping') return (string) $player->getNetworkSession()->getPing();
 
-        $duelPlayer = $this->getPlayer($player->getXuid());
+        $duelPlayer = $this->getMember($player->getXuid());
         if ($duelPlayer === null) return null;
 
         if ($this->stage instanceof EndingStage && $duelPlayer->isPlaying()) {

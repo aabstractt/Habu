@@ -19,7 +19,7 @@ use bitrule\practice\listener\entity\ProjectileLaunchListener;
 use bitrule\practice\listener\match\PlayerKitAppliedListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\listener\world\BlockBreakListener;
-use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\profile\Profile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\DuelRegistry;
@@ -158,39 +158,39 @@ final class Practice extends PluginBase {
      * @param string $identifier
      */
     public static function setProfileScoreboard(Player $player, string $identifier): void {
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-        if ($localProfile === null) {
+        $profile = ProfileRegistry::getInstance()->getprofile($player->getXuid());
+        if ($profile === null) {
             throw new RuntimeException('Local profile not found for player: ' . $player->getName());
         }
 
-        if (($scoreboard = $localProfile->getScoreboard()) !== null) {
+        if (($scoreboard = $profile->getScoreboard()) !== null) {
             $scoreboard->hide($player); // TODO: Yes ??????
         }
 
-        $localProfile->setScoreboard($scoreboard = new Scoreboard());
+        $profile->setScoreboard($scoreboard = new Scoreboard());
 
         // TODO: Please make this more clean :sad:
         $scoreboard->load(self::getInstance()->scoreboardLines[$identifier] ?? throw new RuntimeException('Scoreboard not found: ' . $identifier));
         $scoreboard->show($player);
-        $scoreboard->update($player, $localProfile);
+        $scoreboard->update($player, $profile);
     }
 
     /**
      * Replace placeholders in the text.
      *
-     * @param Player       $player
-     * @param LocalProfile $localProfile
-     * @param string       $identifier
+     * @param Player  $player
+     * @param Profile $profile
+     * @param string  $identifier
      *
      * @return string|null
      */
-    public static function replacePlaceholders(Player $player, LocalProfile $localProfile, string $identifier): ?string {
+    public static function replacePlaceholders(Player $player, Profile $profile, string $identifier): ?string {
         if ($identifier === 'total-queue-count') return (string) (QueueRegistry::getInstance()->getQueueCount());
         if ($identifier === 'total-duel-count') return (string) (DuelRegistry::getInstance()->getDuelsCount());
         if ($identifier === 'online-players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
 
         if (str_starts_with($identifier, 'queue-')) {
-            if (($queue = $localProfile->getQueue()) === null) return null;
+            if (($queue = $profile->getQueue()) === null) return null;
 
             if ($identifier === 'queue-type') return $queue->isRanked() ? 'Ranked' : 'Unranked';
             if ($identifier === 'queue-kit') return $queue->getKitName();
@@ -204,7 +204,7 @@ final class Practice extends PluginBase {
         if ($result !== null) return $result;
 
         $stage = $duel->getStage();
-        if ($stage instanceof DuelScoreboard) return $stage->replacePlaceholders($duel, $player, $localProfile, $identifier);
+        if ($stage instanceof DuelScoreboard) return $stage->replacePlaceholders($duel, $player, $profile, $identifier);
 
         return null;
     }

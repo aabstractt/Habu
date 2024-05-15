@@ -31,6 +31,6 @@ final class PlayerJoinListener implements Listener {
             count(Server::getInstance()->getOnlinePlayers())
         ));
 
-        ProfileRegistry::getInstance()->addLocalProfile($player);
+        ProfileRegistry::getInstance()->addprofile($player);
     }
 }

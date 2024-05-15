@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\impl;
 
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
 use bitrule\practice\duel\Team;
-use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 use function ceil;
 use function count;
@@ -58,20 +58,20 @@ final class TeamDuelImpl extends Duel {
     }
 
     /**
-     * @param Player      $player
-     * @param DuelProfile $duelProfile
+     * @param Player     $player
+     * @param DuelMember $duelMember
      */
-    public function processPlayerPrepare(Player $player, DuelProfile $duelProfile): void {
+    public function processPlayerPrepare(Player $player, DuelMember $duelMember): void {
         // TODO: Implement processPlayerPrepare() method.
     }
 
     /**
      * Process the player when the match ends.
      *
-     * @param Player      $player
-     * @param DuelProfile $duelProfile
+     * @param Player     $player
+     * @param DuelMember $duelMember
      */
-    public function processPlayerEnd(Player $player, DuelProfile $duelProfile): void {
+    public function processPlayerEnd(Player $player, DuelMember $duelMember): void {
         // TODO: Implement processPlayerEnd() method.
     }
 }

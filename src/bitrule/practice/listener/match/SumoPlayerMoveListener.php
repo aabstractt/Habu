@@ -32,11 +32,11 @@ final class SumoPlayerMoveListener implements Listener {
 
         if ($duel->getKit()->getName() !== Kit::SUMO) return;
 
-        $duelProfile = $duel->getPlayer($player->getXuid());
-        if ($duelProfile === null) {
+        $duelMember = $duel->getMember($player->getXuid());
+        if ($duelMember === null) {
             throw new RuntimeException('Error code 1');
         }
 
-        $duelProfile->convertAsSpectator($duel, false);
+        $duelMember->convertAsSpectator($duel, false);
     }
 }

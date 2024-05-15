@@ -17,7 +17,7 @@ use pocketmine\player\Player;
 use function explode;
 use function is_string;
 
-final class LocalProfile {
+final class Profile {
 
     /** @var AbstractArenaSetup|null */
     private ?AbstractArenaSetup $arenaSetup = null;

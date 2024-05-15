@@ -6,7 +6,7 @@ namespace bitrule\practice\registry;
 
 use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
-use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\profile\Profile;
 use Exception;
 use pocketmine\player\Player;
 use pocketmine\promise\Promise;
@@ -30,13 +30,13 @@ final class QueueRegistry {
      * Also checks if there is an opponent in the queue
      * If there is, it will remove both players from the queue
      *
-     * @param LocalProfile $sourceLocalProfile
-     * @param string       $kitName
-     * @param bool         $ranked
+     * @param Profile $sourceprofile
+     * @param string  $kitName
+     * @param bool    $ranked
      *
      * @return Promise<Queue>
      */
-    public function createQueue(LocalProfile $sourceLocalProfile, string $kitName, bool $ranked): Promise {
+    public function createQueue(Profile $sourceprofile, string $kitName, bool $ranked): Promise {
         $promiseResolver = new PromiseResolver();
 
         if (($kit = KitRegistry::getInstance()->getKit($kitName)) === null) {
@@ -45,7 +45,7 @@ final class QueueRegistry {
             return $promiseResolver->getPromise();
         }
 
-        $this->queues[$sourceXuid = $sourceLocalProfile->getXuid()] = $queue = new Queue($sourceXuid, $kitName, $ranked, time());
+        $this->queues[$sourceXuid = $sourceprofile->getXuid()] = $queue = new Queue($sourceXuid, $kitName, $ranked, time());
 
         $opponentMatchQueue = $this->lookupOpponent($queue);
         if ($opponentMatchQueue === null) {
@@ -54,18 +54,18 @@ final class QueueRegistry {
             return $promiseResolver->getPromise();
         }
 
-        $this->removeQueue($sourceLocalProfile);
+        $this->removeQueue($sourceprofile);
 
-        if (($opponentLocalProfile = ProfileRegistry::getInstance()->getLocalProfile($opponentMatchQueue->getXuid())) === null) {
+        if (($opponentprofile = ProfileRegistry::getInstance()->getprofile($opponentMatchQueue->getXuid())) === null) {
             throw new RuntimeException('Opponent profile no exists.');
         }
 
-        $this->removeQueue($opponentLocalProfile);
+        $this->removeQueue($opponentprofile);
 
         /** @var Player[] $totalPlayers */
         $totalPlayers = [];
-        foreach ([$sourceLocalProfile, $opponentLocalProfile] as $localProfile) {
-            $player = Server::getInstance()->getPlayerExact($localProfile->getName());
+        foreach ([$sourceprofile, $opponentprofile] as $profile) {
+            $player = Server::getInstance()->getPlayerExact($profile->getName());
             if ($player === null || !$player->isOnline()) continue;
 
             $totalPlayers[] = $player;
@@ -100,14 +100,14 @@ final class QueueRegistry {
      * Removes a player from the queue
      * Using their xuid and kit name
      *
-     * @param LocalProfile $localProfile
+     * @param Profile $profile
      */
-    public function removeQueue(LocalProfile $localProfile): void {
-        unset($this->queues[$localProfile->getXuid()]);
+    public function removeQueue(Profile $profile): void {
+        unset($this->queues[$profile->getXuid()]);
 
-        if (($player = Server::getInstance()->getPlayerExact($localProfile->getName())) === null) return;
+        if (($player = Server::getInstance()->getPlayerExact($profile->getName())) === null) return;
 
-        $localProfile->setQueue(null);
+        $profile->setQueue(null);
         Practice::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
     }
 

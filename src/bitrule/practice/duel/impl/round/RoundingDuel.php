@@ -7,10 +7,10 @@ namespace bitrule\practice\duel\impl\round;
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Practice;
-use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\registry\DuelRegistry;
 use Exception;
 use pocketmine\player\Player;
@@ -54,8 +54,8 @@ abstract class RoundingDuel extends Duel {
         }
 
         $winnerXuid = $this->roundingInfo->findWinner();
-        $winnerDuelProfile = $winnerXuid !== null ? $this->players[$winnerXuid] ?? null : null;
-        if ($winnerDuelProfile !== null) {
+        $winnerduelMember = $winnerXuid !== null ? $this->members[$winnerXuid] ?? null : null;
+        if ($winnerduelMember !== null) {
             parent::end();
             $this->ended = true;
 
@@ -64,29 +64,29 @@ abstract class RoundingDuel extends Duel {
 
         $literalSpectators = array_filter(
             $this->getSpectators(),
-            fn(DuelProfile $duelProfile) => !$duelProfile->isPlaying()
+            fn(DuelMember $duelMember) => !$duelMember->isPlaying()
         );
-        $players = $this->getPlayers();
+        $players = $this->getMembers();
 
         $this->postEnd();
 
-        foreach ($players as $duelProfile) {
-            if (!$duelProfile->isAlive()) continue;
+        foreach ($players as $duelMember) {
+            if (!$duelMember->isAlive()) continue;
 
-            $player = $duelProfile->toPlayer();
+            $player = $duelMember->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
-            $this->roundingInfo->increaseWin($duelProfile->getXuid());
+            $this->roundingInfo->increaseWin($duelMember->getXuid());
         }
 
         try {
             DuelRegistry::getInstance()->createDuel(
                 array_filter(
-                    array_map(fn (DuelProfile $duelProfile) => $duelProfile->toPlayer(), $players),
+                    array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $players),
                     fn(?Player $player) => $player !== null && $player->isOnline()
                 ),
                 array_filter(
-                    array_map(fn (DuelProfile $duelProfile) => $duelProfile->toPlayer(), $literalSpectators),
+                    array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $literalSpectators),
                     fn(?Player $player) => $player !== null && $player->isOnline()
                 ),
                 $this->kit,

@@ -8,7 +8,7 @@ use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelScoreboard;
 use bitrule\practice\duel\stage\PlayingStage;
-use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\profile\Profile;
 use bitrule\practice\TranslationKey;
 use LogicException;
 use pocketmine\block\Bed;
@@ -43,23 +43,23 @@ final class FireballFightPlayingStage extends PlayingStage implements AnythingDa
     /**
      * Replace placeholders in the text.
      *
-     * @param Duel         $duel
-     * @param Player       $source
-     * @param LocalProfile $localProfile
-     * @param string       $identifier
+     * @param Duel    $duel
+     * @param Player  $source
+     * @param Profile $profile
+     * @param string  $identifier
      *
      * @return string|null
      */
-    public function replacePlaceholders(Duel $duel, Player $source, LocalProfile $localProfile, string $identifier): ?string {
-        $duelProfile = $duel->getPlayer($source->getXuid());
-        if ($duelProfile === null) return null;
+    public function replacePlaceholders(Duel $duel, Player $source, Profile $profile, string $identifier): ?string {
+        $duelMember = $duel->getMember($source->getXuid());
+        if ($duelMember === null) return null;
 
         $selfSpawnId = $duel->getSpawnId($source->getXuid());
         if ($selfSpawnId === -1) {
             throw new LogicException('Spawn ID not found');
         }
 
-        if ($identifier === 'duel-self-kills') return (string) $duelProfile->getDuelStatistics()->getKills();
+        if ($identifier === 'duel-self-kills') return (string) $duelMember->getDuelStatistics()->getKills();
 
         if (str_starts_with($identifier, 'duel-teams-')) {
             $bedDestroyed = $identifier === 'duel-teams-red' ? $this->redBedDestroyed : $this->blueBedDestroyed;
@@ -93,12 +93,12 @@ final class FireballFightPlayingStage extends PlayingStage implements AnythingDa
     public function onAnythingDamageEvent(Duel $duel, Player $victim, EntityDamageEvent $ev): void {
         if ($victim->getHealth() - $ev->getFinalDamage() > 0) return;
 
-        $victimProfile = $duel->getPlayer($victim->getXuid());
+        $victimProfile = $duel->getMember($victim->getXuid());
         if ($victimProfile === null || !$victimProfile->isAlive()) return;
 
         $attacker = $ev instanceof EntityDamageByEntityEvent ? $ev->getDamager() : null;
 
-        $attackerProfile = $attacker instanceof Player ? $duel->getPlayer($attacker->getXuid()) : null;
+        $attackerProfile = $attacker instanceof Player ? $duel->getMember($attacker->getXuid()) : null;
         if ($attacker !== null && ($attackerProfile === null || !$attackerProfile->isAlive())) return;
 
         $victimSpawnId = $duel->getSpawnId($victim->getXuid());
@@ -109,7 +109,7 @@ final class FireballFightPlayingStage extends PlayingStage implements AnythingDa
         $ev->cancel();
 
         $duel->teleportSpawn($victim);
-        LocalProfile::resetInventory($victim);
+        Profile::resetInventory($victim);
 
         $colorSupplier = fn(int $spawnId): string => $spawnId === 0 ? TextFormat::RED : TextFormat::BLUE;
         if ($attackerProfile === null || $attacker === null) {

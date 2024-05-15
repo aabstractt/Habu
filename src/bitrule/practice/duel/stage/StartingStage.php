@@ -42,8 +42,8 @@ final class StartingStage implements AbstractStage {
 
         $scoreboardId = $stage instanceof DuelScoreboard ? $stage->getScoreboardId() : ProfileRegistry::MATCH_PLAYING_SCOREBOARD;
 
-        foreach ($duel->getEveryone() as $duelProfile) {
-            $player = $duelProfile->toPlayer();
+        foreach ($duel->getEveryone() as $duelMember) {
+            $player = $duelMember->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
             Practice::setProfileScoreboard(

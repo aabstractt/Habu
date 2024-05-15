@@ -18,14 +18,14 @@ final class EntityMotionListener implements Listener {
         $entity = $ev->getEntity();
         if (!$entity instanceof Player) return;
 
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($entity->getXuid());
-        if ($localProfile === null) return;
+        $profile = ProfileRegistry::getInstance()->getprofile($entity->getXuid());
+        if ($profile === null) return;
 
-        if ($localProfile->initialKnockbackMotion) {
-            $localProfile->initialKnockbackMotion = false;
-            $localProfile->cancelKnockbackMotion = true;
-        } elseif ($localProfile->cancelKnockbackMotion) {
-            $localProfile->cancelKnockbackMotion = false;
+        if ($profile->initialKnockbackMotion) {
+            $profile->initialKnockbackMotion = false;
+            $profile->cancelKnockbackMotion = true;
+        } elseif ($profile->cancelKnockbackMotion) {
+            $profile->cancelKnockbackMotion = false;
             $ev->cancel();
         }
     }

@@ -29,7 +29,7 @@ final class ProjectileLaunchListener implements Listener {
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($owningEntity->getXuid());
         if ($duel !== null) {
-            $duelPlayer = $duel->getPlayer($owningEntity->getXuid());
+            $duelPlayer = $duel->getMember($owningEntity->getXuid());
             if ($duelPlayer === null) {
                 throw new RuntimeException('Player not found in the duel');
             }
