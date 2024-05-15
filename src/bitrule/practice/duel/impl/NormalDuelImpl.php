@@ -26,6 +26,8 @@ final class NormalDuelImpl extends Duel {
      * to Ending.
      */
     public function end(): void {
+        if ($this->ending) return;
+
         parent::end();
 
         $duelProfile = $this->getWinner();

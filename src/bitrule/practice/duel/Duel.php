@@ -175,8 +175,6 @@ abstract class Duel {
     public function end(): void {
         if ($this->ending) return;
 
-        echo 'This game already end!' . PHP_EOL;
-
         $this->ending = true;
 
         $this->stage = EndingStage::create($this->stage instanceof PlayingStage ? $this->stage->getSeconds() : 0);

@@ -11,6 +11,9 @@ duel:
   opponent-found: '&bPractice &8> &7Found a &f<type> <kit>&7 match against &c<player>'
   winner-broadcast: '&a<winner>&7 has won a &e<kit>&7 duel against &c<loser>.'
 
+  player-dead: '&c<player>&7 was slain by &a<killer>'
+  player-dead-without-killer: '&c<player>&7 was slain.'
+
   elo-changes:
     win: '&a+<amount>'
     lost: '&c-<amount>'

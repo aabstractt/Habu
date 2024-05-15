@@ -252,7 +252,7 @@ abstract class AbstractArenaSetup {
      */
     public static function from(string $type): self {
         return match (strtolower($type)) {
-            'normal', 'boxing' => new DefaultArenaSetup($type), // BoxingArenaSetup
+            'default', 'boxing' => new DefaultArenaSetup($type), // BoxingArenaSetup
             'bridge' => new BridgeArenaSetup(),
             strtolower(FireballFightArenaProperties::IDENTIFIER) => new FireballFightArenaSetup(),
             default => throw new InvalidArgumentException('Invalid arena setup type ' . $type),

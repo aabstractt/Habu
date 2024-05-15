@@ -29,6 +29,8 @@ use function ucwords;
  *
  * @method static self FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()
  * @method static self FIREBALL_FIGHT_PLAYER_DEAD()
+ * @method static self DUEL_PLAYER_DEAD_WITHOUT_KILLER()
+ * @method static self DUEL_PLAYER_DEAD()
  *
  * @method static self PLAYER_JOINED_MESSAGE()
  * @method static self PLAYER_WELCOME_MESSAGE()
@@ -156,6 +158,21 @@ final class TranslationKey {
             self::create(
                 'FIREBALL_FIGHT_PLAYER_DEAD',
                 'duel.fireball-fight.player-dead',
+                [
+                	'player',
+                	'killer'
+                ]
+            ),
+            self::create(
+                'DUEL_PLAYER_DEAD_WITHOUT_KILLER',
+                'duel.player-dead-without-killer',
+                [
+                	'player'
+                ]
+            ),
+            self::create(
+                'DUEL_PLAYER_DEAD',
+                'duel.player-dead',
                 [
                 	'player',
                 	'killer'
