@@ -15,6 +15,7 @@ use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\listener\entity\EntityDamageListener;
 use bitrule\practice\listener\entity\EntityMotionListener;
 use bitrule\practice\listener\entity\EntityTeleportListener;
+use bitrule\practice\listener\entity\ProjectileLaunchListener;
 use bitrule\practice\listener\match\PlayerKitAppliedListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\listener\world\BlockBreakListener;
@@ -100,6 +101,7 @@ final class Practice extends PluginBase {
 
         // TODO: Match listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerKitAppliedListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new ProjectileLaunchListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityTeleportListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityMotionListener(), $this);

@@ -10,11 +10,15 @@ use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use function count;
+use function microtime;
+use function round;
 
 final class DuelProfile {
 
     /** @var bool */
     private bool $alive = true;
+    /** @var float The last time the player used an ender pearl. */
+    private float $enderPearlCountdown = 0.0;
 
     /**
      * @param string         $xuid
@@ -78,6 +82,27 @@ final class DuelProfile {
      */
     public function setAlive(bool $alive): void {
         $this->alive = $alive;
+    }
+
+    /**
+     * @return float
+     */
+    public function getRemainingEnderPearlCountdown(): float {
+        return round($this->enderPearlCountdown - microtime(true), 1);
+    }
+
+    /**
+     * @return float
+     */
+    public function getEnderPearlCountdown(): float {
+        return $this->enderPearlCountdown;
+    }
+
+    /**
+     * @param float $enderPearlCountdown
+     */
+    public function setEnderPearlCountdown(float $enderPearlCountdown): void {
+        $this->enderPearlCountdown = $enderPearlCountdown;
     }
 
     /**

@@ -42,7 +42,7 @@ final class Scoreboard {
         $player->getNetworkSession()->sendDataPacket(SetDisplayObjectivePacket::create(
             SetDisplayObjectivePacket::DISPLAY_SLOT_SIDEBAR,
             'bitrule',
-            TextFormat::colorize('&l&3Practice'),
+            TextFormat::colorize('&l&3Hyrium Practice'),
             'dummy',
             SetDisplayObjectivePacket::SORT_ORDER_ASCENDING
         ));

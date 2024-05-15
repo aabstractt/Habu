@@ -8,7 +8,9 @@ use bitrule\practice\profile\LocalProfile;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
 use RuntimeException;
+use function round;
 
 final class ProfileRegistry {
     use SingletonTrait;
@@ -78,6 +80,24 @@ final class ProfileRegistry {
             if ($player === null || !$player->isOnline()) continue;
 
             $scoreboard->update($player, $localProfile);
+
+            $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
+            if ($duel === null) continue;
+
+            $duelProfile = $duel->getPlayer($player->getXuid());
+            if ($duelProfile === null) continue;
+
+            if ($duelProfile->getEnderPearlCountdown() > 0.0) {
+                $remainingCountdown = $duelProfile->getRemainingEnderPearlCountdown();
+                if ($remainingCountdown > 0.0) {
+                    $player->getXpManager()->setXpAndProgressNoEvent((int) round($remainingCountdown), $remainingCountdown / 15);
+                } else {
+                    $player->sendMessage(TextFormat::GREEN . 'Your enderpearl cooldown expired.');
+                    $player->getXpManager()->setXpAndProgressNoEvent(0, 0.0);
+
+                    $duelProfile->setEnderPearlCountdown(0.0);
+                }
+            }
         }
     }
 }
