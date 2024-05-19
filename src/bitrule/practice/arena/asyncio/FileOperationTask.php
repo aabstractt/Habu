@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena\asyncio;
 
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use Exception;
 use pocketmine\scheduler\AsyncTask;
 use RuntimeException;
@@ -52,7 +52,7 @@ abstract class FileOperationTask extends AsyncTask {
 
             $closure();
         } catch (Exception $e) {
-            Practice::getInstance()->getLogger()->logException($e);
+            Habu::getInstance()->getLogger()->logException($e);
         }
     }
 }

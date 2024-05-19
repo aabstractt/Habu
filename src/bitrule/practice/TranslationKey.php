@@ -225,7 +225,7 @@ final class TranslationKey {
             throw new InvalidArgumentException('The message key is not set.');
         }
 
-        return Practice::wrapMessage($this->messageKey, array_combine($this->arguments, $arguments));
+        return Habu::wrapMessage($this->messageKey, array_combine($this->arguments, $arguments));
     }
 
     /**

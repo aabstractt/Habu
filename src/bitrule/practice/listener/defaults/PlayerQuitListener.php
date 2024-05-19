@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\defaults;
 
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\Listener;
@@ -27,6 +27,6 @@ final class PlayerQuitListener implements Listener {
         ProfileRegistry::getInstance()->quitPlayer($player);
 
         // Listen to the event when a player quits
-        Practice::getInstance()->getPartyAdapter()?->onPlayerQuit($player);
+        Habu::getInstance()->getPartyAdapter()?->onPlayerQuit($player);
     }
 }

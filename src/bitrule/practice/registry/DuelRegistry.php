@@ -12,7 +12,7 @@ use bitrule\practice\duel\impl\round\NormalRoundingDuelImpl;
 use bitrule\practice\duel\impl\round\RoundingDuel;
 use bitrule\practice\duel\impl\round\RoundingInfo;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
@@ -97,7 +97,7 @@ final class DuelRegistry {
         // and delete the world file
         $world = $duel->getWorld();
         if ($world->isDoingTick()) {
-            Practice::getInstance()->getScheduler()->scheduleTask(
+            Habu::getInstance()->getScheduler()->scheduleTask(
                 new ClosureTask(function () use ($duel): void {
                     $this->endDuel($duel);
                 })

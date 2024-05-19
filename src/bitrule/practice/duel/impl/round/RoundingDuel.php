@@ -10,7 +10,7 @@ use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\DuelRegistry;
 use Exception;
 use pocketmine\player\Player;
@@ -94,7 +94,7 @@ abstract class RoundingDuel extends Duel {
                 $this->roundingInfo
             );
         } catch (Exception $e) {
-            Practice::getInstance()->getLogger()->error($e->getMessage());
+            Habu::getInstance()->getLogger()->error($e->getMessage());
 
             parent::end();
             $this->ended = true;

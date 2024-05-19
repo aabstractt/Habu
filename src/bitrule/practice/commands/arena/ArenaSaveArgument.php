@@ -8,7 +8,7 @@ use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use Exception;
@@ -43,7 +43,7 @@ final class ArenaSaveArgument extends Argument {
 
         Server::getInstance()->getAsyncPool()->submitTask(new FileCopyAsyncTask(
             Server::getInstance()->getDataPath() . 'worlds/' . $arenaSetup->getName(),
-            Practice::getInstance()->getDataFolder() . 'backups/' . $arenaSetup->getName(),
+            Habu::getInstance()->getDataFolder() . 'backups/' . $arenaSetup->getName(),
             function () use ($arenaSetup, $sender): void {
                 try {
                     $arenaProperties = ArenaProperties::parse($arenaSetup->getName(), $properties = $arenaSetup->getProperties());

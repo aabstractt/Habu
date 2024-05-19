@@ -6,7 +6,7 @@ namespace bitrule\practice\profile;
 
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\duel\queue\Queue;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ProfileRegistry;
 use InvalidArgumentException;
@@ -125,7 +125,7 @@ final class Profile {
 
         if (!$showScoreboard) return;
 
-        Practice::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
+        Habu::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
     }
 
     /**
@@ -171,8 +171,8 @@ final class Profile {
                 throw new InvalidArgumentException('Item must be an instance of Item');
             }
 
-            $item->setCustomName(Practice::wrapMessage('items.' . $itemType . '.custom-name'));
-            $item->setLore(explode("\n", Practice::wrapMessage('items.' . $itemType . '.lore')));
+            $item->setCustomName(Habu::wrapMessage('items.' . $itemType . '.custom-name'));
+            $item->setLore(explode("\n", Habu::wrapMessage('items.' . $itemType . '.lore')));
 
             $nbt = $item->getNamedTag();
 

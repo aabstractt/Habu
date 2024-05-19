@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\registry;
 
 use bitrule\practice\duel\queue\Queue;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\profile\Profile;
 use Exception;
 use pocketmine\player\Player;
@@ -101,7 +101,7 @@ final class QueueRegistry {
         if (($player = Server::getInstance()->getPlayerExact($profile->getName())) === null) return;
 
         $profile->setQueue(null);
-        Practice::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
+        Habu::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
     }
 
     /**

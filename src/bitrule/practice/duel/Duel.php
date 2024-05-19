@@ -10,7 +10,7 @@ use bitrule\practice\duel\stage\EndingStage;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\duel\stage\StartingStage;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
@@ -142,7 +142,7 @@ abstract class Duel {
 
             $this->kit->applyOn($player);
 
-            Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
+            Habu::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
         }
 
         $this->loaded = true;
@@ -214,7 +214,7 @@ abstract class Duel {
      * @param DuelMember $duelMember
      */
     public function processPlayerEnd(Player $player, DuelMember $duelMember): void {
-        Practice::setProfileScoreboard($player, ProfileRegistry::MATCH_ENDING_SCOREBOARD);
+        Habu::setProfileScoreboard($player, ProfileRegistry::MATCH_ENDING_SCOREBOARD);
     }
 
     /**

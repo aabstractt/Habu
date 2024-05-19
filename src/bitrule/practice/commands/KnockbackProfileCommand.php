@@ -17,7 +17,7 @@ final class KnockbackProfileCommand extends BaseCommand {
     public const PREFIX = TextFormat::BLUE . TextFormat::BOLD . 'Knockback' . TextFormat::DARK_GRAY . '> ' . TextFormat::RESET;
 
     public function __construct() {
-        parent::__construct('kbp', 'Knockback management for Practice', '/arena hep');
+        parent::__construct('kbp', 'Knockback management for Habu', '/arena hep');
 
         $this->setPermission('kb.command');
 

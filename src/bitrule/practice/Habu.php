@@ -46,7 +46,7 @@ use function str_replace;
 use function str_starts_with;
 use function time;
 
-final class Practice extends PluginBase {
+final class Habu extends PluginBase {
     use SingletonTrait {
         setInstance as private;
         reset as private;

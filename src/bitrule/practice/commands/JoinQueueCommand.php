@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\commands;
 
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\registry\QueueRegistry;
@@ -71,6 +71,6 @@ final class JoinQueueCommand extends Command {
 
         $profile->setQueue($queue);
 
-        Practice::setProfileScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
+        Habu::setProfileScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
     }
 }

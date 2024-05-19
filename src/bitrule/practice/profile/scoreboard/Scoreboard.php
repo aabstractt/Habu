@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile\scoreboard;
 
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\profile\Profile;
 use pocketmine\network\mcpe\NetworkBroadcastUtils;
 use pocketmine\network\mcpe\protocol\RemoveObjectivePacket;
@@ -42,7 +42,7 @@ final class Scoreboard {
         $player->getNetworkSession()->sendDataPacket(SetDisplayObjectivePacket::create(
             SetDisplayObjectivePacket::DISPLAY_SLOT_SIDEBAR,
             'bitrule',
-            TextFormat::colorize('&l&3Hyrium Practice'),
+            TextFormat::colorize('&l&3Hyrium Habu'),
             'dummy',
             SetDisplayObjectivePacket::SORT_ORDER_ASCENDING
         ));
@@ -68,7 +68,7 @@ final class Scoreboard {
         foreach ($this->lines as $identifier => $scoreboardLine) {
             $updateResult = $scoreboardLine->update(
                 $slot,
-                str_contains($identifier, 'nothing-') ? '' : Practice::replacePlaceholders($player, $profile, $identifier)
+                str_contains($identifier, 'nothing-') ? '' : Habu::replacePlaceholders($player, $profile, $identifier)
             );
 
             if ($updateResult === UpdateResult::NOT_UPDATED) {

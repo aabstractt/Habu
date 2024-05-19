@@ -6,7 +6,7 @@ namespace bitrule\practice\arena\setup;
 
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\impl\FireballFightArenaProperties;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use InvalidArgumentException;
 use pocketmine\entity\Location;
 use pocketmine\item\VanillaItems;
@@ -162,7 +162,7 @@ abstract class AbstractArenaSetup {
 
         $worldManager = Server::getInstance()->getWorldManager();
         if (!$worldManager->isWorldGenerated($this->name)) {
-            Practice::getInstance()->getLogger()->info('Generating world ' . $this->name);
+            Habu::getInstance()->getLogger()->info('Generating world ' . $this->name);
         }
 
         if (!$worldManager->loadWorld($this->name)) {

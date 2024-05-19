@@ -7,7 +7,7 @@ namespace bitrule\practice\registry;
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use Closure;
 use Exception;
 use pocketmine\Server;
@@ -32,7 +32,7 @@ final class ArenaRegistry {
      * Load all arenas from the arenas.yml file.
      */
     public function loadAll(): void {
-        $config = new Config(Practice::getInstance()->getDataFolder() . 'arenas.yml', Config::YAML);
+        $config = new Config(Habu::getInstance()->getDataFolder() . 'arenas.yml', Config::YAML);
         foreach ($config->getAll() as $arenaName => $properties) {
             if (!is_string($arenaName) || !is_array($properties)) {
                 throw new RuntimeException('Invalid arena data');
@@ -43,7 +43,7 @@ final class ArenaRegistry {
 
                 $arenaProperties->setup($properties);
             } catch (Exception $e) {
-                Practice::getInstance()->getLogger()->error('Failed to load arena ' . $arenaName . ': ' . $e->getMessage());
+                Habu::getInstance()->getLogger()->error('Failed to load arena ' . $arenaName . ': ' . $e->getMessage());
             }
         }
     }
@@ -52,7 +52,7 @@ final class ArenaRegistry {
      * Save all arenas to the arenas.yml file.
      */
     public function saveAll(): void {
-        $config = new Config(Practice::getInstance()->getDataFolder() . 'arenas.yml');
+        $config = new Config(Habu::getInstance()->getDataFolder() . 'arenas.yml');
 
         foreach ($this->arenas as $arena) {
             $config->set($arena->getOriginalName(), $arena->getOriginalProperties());
@@ -61,7 +61,7 @@ final class ArenaRegistry {
         try {
             $config->save();
         } catch (Exception $e) {
-            Practice::getInstance()->getLogger()->error('Failed to save arenas: ' . $e->getMessage());
+            Habu::getInstance()->getLogger()->error('Failed to save arenas: ' . $e->getMessage());
         }
     }
 
@@ -118,7 +118,7 @@ final class ArenaRegistry {
      */
     public function loadWorld(string $arenaName, string $worldName, Closure $onComplete): void {
        Server::getInstance()->getAsyncPool()->submitTask(new FileCopyAsyncTask(
-           Practice::getInstance()->getDataFolder() . 'backups/' . $arenaName,
+           Habu::getInstance()->getDataFolder() . 'backups/' . $arenaName,
            Server::getInstance()->getDataPath() . 'worlds/' . $worldName,
            $onComplete
        ));

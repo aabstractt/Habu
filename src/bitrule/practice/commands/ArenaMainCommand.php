@@ -15,7 +15,7 @@ use bitrule\practice\commands\arena\KitKnockbackArgument;
 final class ArenaMainCommand extends BaseCommand {
 
     public function __construct() {
-        parent::__construct('arena', 'Arena management for Practice', '/arena hep');
+        parent::__construct('arena', 'Arena management for Habu', '/arena hep');
 
         $this->setPermission('arena.command');
 
