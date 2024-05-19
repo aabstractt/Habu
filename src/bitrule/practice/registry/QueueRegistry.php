@@ -9,7 +9,6 @@ use bitrule\practice\Practice;
 use bitrule\practice\profile\Profile;
 use Exception;
 use pocketmine\player\Player;
-use pocketmine\promise\Promise;
 use pocketmine\promise\PromiseResolver;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
@@ -34,29 +33,23 @@ final class QueueRegistry {
      * @param string  $kitName
      * @param bool    $ranked
      *
-     * @return Promise<Queue>
+     * @return Queue|null
      */
-    public function createQueue(Profile $sourceprofile, string $kitName, bool $ranked): Promise {
+    public function createQueue(Profile $sourceprofile, string $kitName, bool $ranked): ?Queue {
         $promiseResolver = new PromiseResolver();
 
         if (($kit = KitRegistry::getInstance()->getKit($kitName)) === null) {
-            $promiseResolver->reject();
-
-            return $promiseResolver->getPromise();
+            throw new RuntimeException('Kit not found.');
         }
 
         $this->queues[$sourceXuid = $sourceprofile->getXuid()] = $queue = new Queue($sourceXuid, $kitName, $ranked, time());
 
         $opponentMatchQueue = $this->lookupOpponent($queue);
-        if ($opponentMatchQueue === null) {
-            $promiseResolver->resolve($queue);
-
-            return $promiseResolver->getPromise();
-        }
+        if ($opponentMatchQueue === null) return $queue;
 
         $this->removeQueue($sourceprofile);
 
-        if (($opponentprofile = ProfileRegistry::getInstance()->getprofile($opponentMatchQueue->getXuid())) === null) {
+        if (($opponentprofile = ProfileRegistry::getInstance()->getProfile($opponentMatchQueue->getXuid())) === null) {
             throw new RuntimeException('Opponent profile no exists.');
         }
 
@@ -93,7 +86,7 @@ final class QueueRegistry {
             }
         }
 
-        return $promiseResolver->getPromise();
+        return null;
     }
 
     /**

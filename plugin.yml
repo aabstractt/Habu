@@ -31,6 +31,8 @@ permissions:
     default: op
   kb.command.highestlimit:
     default: op
+  kb.command.hitdelay:
+    default: op
   practice.command.durability:
     default: op
 ...

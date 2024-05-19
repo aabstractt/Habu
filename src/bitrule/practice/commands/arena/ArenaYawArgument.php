@@ -22,7 +22,7 @@ final class ArenaYawArgument extends Argument {
      * @param array  $args
      */
     public function onPlayerExecute(Player $sender, string $label, array $args): void {
-        $profile = ProfileRegistry::getInstance()->getprofile($sender->getXuid());
+        $profile = ProfileRegistry::getInstance()->getProfile($sender->getXuid());
         if ($profile === null) {
             $sender->sendMessage(TextFormat::RED . 'Error code 1');
 

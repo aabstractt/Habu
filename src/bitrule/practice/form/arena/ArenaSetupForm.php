@@ -89,7 +89,7 @@ final class ArenaSetupForm extends CustomForm implements ClosableForm {
             throw new RuntimeException('Arena setup form not initialized.');
         }
 
-        $profile = ProfileRegistry::getInstance()->getprofile($player->getXuid());
+        $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
         if ($profile === null) {
             throw new RuntimeException('Local player not found.');
         }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\commands;
 
-use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Practice;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\ProfileRegistry;
@@ -42,7 +41,7 @@ final class JoinQueueCommand extends Command {
             return;
         }
 
-        $profile = ProfileRegistry::getInstance()->getprofile($sender->getXuid());
+        $profile = ProfileRegistry::getInstance()->getProfile($sender->getXuid());
         if ($profile === null) {
             $sender->sendMessage(TextFormat::RED . 'Your profile has not loaded yet.');
 
@@ -62,20 +61,16 @@ final class JoinQueueCommand extends Command {
             return;
         }
 
-        QueueRegistry::getInstance()
-            ->createQueue($profile, $kit->getName(), isset($args[1]) && $args[1] === 'ranked')
-            ->onCompletion(
-                function (Queue $queue) use ($profile, $sender): void {
-                    $sender->sendMessage(TranslationKey::PLAYER_QUEUE_JOINED()->build(
-                        $queue->getKitName(),
-                        $queue->isRanked() ? 'Ranked' : 'Unranked'
-                    ));
+        $queue = QueueRegistry::getInstance()->createQueue($profile, $kit->getName(), isset($args[1]) && $args[1] === 'ranked');
+        if ($queue === null) return;
 
-                    $profile->setQueue($queue);
+        $sender->sendMessage(TranslationKey::PLAYER_QUEUE_JOINED()->build(
+            $kit->getName(),
+            $queue->isRanked() ? 'Ranked' : 'Unranked'
+        ));
 
-                    Practice::setProfileScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
-                },
-                fn() => $sender->sendMessage(TextFormat::RED . 'An error occurred while joining the queue.')
-            );
+        $profile->setQueue($queue);
+
+        Practice::setProfileScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
     }
 }

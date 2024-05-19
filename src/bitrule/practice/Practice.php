@@ -19,6 +19,8 @@ use bitrule\practice\listener\entity\ProjectileLaunchListener;
 use bitrule\practice\listener\match\PlayerKitAppliedListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\listener\world\BlockBreakListener;
+use bitrule\practice\party\impl\DefaultPartyAdapter;
+use bitrule\practice\party\PartyAdapter;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ArenaRegistry;
@@ -54,6 +56,11 @@ final class Practice extends PluginBase {
     private array $scoreboardLines = [];
 
     private ?Config $messagesConfig = null;
+    /**
+     * This is an adapter for our party system.
+     * @var PartyAdapter|null $partyAdapter
+     */
+    private ?PartyAdapter $partyAdapter = null;
 
     protected function onEnable(): void {
         self::setInstance($this);
@@ -127,6 +134,28 @@ final class Practice extends PluginBase {
             }),
             5
         );
+
+        if (!$this->getConfig()->get('parties.enabled')) return;
+
+        $this->partyAdapter = new DefaultPartyAdapter();
+
+        $this->getLogger()->info('This server is running the default party adapter');
+    }
+
+    /**
+     * @return PartyAdapter|null
+     */
+    public function getPartyAdapter(): ?PartyAdapter {
+        return $this->partyAdapter;
+    }
+
+    /**
+     * Set the party adapter.
+     *
+     * @param PartyAdapter $partyAdapter
+     */
+    public function setPartyAdapter(PartyAdapter $partyAdapter): void {
+        $this->partyAdapter = $partyAdapter;
     }
 
     // TODO: Make more clean this code
@@ -158,7 +187,7 @@ final class Practice extends PluginBase {
      * @param string $identifier
      */
     public static function setProfileScoreboard(Player $player, string $identifier): void {
-        $profile = ProfileRegistry::getInstance()->getprofile($player->getXuid());
+        $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
         if ($profile === null) {
             throw new RuntimeException('Local profile not found for player: ' . $player->getName());
         }

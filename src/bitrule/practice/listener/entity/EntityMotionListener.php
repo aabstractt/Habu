@@ -18,7 +18,7 @@ final class EntityMotionListener implements Listener {
         $entity = $ev->getEntity();
         if (!$entity instanceof Player) return;
 
-        $profile = ProfileRegistry::getInstance()->getprofile($entity->getXuid());
+        $profile = ProfileRegistry::getInstance()->getProfile($entity->getXuid());
         if ($profile === null) return;
 
         if ($profile->initialKnockbackMotion) {

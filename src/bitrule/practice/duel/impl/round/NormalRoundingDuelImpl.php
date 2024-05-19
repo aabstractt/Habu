@@ -68,13 +68,13 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
             ));
 
             // Apply elo changes to the winner
-            $profile = ProfileRegistry::getInstance()->getprofile($player->getXuid());
+            $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
             if ($profile === null) continue;
 
             $profile->setElo($winElo);
 
             // Apply elo changes to the loser
-            $profile = ProfileRegistry::getInstance()->getprofile($opponentPlayer->getXuid());
+            $profile = ProfileRegistry::getInstance()->getProfile($opponentPlayer->getXuid());
             if ($profile === null) continue;
 
             $profile->setElo($lostElo);

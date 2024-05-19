@@ -10,7 +10,6 @@
     "ext-json": "*",
     "ext-mysqli": "*",
     "ext-curl": "*",
-    "abstract/command-framework": "^0.4",
     "bitrule/forms": "dev-master",
     "ext-igbinary": "*"
   },

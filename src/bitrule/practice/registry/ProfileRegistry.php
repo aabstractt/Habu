@@ -29,14 +29,14 @@ final class ProfileRegistry {
      *
      * @return Profile|null
      */
-    public function getprofile(string $xuid): ?Profile {
+    public function getProfile(string $xuid): ?Profile {
         return $this->profiles[$xuid] ?? null;
     }
 
     /**
      * @param Player $player
      */
-    public function addprofile(Player $player): void {
+    public function addProfile(Player $player): void {
         if (isset($this->profiles[$player->getXuid()])) {
             throw new RuntimeException('Player already exists in local players list');
         }

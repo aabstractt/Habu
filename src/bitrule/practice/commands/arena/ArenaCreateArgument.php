@@ -28,7 +28,7 @@ final class ArenaCreateArgument extends Argument {
             return;
         }
 
-        $profile = ProfileRegistry::getInstance()->getprofile($sender->getXuid());
+        $profile = ProfileRegistry::getInstance()->getProfile($sender->getXuid());
         if ($profile === null) {
             $sender->sendMessage(TextFormat::RED . 'Error code 1');
 

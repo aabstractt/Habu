@@ -7,6 +7,7 @@ namespace bitrule\practice\commands;
 use abstractplugin\command\BaseCommand;
 use bitrule\practice\commands\knockback\KnockbackCreateCommand;
 use bitrule\practice\commands\knockback\KnockbackHighestLimitCommand;
+use bitrule\practice\commands\knockback\KnockbackHitDelayCommand;
 use bitrule\practice\commands\knockback\KnockbackHorizontalCommand;
 use bitrule\practice\commands\knockback\KnockbackVerticalCommand;
 use pocketmine\utils\TextFormat;
@@ -24,7 +25,8 @@ final class KnockbackProfileCommand extends BaseCommand {
             new KnockbackCreateCommand('create', 'kb.command.create'),
             new KnockbackHorizontalCommand('horizontal', 'kb.command.horizontal'),
             new KnockbackVerticalCommand('vertical', 'kb.command.vertical'),
-            new KnockbackHighestLimitCommand('highestlimit', 'kb.command.highestlimit')
+            new KnockbackHighestLimitCommand('highestlimit', 'kb.command.highestlimit'),
+            new KnockbackHitDelayCommand('hitdelay', 'kb.command.hitdelay')
         );
     }
 

@@ -32,7 +32,7 @@ final class BlockBreakListener implements Listener {
             $stage->onBlockBreakEvent($duel, $player, $ev);
         }
 
-        $profile = ProfileRegistry::getInstance()->getprofile($player->getXuid());
+        $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
         if ($profile === null) return;
 
         $arenaSetup = $profile->getArenaSetup();
