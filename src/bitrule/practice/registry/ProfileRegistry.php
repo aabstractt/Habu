@@ -76,6 +76,7 @@ final class ProfileRegistry {
         foreach ($this->profiles as $profile) {
             if (($scoreboard = $profile->getScoreboard()) === null) continue;
 
+            // TODO: Optimize this
             $player = Server::getInstance()->getPlayerExact($profile->getName());
             if ($player === null || !$player->isOnline()) continue;
 

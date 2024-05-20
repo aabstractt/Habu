@@ -26,6 +26,13 @@ final class PartyLeaveArgument extends Argument {
             return;
         }
 
-        $partyAdapter->processLeavePlayer($sender);
+        $party = $partyAdapter->getPartyByPlayer($sender);
+        if ($party === null) {
+            $sender->sendMessage(TextFormat::RED . 'You are not in a party');
+
+            return;
+        }
+
+        $partyAdapter->processLeavePlayer($sender, $party);
     }
 }

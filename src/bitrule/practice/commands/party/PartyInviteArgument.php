@@ -40,6 +40,31 @@ final class PartyInviteArgument extends Argument {
             return;
         }
 
-        $partyAdapter->processInvitePlayer($sender, $target);
+        $party = $partyAdapter->getPartyByPlayer($sender);
+        if ($party === null) {
+            $sender->sendMessage(TextFormat::RED . 'You are not in a party');
+
+            return;
+        }
+
+        if ($party->isMember($target->getXuid())) {
+            $sender->sendMessage(TextFormat::RED . $target->getName() . ' is already in your party');
+
+            return;
+        }
+
+        if ($partyAdapter->getPartyByPlayer($target) !== null) {
+            $sender->sendMessage(TextFormat::RED . $target->getName() . ' is already in a party');
+
+            return;
+        }
+
+        if ($party->isPendingInvite($target->getXuid())) {
+            $sender->sendMessage(TextFormat::RED . 'You have already invited ' . $target->getName());
+
+            return;
+        }
+
+        $partyAdapter->processInvitePlayer($sender, $target, $party);
     }
 }

@@ -136,8 +136,7 @@ final class Habu extends PluginBase {
             5
         );
 
-        $partiesEnabled = $this->getConfig()->get('parties.enabled');
-
+        $partiesEnabled = $this->getConfig()->get('parties-enabled');
         if (!is_bool($partiesEnabled) || !$partiesEnabled) return;
 
         $this->partyAdapter = new DefaultPartyAdapter();
