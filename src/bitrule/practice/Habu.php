@@ -8,6 +8,7 @@ use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\DurabilityCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
+use bitrule\practice\commands\PartyCommand;
 use bitrule\practice\duel\DuelScoreboard;
 use bitrule\practice\listener\defaults\PlayerExhaustListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
@@ -135,9 +136,13 @@ final class Habu extends PluginBase {
             5
         );
 
-        if (!$this->getConfig()->get('parties.enabled')) return;
+        $partiesEnabled = $this->getConfig()->get('parties.enabled');
+
+        if (!is_bool($partiesEnabled) || !$partiesEnabled) return;
 
         $this->partyAdapter = new DefaultPartyAdapter();
+
+        $this->getServer()->getCommandMap()->register('party', new PartyCommand('party', 'Party commands', '/party <subcommand> [args]', ['p']));
 
         $this->getLogger()->info('This server is running the default party adapter');
     }
