@@ -32,4 +32,26 @@ interface Party {
      * @return bool
      */
     public function isMember(string $xuid): bool;
+
+    /**
+     * @param string $xuid
+     */
+    public function addPendingInvite(string $xuid): void;
+
+    /**
+     * @param string $xuid
+     */
+    public function removePendingInvite(string $xuid): void;
+
+    /**
+     * @param string $xuid
+     *
+     * @return bool
+     */
+    public function isPendingInvite(string $xuid): bool;
+
+    /**
+     * @param string $message
+     */
+    public function broadcastMessage(string $message): void;
 }

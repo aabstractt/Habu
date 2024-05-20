@@ -53,6 +53,85 @@ final class DefaultPartyAdapter implements PartyAdapter {
     }
 
     /**
+     * @param Player $source
+     * @param Player $target
+     */
+    public function processInvitePlayer(Player $source, Player $target): void {
+        $party = $this->getPartyByPlayer($source);
+        if ($party === null) {
+            $source->sendMessage(TextFormat::RED . 'You are not in a party');
+
+            return;
+        }
+
+        if ($party->isMember($target->getXuid())) {
+            $source->sendMessage(TextFormat::RED . $target->getName() . ' is already in your party');
+
+            return;
+        }
+
+        if ($this->getPartyByPlayer($target) !== null) {
+            $source->sendMessage(TextFormat::RED . $target->getName() . ' is already in a party');
+
+            return;
+        }
+
+        if ($party->isPendingInvite($target->getXuid())) {
+            $source->sendMessage(TextFormat::RED . 'You have already invited ' . $target->getName());
+
+            return;
+        }
+
+        $party->addPendingInvite($target->getXuid());
+
+        $source->sendMessage(TextFormat::GREEN . 'You have invited ' . $target->getName() . ' to your party');
+        $target->sendMessage(TextFormat::GREEN . 'You have been invited to ' . $source->getName() . '\'s party');
+
+        $party->broadcastMessage(TextFormat::YELLOW . $source->getName() . ' has invited ' . $target->getName() . ' to the party');
+    }
+
+    /**
+     * @param Player $source
+     * @param Player $target
+     */
+    public function processKickPlayer(Player $source, Player $target): void {
+        $party = $this->getPartyByPlayer($source);
+        if ($party === null) {
+            $source->sendMessage(TextFormat::RED . 'You are not in a party');
+
+            return;
+        }
+
+        if (!$party->isMember($target->getXuid())) {
+            $source->sendMessage(TextFormat::RED . $target->getName() . ' is not in your party');
+
+            return;
+        }
+
+        $party->removeMember($target->getXuid());
+        unset($this->playersParty[$target->getXuid()]);
+
+        $party->broadcastMessage(TextFormat::YELLOW . $target->getName() . ' has been kicked from the party');
+    }
+
+    /**
+     * @param Player $source
+     */
+    public function processLeavePlayer(Player $source): void {
+        $party = $this->getPartyByPlayer($source);
+        if ($party === null) {
+            $source->sendMessage(TextFormat::RED . 'You are not in a party');
+
+            return;
+        }
+
+        $party->removeMember($source->getXuid());
+        unset($this->playersParty[$source->getXuid()]);
+
+        $party->broadcastMessage(TextFormat::YELLOW . $source->getName() . ' has left the party');
+    }
+
+    /**
      * Adapt the method to disband a party
      *
      * @param Player $source

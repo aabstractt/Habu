@@ -23,6 +23,23 @@ interface PartyAdapter {
     public function createParty(Player $source): void;
 
     /**
+     * @param Player $source
+     * @param Player $target
+     */
+    public function processInvitePlayer(Player $source, Player $target): void;
+
+    /**
+     * @param Player $source
+     * @param Player $target
+     */
+    public function processKickPlayer(Player $source, Player $target): void;
+
+    /**
+     * @param Player $source
+     */
+    public function processLeavePlayer(Player $source): void;
+
+    /**
      * Adapt the method to disband a party
      *
      * @param Player $source
