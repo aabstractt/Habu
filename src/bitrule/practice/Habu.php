@@ -8,8 +8,7 @@ use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\DurabilityCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
-use bitrule\practice\commands\PartyCommand;
-use bitrule\practice\duel\DuelScoreboard;
+use bitrule\practice\duel\stage\StageScoreboard;
 use bitrule\practice\listener\defaults\PlayerExhaustListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
@@ -20,8 +19,6 @@ use bitrule\practice\listener\entity\ProjectileLaunchListener;
 use bitrule\practice\listener\match\PlayerKitAppliedListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\listener\world\BlockBreakListener;
-use bitrule\practice\party\impl\DefaultPartyAdapter;
-use bitrule\practice\party\PartyAdapter;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ArenaRegistry;
@@ -57,11 +54,6 @@ final class Habu extends PluginBase {
     private array $scoreboardLines = [];
 
     private ?Config $messagesConfig = null;
-    /**
-     * This is an adapter for our party system.
-     * @var PartyAdapter|null $partyAdapter
-     */
-    private ?PartyAdapter $partyAdapter = null;
 
     protected function onEnable(): void {
         self::setInstance($this);
@@ -135,31 +127,6 @@ final class Habu extends PluginBase {
             }),
             5
         );
-
-        $partiesEnabled = $this->getConfig()->get('parties-enabled');
-        if (!is_bool($partiesEnabled) || !$partiesEnabled) return;
-
-        $this->partyAdapter = new DefaultPartyAdapter();
-
-        $this->getServer()->getCommandMap()->register('party', new PartyCommand('party', 'Party commands', '/party <subcommand> [args]', ['p']));
-
-        $this->getLogger()->info('This server is running the default party adapter');
-    }
-
-    /**
-     * @return PartyAdapter|null
-     */
-    public function getPartyAdapter(): ?PartyAdapter {
-        return $this->partyAdapter;
-    }
-
-    /**
-     * Set the party adapter.
-     *
-     * @param PartyAdapter $partyAdapter
-     */
-    public function setPartyAdapter(PartyAdapter $partyAdapter): void {
-        $this->partyAdapter = $partyAdapter;
     }
 
     // TODO: Make more clean this code
@@ -174,7 +141,6 @@ final class Habu extends PluginBase {
         }
 
         return TextFormat::colorize($message);
-
     }
 
     /**
@@ -237,7 +203,7 @@ final class Habu extends PluginBase {
         if ($result !== null) return $result;
 
         $stage = $duel->getStage();
-        if ($stage instanceof DuelScoreboard) return $stage->replacePlaceholders($duel, $player, $profile, $identifier);
+        if ($stage instanceof StageScoreboard) return $stage->replacePlaceholders($duel, $player, $profile, $identifier);
 
         return null;
     }

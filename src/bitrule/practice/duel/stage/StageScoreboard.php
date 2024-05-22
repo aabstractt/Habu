@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\duel;
+namespace bitrule\practice\duel\stage;
 
+use bitrule\practice\duel\Duel;
 use bitrule\practice\profile\Profile;
 use pocketmine\player\Player;
 
-interface DuelScoreboard {
+interface StageScoreboard {
 
     /**
      * This is the scoreboard identifier of the arena.

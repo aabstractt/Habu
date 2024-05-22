@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage\impl;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\DuelScoreboard;
 use bitrule\practice\duel\impl\NormalDuelImpl;
 use bitrule\practice\duel\impl\round\NormalRoundingDuelImpl;
 use bitrule\practice\duel\stage\PlayingStage;
+use bitrule\practice\duel\stage\StageScoreboard;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\player\Player;
 use function abs;
 
-final class BoxingPlayingStage extends PlayingStage implements AttackDamageStageListener, DuelScoreboard {
+final class BoxingPlayingStage extends PlayingStage implements AttackDamageStageListener, StageScoreboard {
 
     /**
      * This method is called when a player is damaged by another player.

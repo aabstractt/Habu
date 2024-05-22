@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\DuelScoreboard;
 use bitrule\practice\event\duel\DuelStartedEvent;
 use bitrule\practice\Habu;
 use bitrule\practice\registry\ProfileRegistry;
@@ -40,7 +39,7 @@ final class StartingStage implements AbstractStage {
 
         (new DuelStartedEvent($duel))->call();
 
-        $scoreboardId = $stage instanceof DuelScoreboard ? $stage->getScoreboardId() : ProfileRegistry::MATCH_PLAYING_SCOREBOARD;
+        $scoreboardId = $stage instanceof StageScoreboard ? $stage->getScoreboardId() : ProfileRegistry::MATCH_PLAYING_SCOREBOARD;
 
         foreach ($duel->getEveryone() as $duelMember) {
             $player = $duelMember->toPlayer();

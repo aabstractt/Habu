@@ -6,8 +6,8 @@ namespace bitrule\practice\duel\stage\impl;
 
 use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\DuelScoreboard;
 use bitrule\practice\duel\stage\PlayingStage;
+use bitrule\practice\duel\stage\StageScoreboard;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\TranslationKey;
 use LogicException;
@@ -19,7 +19,7 @@ use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use function str_starts_with;
 
-final class FireballFightPlayingStage extends PlayingStage implements AnythingDamageStageListener, AttackDamageStageListener, BlockBreakStageListener, DuelScoreboard {
+final class FireballFightPlayingStage extends PlayingStage implements AnythingDamageStageListener, AttackDamageStageListener, BlockBreakStageListener, StageScoreboard {
 
     /**
      * These properties allow us to know if some bed has been destroyed.
