@@ -7,6 +7,7 @@ namespace bitrule\practice\commands\knockback;
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\commands\KnockbackProfileCommand;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\KnockbackRegistry;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
@@ -41,7 +42,7 @@ final class KnockbackHitDelayCommand extends Argument {
             return;
         }
 
-        $sender->sendMessage(KnockbackProfileCommand::PREFIX . TextFormat::GREEN . 'Set hit-delay knockback for ' . $args[0] . ' to ' . $args[1] . '.');
+        $sender->sendMessage(Habu::prefix() . TextFormat::GREEN . 'Set hit-delay knockback for ' . $args[0] . ' to ' . $args[1] . '.');
 
         $knockbackProfile->setHitDelay((int) ($args[1]));
         KnockbackRegistry::getInstance()->saveAll();

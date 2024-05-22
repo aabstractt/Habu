@@ -6,6 +6,7 @@ namespace bitrule\practice\commands\arena;
 
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
+use bitrule\practice\Habu;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\registry\KitRegistry;
 use JsonException;
@@ -39,7 +40,7 @@ final class KitCreateArgument extends Argument {
         try {
             KitRegistry::getInstance()->createKit($kit);
 
-            $sender->sendMessage(TextFormat::GREEN . 'Kit ' . $args[0] . ' successfully saved!');
+            $sender->sendMessage(Habu::prefix() . TextFormat::GREEN . 'Kit ' . $args[0] . ' successfully saved!');
         } catch (JsonException $e) {
             $sender->sendMessage(TextFormat::RED . 'Failed to save kit: ' . $e->getMessage());
         }

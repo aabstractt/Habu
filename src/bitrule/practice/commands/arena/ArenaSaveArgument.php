@@ -54,7 +54,7 @@ final class ArenaSaveArgument extends Argument {
                     ArenaRegistry::getInstance()->createArena($arenaProperties);
                     ArenaRegistry::getInstance()->saveAll();
 
-                    $sender->sendMessage(TextFormat::GREEN . 'Arena saved successfully!');
+                    $sender->sendMessage(Habu::prefix() . TextFormat::GREEN . 'Arena saved successfully!');
 
                     Server::getInstance()->getLogger()->info('Arena backup saved successfully!');
                 } catch (Exception $e) {

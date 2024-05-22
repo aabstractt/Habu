@@ -201,4 +201,11 @@ final class Habu extends PluginBase {
 
         return null;
     }
+
+    /**
+     * @return string
+     */
+    public static function prefix(): string {
+        return TextFormat::GOLD . TextFormat::BOLD . 'Habu ' . TextFormat::GRAY . '» ' . TextFormat::RESET;
+    }
 }

@@ -8,6 +8,7 @@ use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\player\Player;
@@ -64,7 +65,7 @@ final class ArenaEditArgument extends Argument {
 
             $profile->setArenaSetup($arenaSetup);
 
-            $sender->sendMessage(TextFormat::GREEN . 'Arena setup for ' . $world->getFolderName() . ' started.');
+            $sender->sendMessage(Habu::prefix() . TextFormat::GREEN . 'Arena setup for ' . $world->getFolderName() . ' started.');
         } catch (\Exception $e) {
             $sender->sendMessage(TextFormat::RED . 'An error occurred while starting the arena setup: ' . $e->getMessage());
 
