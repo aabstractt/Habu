@@ -142,7 +142,7 @@ abstract class Duel {
 
             $this->kit->applyOn($player);
 
-            Habu::setProfileScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
+            Habu::applyScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
         }
 
         $this->loaded = true;
@@ -214,7 +214,7 @@ abstract class Duel {
      * @param DuelMember $duelMember
      */
     public function processPlayerEnd(Player $player, DuelMember $duelMember): void {
-        Habu::setProfileScoreboard($player, ProfileRegistry::MATCH_ENDING_SCOREBOARD);
+        Habu::applyScoreboard($player, ProfileRegistry::MATCH_ENDING_SCOREBOARD);
     }
 
     /**

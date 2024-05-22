@@ -60,9 +60,7 @@ final class Habu extends PluginBase {
 
         $bootstrap = 'phar://' . $this->getServer()->getPluginPath() . $this->getName() . '.phar/vendor/autoload.php';
         if (!is_file($bootstrap)) {
-            $this->getLogger()->error('Could not find autoload.php in plugin phar, directory: ' . $bootstrap);
-            $this->getServer()->getPluginManager()->disablePlugin($this);
-            return;
+            throw new RuntimeException('Could not find autoload.php in plugin phar, directory: ' . $bootstrap);
         }
 
         require_once $bootstrap;
@@ -72,34 +70,28 @@ final class Habu extends PluginBase {
         $this->saveResource('messages.yml', true);
 
         $config = new Config($this->getDataFolder() . 'scoreboard.yml');
-
         if (!is_array($scoreboardLine = $config->get('lines'))) {
             throw new RuntimeException('Invalid scoreboard.yml');
         }
 
         $this->scoreboardLines = $scoreboardLine;
 
-        $this->messagesConfig = new Config($this->getDataFolder() . 'messages.yml');
-
         try {
             KitRegistry::getInstance()->loadAll();
         } catch (Exception $e) {
-            $this->getLogger()->error('Error loading kits: ' . $e->getMessage());
-
-            $this->getServer()->shutdown();
-            return;
+            throw new RuntimeException('Error loading kits: ' . $e->getMessage());
         }
 
         ArenaRegistry::getInstance()->loadAll();
         KnockbackRegistry::getInstance()->loadAll($this);
 
-        // TODO: Default server listeners
+        // Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new BlockBreakListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerExhaustListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerQuitListener(), $this);
 
-        // TODO: Match listeners
+        // Match listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerKitAppliedListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new ProjectileLaunchListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityTeleportListener(), $this);
@@ -127,6 +119,8 @@ final class Habu extends PluginBase {
             }),
             5
         );
+
+        $this->messagesConfig = new Config($this->getDataFolder() . 'messages.yml');
     }
 
     // TODO: Make more clean this code
@@ -156,7 +150,7 @@ final class Habu extends PluginBase {
      * @param Player $player
      * @param string $identifier
      */
-    public static function setProfileScoreboard(Player $player, string $identifier): void {
+    public static function applyScoreboard(Player $player, string $identifier): void {
         $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
         if ($profile === null) {
             throw new RuntimeException('Local profile not found for player: ' . $player->getName());

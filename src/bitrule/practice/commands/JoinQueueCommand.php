@@ -71,6 +71,6 @@ final class JoinQueueCommand extends Command {
 
         $profile->setQueue($queue);
 
-        Habu::setProfileScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
+        Habu::applyScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
     }
 }

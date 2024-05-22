@@ -67,6 +67,7 @@ trait OpponentDuelTrait {
             throw new RuntimeException('This trait can only be used in NormalDuelImpl class.');
         }
 
+        // TODO: I dont think this going to work... Idk
         $parent = parent::replacePlaceholders($player, $identifier);
         if ($parent !== null) return $parent;
 

@@ -45,7 +45,7 @@ final class StartingStage implements AbstractStage {
             $player = $duelMember->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
-            Habu::setProfileScoreboard(
+            Habu::applyScoreboard(
                 $player,
                 $scoreboardId
             );

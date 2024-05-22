@@ -101,7 +101,7 @@ final class QueueRegistry {
         if (($player = Server::getInstance()->getPlayerExact($profile->getName())) === null) return;
 
         $profile->setQueue(null);
-        Habu::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
+        Habu::applyScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
     }
 
     /**

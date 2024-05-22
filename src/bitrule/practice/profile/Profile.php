@@ -125,7 +125,7 @@ final class Profile {
 
         if (!$showScoreboard) return;
 
-        Habu::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
+        Habu::applyScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
     }
 
     /**
