@@ -42,7 +42,7 @@ final class Scoreboard {
         $player->getNetworkSession()->sendDataPacket(SetDisplayObjectivePacket::create(
             SetDisplayObjectivePacket::DISPLAY_SLOT_SIDEBAR,
             'bitrule',
-            TextFormat::colorize('&l&3Hyrium Habu'),
+            TextFormat::colorize('&l&9Practice'),
             'dummy',
             SetDisplayObjectivePacket::SORT_ORDER_ASCENDING
         ));
@@ -54,7 +54,13 @@ final class Scoreboard {
      * @param Player $player
      */
     public function hide(Player $player): void {
+        if (!$this->showed) {
+            throw new \RuntimeException('Scoreboard is not showed');
+        }
+
         $player->getNetworkSession()->sendDataPacket(RemoveObjectivePacket::create('bitrule'));
+
+        $this->showed = false;
     }
 
     /**

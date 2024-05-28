@@ -18,6 +18,9 @@ use bitrule\practice\listener\entity\EntityTeleportListener;
 use bitrule\practice\listener\entity\ProjectileLaunchListener;
 use bitrule\practice\listener\match\PlayerKitAppliedListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
+use bitrule\practice\listener\party\PartyCreateListener;
+use bitrule\practice\listener\party\PartyDisbandListener;
+use bitrule\practice\listener\party\PartyTransferListener;
 use bitrule\practice\listener\world\BlockBreakListener;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
@@ -98,6 +101,11 @@ final class Habu extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityMotionListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityDamageListener(), $this);
+
+        // Party listeners
+        $this->getServer()->getPluginManager()->registerEvents(new PartyCreateListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PartyDisbandListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PartyTransferListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),
@@ -198,7 +206,7 @@ final class Habu extends PluginBase {
 
         $stage = $duel->getStage();
         if ($stage instanceof StageScoreboard) return $stage->replacePlaceholders($duel, $player, $profile, $identifier);
-
+ 
         return null;
     }
 

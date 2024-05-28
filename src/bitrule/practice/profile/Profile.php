@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile;
 
+use bitrule\parties\PartiesPlugin;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Habu;
@@ -153,14 +154,31 @@ final class Profile {
 
         $player->setGamemode(GameMode::ADVENTURE);
 
-        /** @var array<int, array<int, string|Item>> $items */
-        $items = [
-        	0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],
-        	1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
-        	4 => ['spectate', VanillaItems::CLOCK()],
-        	7 => ['parties', VanillaItems::PAPER()],
-        	8 => ['settings', VanillaItems::COMPASS()]
-        ];
+        $partyAdapter = PartiesPlugin::getInstance()->getPartyAdapter();
+        if ($partyAdapter === null) {
+            throw new InvalidArgumentException('Party adapter not found');
+        }
+
+        $party = $partyAdapter->getPartyByPlayer($player->getXuid());
+        if ($party !== null && $party->getOwnership()->getXuid() === $player->getXuid()) {
+            /** @var array<int, array<int, string|Item>> $items */
+            $items = [
+                0 => ['party-split', VanillaItems::DIAMOND_SWORD()],
+                1 => ['party-ffa', VanillaItems::GOLDEN_SWORD()],
+                4 => ['parties-duel', VanillaItems::CLOCK()],
+                7 => ['parties', VanillaItems::PAPER()],
+                8 => ['settings', VanillaItems::COMPASS()]
+            ];
+        } else {
+            /** @var array<int, array<int, string|Item>> $items */
+            $items = [
+                0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],
+                1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
+                4 => ['spectate', VanillaItems::CLOCK()],
+                7 => ['parties', VanillaItems::PAPER()],
+                8 => ['settings', VanillaItems::COMPASS()]
+            ];
+        }
 
         foreach ($items as $inventorySlot => [$itemType, $item]) {
             if (!is_string($itemType)) {

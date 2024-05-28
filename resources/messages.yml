@@ -62,7 +62,24 @@ items:
       &7Right-click to open the parties menu.
       &7You can create or join a party here.
   settings:
-    custom-name: "&r&sProfile Settings"
+    custom-name: "&r§sProfile Settings"
     lore: |-
       &7Right-click to open the profile settings menu.
       &7You can change your settings here.
+
+  party-split:
+    custom-name: "&r&9Party Split"
+    lore: |-
+      &7Right-click to split the party.
+      &7You will be teleported to a random duel.
+  party-ffa:
+    custom-name: "&r&eParty FFA"
+    lore: |-
+      &7Right-click to queue for a party FFA.
+      &7You will be teleported to a random duel.
+
+  parties-duel:
+    custom-name: "&r&aParty Duel"
+    lore: |-
+      &7Right-click to queue for a party duel.
+      &7You will be teleported to a random duel.
