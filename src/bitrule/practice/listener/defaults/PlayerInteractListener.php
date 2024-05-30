@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\listener\defaults;
 
 use bitrule\parties\PartiesPlugin;
-use bitrule\practice\form\duel\KitSelectorForm;
+use bitrule\practice\form\duel\NormalDuelSelector;
 use bitrule\practice\form\duel\PartyDuelForm;
 use bitrule\practice\registry\DuelRegistry;
 use pocketmine\event\Listener;
@@ -31,7 +31,7 @@ final class PlayerInteractListener implements Listener {
         if (!is_string($type)) return;
 
         if ($type === 'competitive-duel' || $type === 'unranked-duel') {
-            $form = new KitSelectorForm(TextFormat::BOLD . TextFormat::BLUE . ($type === 'competitive-duel' ? 'Competitive Duel' : 'Unranked Duel'));
+            $form = new NormalDuelSelector(TextFormat::BOLD . TextFormat::BLUE . ($type === 'competitive-duel' ? 'Competitive' : 'Friendly' . ' Duels'));
             $form->setup($type === 'competitive-duel');
 
             $player->sendForm($form);

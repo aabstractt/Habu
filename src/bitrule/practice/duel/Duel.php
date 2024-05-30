@@ -16,6 +16,7 @@ use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\player\Player;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 use RuntimeException;
@@ -141,8 +142,6 @@ abstract class Duel {
             $this->teleportSpawn($player);
 
             $this->kit->applyOn($player);
-
-            Habu::applyScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
         }
 
         $this->loaded = true;
@@ -397,12 +396,14 @@ abstract class Duel {
 
         if ($identifier === 'your-ping') return (string) $player->getNetworkSession()->getPing();
 
-        $duelPlayer = $this->getMember($player->getXuid());
-        if ($duelPlayer === null) return null;
+        $duelMember = $this->getMember($player->getXuid());
+        if ($duelMember === null) return null;
 
-        if ($this->stage instanceof EndingStage && $duelPlayer->isPlaying()) {
-            if ($identifier === 'duel-ending-defeat' && !$duelPlayer->isAlive()) return '';
-            if ($identifier === 'duel-ending-victory' && $duelPlayer->isAlive()) return '';
+        if ($identifier === 'duel-players') return count($this->getAlive()) . TextFormat::WHITE . '/' . TextFormat::BLUE . count($this->getPlaying());
+
+        if ($this->stage instanceof EndingStage && $duelMember->isPlaying()) {
+            if ($identifier === 'duel-ending-defeat' && !$duelMember->isAlive()) return '';
+            if ($identifier === 'duel-ending-victory' && $duelMember->isAlive()) return '';
         }
 
         return null;

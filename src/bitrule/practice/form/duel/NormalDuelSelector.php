@@ -13,7 +13,7 @@ use cosmicpe\form\SimpleForm;
 use pocketmine\player\Player;
 use pocketmine\Server;
 
-final class KitSelectorForm extends SimpleForm {
+final class NormalDuelSelector extends SimpleForm {
 
     /**
      * @param bool $ranked

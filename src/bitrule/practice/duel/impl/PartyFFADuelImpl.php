@@ -7,10 +7,13 @@ namespace bitrule\practice\duel\impl;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
+use bitrule\practice\Habu;
 use bitrule\practice\TranslationKey;
 use pocketmine\player\Player;
+use pocketmine\utils\TextFormat;
 use RuntimeException;
 use function array_filter;
+use function array_keys;
 use function array_map;
 use function count;
 use function implode;
@@ -41,6 +44,8 @@ final class PartyFFADuelImpl extends Duel {
             $this->ranked ? 'Ranked' : 'Unranked',
             $this->kit->getName()
         ));
+
+        Habu::applyScoreboard($player, 'match-starting-party');
     }
 
     /**
@@ -60,13 +65,13 @@ final class PartyFFADuelImpl extends Duel {
 
         $endMessage = TranslationKey::PARTY_DUEL_FFA_END()->build(
             $player->getName(),
-            array_map(
+            implode(', ', array_map(
                 fn(DuelMember $member): string => $member->getName(),
                 array_filter(
                     $this->getEveryone(),
                     fn(DuelMember $member) => $member->getXuid() !== $player->getXuid()
                 )
-            ),
+            )),
             $winnerMember->getDuelStatistics()->getDamageDealt()
         );
 
@@ -109,5 +114,43 @@ final class PartyFFADuelImpl extends Duel {
         if (count($this->getAlive()) > 2) return;
 
 //        $this->end();
+    }
+
+    /**
+     * @param Player $player
+     * @param string $identifier
+     *
+     * @return string|null
+     */
+    public function replacePlaceholders(Player $player, string $identifier): ?string {
+        $result = parent::replacePlaceholders($player, $identifier);
+        if ($result !== null) return $result;
+
+        $opponentId = match ($identifier) {
+            'first-opponent' => 0,
+            'second-opponent' => 1,
+            'third-opponent' => 2,
+            default => null
+        };
+        if ($opponentId === null) return null;
+
+        $filtered = array_filter(
+            $this->getAlive(),
+            fn(DuelMember $member) => $member->getXuid() !== $player->getXuid()
+        );
+        if (count($filtered) === 0) return null;
+
+        $opponentXuid = array_keys($filtered)[$opponentId] ?? null;
+        if ($opponentXuid === null) return null;
+
+        $duelMember = $this->getMember((string) $opponentXuid);
+        if ($duelMember === null || !$duelMember->isPlaying()) return null;
+
+        $suffix = '';
+        if (count($filtered) > 3 && $opponentId === 2) {
+            $suffix = TextFormat::GRAY . ' (+' . (count($filtered) - 3) . ')';
+        }
+
+        return $duelMember->getName() . $suffix;
     }
 }

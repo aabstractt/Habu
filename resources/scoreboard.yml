@@ -35,8 +35,20 @@ lines:
     your-ping: '&fYour Ping: &b'
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-3: '&9&l'
-    nothing-4: '   &9play.hyrium.com'
+    nothing-4: '&9play.hyrium.com'
     nothing-5: '&7-----------------&d'
+  match-starting-party:
+    nothing-0: '&7-----------------'
+    nothing-1: '&9&lStarting...'
+    nothing-2: '&fOpponents:'
+    first-opponent: ' &a'
+    second-opponent: ' &a'
+    third-opponent: ' &a'
+    nothing-3: '&7'
+    your-ping: '&fYour Ping: &b'
+    nothing-4: '&9&l'
+    nothing-5: '&9play.hyrium.com'
+    nothing-6: '&7-----------------&d'
 
   match-playing:
     nothing-0: '&7-----------------'
@@ -46,7 +58,7 @@ lines:
     your-ping: '&fYour Ping: &b'
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-2: '&9&l'
-    nothing-3: '   &9play.hyrium.com'
+    nothing-3: '&9play.hyrium.com'
     nothing-4: '&7-----------------&d'
 
   match-playing-boxing:
@@ -59,7 +71,7 @@ lines:
     your-ping: '&fYour Ping: &b'
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-2: '&9&l'
-    nothing-3: '   &9play.hyrium.com'
+    nothing-3: '&9play.hyrium.com'
     nothing-4: '&7-----------------&d'
 
   match-playing-fireball:
@@ -73,7 +85,7 @@ lines:
     duel-self-kills: '  &fKills: &b'
     duel-duration: '  &fDuration: &b'
     nothing-4: '&9&l'
-    nothing-5: '   &9play.hyrium.com'
+    nothing-5: '&9play.hyrium.com'
     nothing-6: '&7-----------------&d'
 
   match-playing-party:
@@ -82,7 +94,7 @@ lines:
     nothing-1: '&7'
     duel-duration: '&fDuration: &9'
     nothing-2: '&9&l'
-    nothing-3: '   &9play.hyrium.com'
+    nothing-3: '&9play.hyrium.com'
     nothing-4: '&7-----------------&d'
 
   match-ending:
@@ -93,5 +105,5 @@ lines:
     nothing-2: '&d'
     duel-duration: ' &fDuration: &b'
     nothing-3: '&9&l'
-    nothing-4: '   &9play.hyrium.com'
+    nothing-4: '&9play.hyrium.com'
     nothing-5: '&7-----------------&d'

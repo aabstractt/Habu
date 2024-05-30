@@ -18,6 +18,7 @@ final class ProfileRegistry {
     public const LOBBY_SCOREBOARD = 'lobby';
     public const QUEUE_SCOREBOARD = 'queue';
     public const MATCH_STARTING_SCOREBOARD = 'match-starting';
+    public const MATCH_STARTING_PARTY_SCOREBOARD = 'match-starting-party';
     public const MATCH_PLAYING_SCOREBOARD = 'match-playing';
     public const MATCH_ENDING_SCOREBOARD = 'match-ending';
 

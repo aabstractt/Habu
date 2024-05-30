@@ -8,6 +8,7 @@ use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\OpponentDuelTrait;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
@@ -20,6 +21,27 @@ use function count;
 final class NormalDuelImpl extends Duel {
     use SpectatingDuelTrait;
     use OpponentDuelTrait;
+
+    /**
+     * @param Player     $player
+     * @param DuelMember $duelMember
+     */
+    public function processPlayerPrepare(Player $player, DuelMember $duelMember): void {
+        $this->playersSpawn[$player->getXuid()] = count($this->playersSpawn);
+
+        $opponentName = $this->getOpponentName($player->getXuid());
+        if ($opponentName === null) {
+            throw new RuntimeException('Opponent not found.');
+        }
+
+        $player->sendMessage(TranslationKey::DUEL_OPPONENT_FOUND()->build(
+            $opponentName,
+            $this->ranked ? 'Ranked' : 'Unranked',
+            $this->kit->getName()
+        ));
+
+        Habu::applyScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
+    }
 
     /**
      * Called when the duel stage changes
@@ -81,25 +103,6 @@ final class NormalDuelImpl extends Duel {
 
             $profile->setElo($id === 0 ? $winElo : $lostElo);
         }
-    }
-
-    /**
-     * @param Player     $player
-     * @param DuelMember $duelMember
-     */
-    public function processPlayerPrepare(Player $player, DuelMember $duelMember): void {
-        $this->playersSpawn[$player->getXuid()] = count($this->playersSpawn);
-
-        $opponentName = $this->getOpponentName($player->getXuid());
-        if ($opponentName === null) {
-            throw new RuntimeException('Opponent not found.');
-        }
-
-        $player->sendMessage(TranslationKey::DUEL_OPPONENT_FOUND()->build(
-            $opponentName,
-            $this->ranked ? 'Ranked' : 'Unranked',
-            $this->kit->getName()
-        ));
     }
 
     /**

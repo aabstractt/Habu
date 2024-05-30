@@ -29,7 +29,7 @@ final class PartyDuelForm extends SimpleForm {
             if (!$kit->isPartyPlayable()) continue;
 
             $this->addButton(
-                new Button('§u' . TextFormat::BOLD . $kit->getName() . "\n" . TextFormat::DARK_GRAY . 'Click to select!'),
+                new Button('§u' . TextFormat::BOLD . $kit->getName() . "\n" . TextFormat::RESET . TextFormat::DARK_GRAY . 'Click to select!'),
                 function (Player $source, ?int $buttonIndex) use ($party, $kit): void {
                     if ($buttonIndex === null) return;
 
