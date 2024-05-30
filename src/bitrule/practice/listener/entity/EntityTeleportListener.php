@@ -26,7 +26,6 @@ final class EntityTeleportListener implements Listener {
         $to = $ev->getTo();
         if ($to->getWorld() === $duel->getWorld()) return;
 
-        $duel->removePlayer($entity, true);
-        $duel->postRemovePlayer($entity);
+        DuelRegistry::getInstance()->quitPlayer($entity);
     }
 }

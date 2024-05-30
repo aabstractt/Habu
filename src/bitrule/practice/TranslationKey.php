@@ -36,6 +36,7 @@ use function ucwords;
  * @method static self PLAYER_WELCOME_MESSAGE()
  * @method static self PLAYER_LEFT_MESSAGE()
  * @method static self PLAYER_QUEUE_JOINED()
+ * @method static self PLAYER_QUEUE_LEFT()
  */
 final class TranslationKey {
     use EnumTrait;
@@ -203,6 +204,14 @@ final class TranslationKey {
             self::create(
                 'PLAYER_QUEUE_JOINED',
                 'player.queue-joined',
+                [
+                	'kit',
+                	'type'
+                ]
+            ),
+            self::create(
+                'PLAYER_QUEUE_LEFT',
+                'player.queue-leaved',
                 [
                 	'kit',
                 	'type'

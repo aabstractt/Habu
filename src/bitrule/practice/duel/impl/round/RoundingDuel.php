@@ -80,18 +80,32 @@ abstract class RoundingDuel extends Duel {
         }
 
         try {
-            DuelRegistry::getInstance()->createDuel(
-                array_filter(
+            $duelRegistry = DuelRegistry::getInstance();
+            $duelRegistry->postPrepare(
+                totalPlayers: array_filter(
                     array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $players),
                     fn(?Player $player) => $player !== null && $player->isOnline()
                 ),
-                array_filter(
-                    array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $literalSpectators),
-                    fn(?Player $player) => $player !== null && $player->isOnline()
+                duel: $duelRegistry->createRoundingDuel(
+                    $this->kit,
+                    $this->ranked,
+                    $this->roundingInfo
                 ),
-                $this->kit,
-                $this->ranked,
-                $this->roundingInfo
+                onCompletion: function (Duel $duel) use ($literalSpectators): void {
+                    $spectators = array_filter(
+                        array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $literalSpectators),
+                        fn(?Player $player) => $player !== null && $player->isOnline()
+                    );
+                    if (count($spectators) === 0) {
+                        Habu::getInstance()->getLogger()->info('No spectators found for the duel.');
+
+                        return;
+                    }
+
+                    foreach ($spectators as $spectator) {
+                        $duel->joinSpectator($spectator);
+                    }
+                }
             );
         } catch (Exception $e) {
             Habu::getInstance()->getLogger()->error($e->getMessage());

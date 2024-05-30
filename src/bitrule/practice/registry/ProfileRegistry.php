@@ -58,12 +58,6 @@ final class ProfileRegistry {
         $profile = $this->profiles[$player->getXuid()] ?? null;
         if ($profile === null) return;
 
-        $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
-        if ($duel !== null) {
-            $duel->removePlayer($player, true);
-            $duel->postRemovePlayer($player);
-        }
-
         QueueRegistry::getInstance()->removeQueue($profile);
 
         unset($this->profiles[$player->getXuid()]);

@@ -198,8 +198,9 @@ abstract class Duel {
                 throw new RuntimeException('Player ' . $duelMember->getName() . ' is not online');
             }
 
-            $this->removePlayer($player, false);
-            $this->postRemovePlayer($player);
+            DuelRegistry::getInstance()->quitPlayer($player);
+//            $this->removePlayer($player, false);
+//            $this->postRemovePlayer($player);
         }
 
         $this->loaded = false;
@@ -237,8 +238,6 @@ abstract class Duel {
         if ($duelMember === null) return;
 
         unset($this->members[$player->getXuid()]);
-
-        DuelRegistry::getInstance()->quitPlayer($player->getXuid());
 
         $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
         if ($profile === null) {

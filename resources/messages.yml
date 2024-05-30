@@ -39,6 +39,7 @@ player:
     &7Welcome to &bPractice&7, &e<player>&7!
     &7Right-click the &b&l&nNether Star &7&7to queue for a duel.
   queue-joined: '&aYou have joined the &b<type> <kit>&a queue.'
+  queue-leaved: '&aYou have left the &b<type> <kit>&a queue.'
 
 items:
   competitive-duel:

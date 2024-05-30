@@ -22,6 +22,7 @@ use bitrule\practice\listener\party\PartyCreateListener;
 use bitrule\practice\listener\party\PartyDisbandListener;
 use bitrule\practice\listener\party\PartyTransferListener;
 use bitrule\practice\listener\world\BlockBreakListener;
+use bitrule\practice\listener\world\WorldSoundListener;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ArenaRegistry;
@@ -61,12 +62,12 @@ final class Habu extends PluginBase {
     protected function onEnable(): void {
         self::setInstance($this);
 
-        $bootstrap = 'phar://' . $this->getServer()->getPluginPath() . $this->getName() . '.phar/vendor/autoload.php';
-        if (!is_file($bootstrap)) {
-            throw new RuntimeException('Could not find autoload.php in plugin phar, directory: ' . $bootstrap);
-        }
-
-        require_once $bootstrap;
+//        $bootstrap = 'phar://' . $this->getServer()->getPluginPath() . $this->getName() . '.phar/vendor/autoload.php';
+//        if (!is_file($bootstrap)) {
+//            throw new RuntimeException('Could not find autoload.php in plugin phar, directory: ' . $bootstrap);
+//        }
+//
+//        require_once $bootstrap;
 
         $this->saveDefaultConfig();
         $this->saveResource('scoreboard.yml', true);
@@ -91,6 +92,7 @@ final class Habu extends PluginBase {
         // Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new BlockBreakListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new WorldSoundListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerExhaustListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerQuitListener(), $this);
 

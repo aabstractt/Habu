@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
+use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Habu;
 use bitrule\practice\profile\Profile;
@@ -29,55 +30,44 @@ final class QueueRegistry {
      * Also checks if there is an opponent in the queue
      * If there is, it will remove both players from the queue
      *
-     * @param Profile $sourceprofile
+     * @param Profile $sourceProfile
      * @param string  $kitName
      * @param bool    $ranked
      *
      * @return Queue|null
      */
-    public function createQueue(Profile $sourceprofile, string $kitName, bool $ranked): ?Queue {
-        $promiseResolver = new PromiseResolver();
-
+    public function createQueue(Profile $sourceProfile, string $kitName, bool $ranked): ?Queue {
         if (($kit = KitRegistry::getInstance()->getKit($kitName)) === null) {
             throw new RuntimeException('Kit not found.');
         }
 
-        $this->queues[$sourceXuid = $sourceprofile->getXuid()] = $queue = new Queue($sourceXuid, $kitName, $ranked, time());
+        $this->queues[$sourceXuid = $sourceProfile->getXuid()] = $queue = new Queue($sourceXuid, $kitName, $ranked, time());
 
         $opponentMatchQueue = $this->lookupOpponent($queue);
         if ($opponentMatchQueue === null) return $queue;
 
-        $this->removeQueue($sourceprofile);
-
-        if (($opponentprofile = ProfileRegistry::getInstance()->getProfile($opponentMatchQueue->getXuid())) === null) {
+        if (($opponentProfile = ProfileRegistry::getInstance()->getProfile($opponentMatchQueue->getXuid())) === null) {
             throw new RuntimeException('Opponent profile no exists.');
         }
 
-        $this->removeQueue($opponentprofile);
-
         /** @var Player[] $totalPlayers */
         $totalPlayers = [];
-        foreach ([$sourceprofile, $opponentprofile] as $profile) {
+        foreach ([$sourceProfile, $opponentProfile] as $profile) {
             $player = Server::getInstance()->getPlayerExact($profile->getName());
             if ($player === null || !$player->isOnline()) continue;
 
             $totalPlayers[] = $player;
+
+            $this->removeQueue($profile);
         }
 
-        $promiseResolver->resolve($queue);
-
         try {
-            DuelRegistry::getInstance()->createDuel(
+            DuelRegistry::getInstance()->postPrepare(
                 $totalPlayers,
-                [],
-                $kit,
-                $ranked
-//            new RoundingInfo(
-//                0,
-//                3,
-//                [],
-//                []
-//            )
+                DuelRegistry::getInstance()->createNormalDuel(
+                    $kit,
+                    $ranked
+                )
             );
         } catch (Exception $e) {
             foreach ($totalPlayers as $player) {

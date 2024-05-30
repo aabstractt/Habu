@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\listener\defaults;
 
 use bitrule\practice\Habu;
+use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\Listener;
@@ -25,8 +26,6 @@ final class PlayerQuitListener implements Listener {
         $ev->setQuitMessage(TranslationKey::PLAYER_LEFT_MESSAGE()->build($player->getName()));
 
         ProfileRegistry::getInstance()->quitPlayer($player);
-
-        // Listen to the event when a player quits
-        Habu::getInstance()->getPartyAdapter()?->onPlayerQuit($player);
+        DuelRegistry::getInstance()->quitPlayer($player);
     }
 }

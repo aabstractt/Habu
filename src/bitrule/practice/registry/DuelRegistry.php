@@ -11,8 +11,10 @@ use bitrule\practice\duel\impl\NormalDuelImpl;
 use bitrule\practice\duel\impl\round\NormalRoundingDuelImpl;
 use bitrule\practice\duel\impl\round\RoundingDuel;
 use bitrule\practice\duel\impl\round\RoundingInfo;
+use bitrule\practice\duel\impl\TeamDuelImpl;
 use bitrule\practice\kit\Kit;
 use bitrule\practice\Habu;
+use Closure;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
@@ -33,55 +35,91 @@ final class DuelRegistry {
     private array $playersDuel = [];
 
     /**
-     * @param Player[]             $players
-     * @param Player[]             $spectators
      * @param Kit                  $kit
      * @param bool                 $ranked
-     * @param RoundingInfo|null    $roundingInfo
      * @param ArenaProperties|null $arenaProperties
      *
      * @return Duel
      */
-    public function createDuel(
-        array $players,
-        array $spectators,
-        Kit $kit,
-        bool $ranked,
-        ?RoundingInfo $roundingInfo = null,
-        ?ArenaProperties $arenaProperties = null
-    ): Duel {
+    public function createNormalDuel(Kit $kit, bool $ranked, ?ArenaProperties $arenaProperties = null): Duel {
         $arenaProperties ??= ArenaRegistry::getInstance()->getRandomArena($kit);
         if ($arenaProperties === null) {
             throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
 
-        if ($roundingInfo === null) {
-            $duel = new NormalDuelImpl($arenaProperties, $kit, $this->duelsPlayed++, $ranked);
-        } else {
-            $duel = new NormalRoundingDuelImpl($arenaProperties, $kit, $roundingInfo, $this->duelsPlayed++, $ranked);
+        return new NormalDuelImpl(
+            $arenaProperties,
+            $kit,
+            $this->duelsPlayed++,
+            $ranked
+        );
+    }
+
+    /**
+     * @param Kit                  $kit
+     * @param bool                 $ranked
+     * @param RoundingInfo         $roundingInfo
+     * @param ArenaProperties|null $arenaProperties
+     *
+     * @return Duel
+     */
+    public function createRoundingDuel(Kit $kit, bool $ranked, RoundingInfo $roundingInfo, ?ArenaProperties $arenaProperties = null): Duel {
+        $arenaProperties ??= ArenaRegistry::getInstance()->getRandomArena($kit);
+        if ($arenaProperties === null) {
+            throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
         }
 
+        return new NormalRoundingDuelImpl(
+            $arenaProperties,
+            $kit,
+            $roundingInfo,
+            $this->duelsPlayed++,
+            $ranked
+        );
+    }
+
+    /**
+     * @param Kit                  $kit
+     * @param ArenaProperties|null $arenaProperties
+     *
+     * @return Duel
+     */
+    public function createTeamDuel(Kit $kit, ?ArenaProperties $arenaProperties = null): Duel {
+        $arenaProperties ??= ArenaRegistry::getInstance()->getRandomArena($kit);
+        if ($arenaProperties === null) {
+            throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
+        }
+
+        return new TeamDuelImpl($arenaProperties, $kit, $this->duelsPlayed++, false);
+    }
+
+    /**
+     * @param Player[]        $totalPlayers
+     * @param Duel         $duel
+     * @param ?Closure(Duel): void $onCompletion
+     */
+    public function postPrepare(array $totalPlayers, Duel $duel, ?Closure $onCompletion = null): void {
         // TODO: Cache the player duel to prevent make many iterations for only a player
         // that helps a bit with the performance
-        foreach ($players as $player) {
+        foreach ($totalPlayers as $player) {
             $this->playersDuel[$player->getXuid()] = $duel->getFullName();
         }
 
         // TODO: Copy the world from the backup to the worlds folder
         // after that, load the world and prepare our duel!
         ArenaRegistry::getInstance()->loadWorld(
-            $arenaProperties->getOriginalName(),
+            $duel->getArenaProperties()->getOriginalName(),
             $duel->getFullName(),
-            function() use ($spectators, $players, $duel): void {
-                $duel->prepare($players);
+            function() use ($onCompletion, $totalPlayers, $duel): void {
+                $duel->prepare($totalPlayers);
 
-                foreach ($spectators as $spectator) $duel->joinSpectator($spectator);
+                if ($onCompletion !== null) {
+                    $onCompletion($duel);
+                }
             }
         );
 
         $this->duels[$duel->getFullName()] = $duel;
-
-        return $duel;
     }
 
     /**
@@ -116,10 +154,19 @@ final class DuelRegistry {
     }
 
     /**
-     * @param string $sourceXuid
+     * @param Player $source
      */
-    public function quitPlayer(string $sourceXuid): void {
-        unset($this->playersDuel[$sourceXuid]);
+    public function quitPlayer(Player $source): void {
+        $duelId = $this->playersDuel[$source->getXuid()] ?? null;
+        if ($duelId === null) return;
+
+        unset($this->playersDuel[$source->getXuid()]);
+
+        $duel = $this->duels[$duelId] ?? null;
+        if ($duel === null) return;
+
+        $duel->removePlayer($source, true);
+        $duel->postRemovePlayer($source);
     }
 
     /**
