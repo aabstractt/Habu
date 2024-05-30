@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
-use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\impl\NormalDuelImpl;
 use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Habu;
 use bitrule\practice\profile\Profile;
 use Exception;
 use pocketmine\player\Player;
-use pocketmine\promise\PromiseResolver;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;

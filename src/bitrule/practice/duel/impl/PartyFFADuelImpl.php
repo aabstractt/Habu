@@ -7,13 +7,13 @@ namespace bitrule\practice\duel\impl;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
-use bitrule\practice\registry\DuelRegistry;
-use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
 use pocketmine\player\Player;
-use pocketmine\Server;
-use pocketmine\utils\TextFormat;
 use RuntimeException;
+use function array_filter;
+use function array_map;
+use function count;
+use function implode;
 
 final class PartyFFADuelImpl extends Duel {
     use SpectatingDuelTrait;
@@ -23,7 +23,7 @@ final class PartyFFADuelImpl extends Duel {
      * @param DuelMember $duelMember
      */
     public function processPlayerPrepare(Player $player, DuelMember $duelMember): void {
-        $this->playersSpawn[$player->getXuid()] = count($this->playersSpawn);
+        $this->playersSpawn[$player->getXuid()] = count($this->playersSpawn) % 2 === 0 ? 0 : 1;
 
         $opponents = array_map(
             fn(DuelMember $member): string => $member->getName(),

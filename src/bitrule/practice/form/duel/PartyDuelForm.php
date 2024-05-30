@@ -6,7 +6,6 @@ namespace bitrule\practice\form\duel;
 
 use bitrule\parties\object\Party;
 use bitrule\practice\duel\impl\PartyFFADuelImpl;
-use bitrule\practice\kit\Kit;
 use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\KitRegistry;
@@ -17,6 +16,7 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use Ramsey\Uuid\Uuid;
+use function count;
 
 final class PartyDuelForm extends SimpleForm {
 

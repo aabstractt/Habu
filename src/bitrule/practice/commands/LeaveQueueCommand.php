@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bitrule\practice\commands;
 
 use bitrule\practice\Habu;
-use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\registry\QueueRegistry;
 use bitrule\practice\TranslationKey;
@@ -13,7 +12,6 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
-use function count;
 
 final class LeaveQueueCommand extends Command {
 

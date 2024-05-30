@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\party;
 
-use bitrule\parties\event\PartyDisbandEvent;
 use bitrule\parties\event\PartyTransferEvent;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;

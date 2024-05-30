@@ -9,14 +9,15 @@ use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
-use bitrule\practice\kit\Kit;
 use bitrule\practice\Habu;
+use bitrule\practice\kit\Kit;
 use bitrule\practice\registry\DuelRegistry;
 use Exception;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use function array_filter;
 use function array_map;
+use function count;
 
 abstract class RoundingDuel extends Duel {
     use SpectatingDuelTrait;

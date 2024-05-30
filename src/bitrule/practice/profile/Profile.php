@@ -163,20 +163,20 @@ final class Profile {
         if ($party !== null && $party->getOwnership()->getXuid() === $player->getXuid()) {
             /** @var array<int, array<int, string|Item>> $items */
             $items = [
-                0 => ['party-split', VanillaItems::DIAMOND_SWORD()],
-                1 => ['party-ffa', VanillaItems::GOLDEN_SWORD()],
-                4 => ['parties-duel', VanillaItems::CLOCK()],
-                7 => ['parties', VanillaItems::PAPER()],
-                8 => ['settings', VanillaItems::COMPASS()]
+            	0 => ['party-split', VanillaItems::DIAMOND_SWORD()],
+            	1 => ['party-ffa', VanillaItems::GOLDEN_SWORD()],
+            	4 => ['parties-duel', VanillaItems::CLOCK()],
+            	7 => ['parties', VanillaItems::PAPER()],
+            	8 => ['settings', VanillaItems::COMPASS()]
             ];
         } else {
             /** @var array<int, array<int, string|Item>> $items */
             $items = [
-                0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],
-                1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
-                4 => ['spectate', VanillaItems::CLOCK()],
-                7 => ['parties', VanillaItems::PAPER()],
-                8 => ['settings', VanillaItems::COMPASS()]
+            	0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],
+            	1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
+            	4 => ['spectate', VanillaItems::CLOCK()],
+            	7 => ['parties', VanillaItems::PAPER()],
+            	8 => ['settings', VanillaItems::COMPASS()]
             ];
         }
 

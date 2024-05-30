@@ -11,6 +11,7 @@ use bitrule\practice\registry\DuelRegistry;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\utils\TextFormat;
+use function is_string;
 
 final class PlayerInteractListener implements Listener {
 

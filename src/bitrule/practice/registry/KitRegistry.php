@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
-use bitrule\practice\kit\Kit;
 use bitrule\practice\Habu;
+use bitrule\practice\kit\Kit;
 use JsonException;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\Durable;
@@ -79,7 +79,7 @@ final class KitRegistry {
 
         $config = new Config(Habu::getInstance()->getDataFolder() . 'kits.yml');
         $config->set($kit->getName(), [
-            'party_playable' => $kit->isPartyPlayable(),
+        	'party_playable' => $kit->isPartyPlayable(),
         	'inventoryItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getInventoryItems()),
         	'armorItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getArmorItems()),
         	'kbProfile' => $kit->getKnockbackProfile()

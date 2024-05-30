@@ -115,7 +115,7 @@ final class Habu extends PluginBase {
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),
         	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
-            new LeaveQueueCommand('leavequeue', 'Leave from the queue.', '/leavequeue'),
+        	new LeaveQueueCommand('leavequeue', 'Leave from the queue.', '/leavequeue'),
         	new KnockbackProfileCommand(),
         	new DurabilityCommand('durability')
         ]);
@@ -212,7 +212,7 @@ final class Habu extends PluginBase {
 
         $stage = $duel->getStage();
         if ($stage instanceof StageScoreboard) return $stage->replacePlaceholders($duel, $player, $profile, $identifier);
- 
+
         return null;
     }
 

@@ -6,7 +6,6 @@ namespace bitrule\practice\commands\knockback;
 
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
-use bitrule\practice\commands\KnockbackProfileCommand;
 use bitrule\practice\Habu;
 use bitrule\practice\kit\KnockbackProfile;
 use bitrule\practice\registry\KnockbackRegistry;

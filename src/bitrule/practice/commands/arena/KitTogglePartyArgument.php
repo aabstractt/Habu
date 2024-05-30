@@ -9,6 +9,7 @@ use bitrule\practice\registry\KitRegistry;
 use Exception;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
+use function count;
 
 final class KitTogglePartyArgument extends Argument {
 

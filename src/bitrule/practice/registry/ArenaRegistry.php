@@ -6,8 +6,8 @@ namespace bitrule\practice\registry;
 
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
-use bitrule\practice\kit\Kit;
 use bitrule\practice\Habu;
+use bitrule\practice\kit\Kit;
 use Closure;
 use Exception;
 use pocketmine\Server;

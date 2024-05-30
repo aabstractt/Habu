@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
-use bitrule\practice\kit\KnockbackProfile;
 use bitrule\practice\Habu;
+use bitrule\practice\kit\KnockbackProfile;
 use Exception;
 use InvalidArgumentException;
 use pocketmine\utils\Config;

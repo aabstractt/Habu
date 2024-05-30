@@ -61,14 +61,14 @@ final class TranslationKey {
                 'DUEL_END_STATISTICS_POT',
                 'duel.end-statistics-pot',
                 [
-                    'opponent',
-                    'self-elo-changes',
-                    'self-critics',
-                    'self-damage-dealt',
-                    'self-total-potions',
-                    'opponent-critics',
-                    'opponent-damage-dealt',
-                    'opponent-total-potions'
+                	'opponent',
+                	'self-elo-changes',
+                	'self-critics',
+                	'self-damage-dealt',
+                	'self-total-potions',
+                	'opponent-critics',
+                	'opponent-damage-dealt',
+                	'opponent-total-potions'
                 ]
             ),
             self::create(
@@ -101,9 +101,9 @@ final class TranslationKey {
                 'PARTY_DUEL_FFA_END',
                 'duel.party-ffa-end',
                 [
-                    'winner',
-                    'spectators',
-                    'damage-dealt'
+                	'winner',
+                	'spectators',
+                	'damage-dealt'
                 ]
             ),
             self::create(
@@ -234,9 +234,9 @@ final class TranslationKey {
                 'QUEUE_LADDER_SELECTOR',
                 'queue.ladder-selector',
                 [
-                    'name',
-                    'queueing-count',
-                    'fighting-count',
+                	'name',
+                	'queueing-count',
+                	'fighting-count',
                 ]
             )
         );
