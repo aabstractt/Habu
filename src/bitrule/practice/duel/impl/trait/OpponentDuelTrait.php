@@ -26,7 +26,7 @@ trait OpponentDuelTrait {
 
         if ($this->getSpawnId($xuid) === -1) return null;
 
-        foreach ($this->getMembers() as $duelMember) {
+        foreach ($this->getPlaying() as $duelMember) {
             if ($duelMember->getXuid() === $xuid) continue;
 
             return $duelMember->getName();
@@ -47,7 +47,7 @@ trait OpponentDuelTrait {
 
         if ($this->getSpawnId($player->getXuid()) === -1) return null;
 
-        foreach ($this->getMembers() as $duelMember) {
+        foreach ($this->getPlaying() as $duelMember) {
             if ($duelMember->getXuid() === $player->getXuid()) continue;
 
             return $duelMember;

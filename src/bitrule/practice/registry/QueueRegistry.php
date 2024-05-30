@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\registry;
 
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\impl\NormalDuelImpl;
 use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Habu;
 use bitrule\practice\profile\Profile;
@@ -14,6 +15,7 @@ use pocketmine\promise\PromiseResolver;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
+use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use function time;
 
@@ -62,10 +64,17 @@ final class QueueRegistry {
         }
 
         try {
-            DuelRegistry::getInstance()->postPrepare(
+            $arenaProperties = ArenaRegistry::getInstance()->getRandomArena($kit);
+            if ($arenaProperties === null) {
+                throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
+            }
+
+            DuelRegistry::getInstance()->prepareDuel(
                 $totalPlayers,
-                DuelRegistry::getInstance()->createNormalDuel(
+                new NormalDuelImpl(
+                    $arenaProperties,
                     $kit,
+                    Uuid::uuid4()->toString(),
                     $ranked
                 )
             );

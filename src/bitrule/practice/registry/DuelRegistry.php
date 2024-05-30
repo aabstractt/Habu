@@ -19,6 +19,7 @@ use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
+use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use function abs;
 use function count;
@@ -33,27 +34,6 @@ final class DuelRegistry {
     private int $duelsPlayed = 0;
     /** @var array<string, string> */
     private array $playersDuel = [];
-
-    /**
-     * @param Kit                  $kit
-     * @param bool                 $ranked
-     * @param ArenaProperties|null $arenaProperties
-     *
-     * @return Duel
-     */
-    public function createNormalDuel(Kit $kit, bool $ranked, ?ArenaProperties $arenaProperties = null): Duel {
-        $arenaProperties ??= ArenaRegistry::getInstance()->getRandomArena($kit);
-        if ($arenaProperties === null) {
-            throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
-        }
-
-        return new NormalDuelImpl(
-            $arenaProperties,
-            $kit,
-            $this->duelsPlayed++,
-            $ranked
-        );
-    }
 
     /**
      * @param Kit                  $kit
@@ -73,24 +53,9 @@ final class DuelRegistry {
             $arenaProperties,
             $kit,
             $roundingInfo,
-            $this->duelsPlayed++,
+            Uuid::uuid4()->toString(),
             $ranked
         );
-    }
-
-    /**
-     * @param Kit                  $kit
-     * @param ArenaProperties|null $arenaProperties
-     *
-     * @return Duel
-     */
-    public function createTeamDuel(Kit $kit, ?ArenaProperties $arenaProperties = null): Duel {
-        $arenaProperties ??= ArenaRegistry::getInstance()->getRandomArena($kit);
-        if ($arenaProperties === null) {
-            throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
-        }
-
-        return new TeamDuelImpl($arenaProperties, $kit, $this->duelsPlayed++, false);
     }
 
     /**
@@ -98,7 +63,7 @@ final class DuelRegistry {
      * @param Duel         $duel
      * @param ?Closure(Duel): void $onCompletion
      */
-    public function postPrepare(array $totalPlayers, Duel $duel, ?Closure $onCompletion = null): void {
+    public function prepareDuel(array $totalPlayers, Duel $duel, ?Closure $onCompletion = null): void {
         // TODO: Cache the player duel to prevent make many iterations for only a player
         // that helps a bit with the performance
         foreach ($totalPlayers as $player) {
@@ -111,10 +76,20 @@ final class DuelRegistry {
             $duel->getArenaProperties()->getOriginalName(),
             $duel->getFullName(),
             function() use ($onCompletion, $totalPlayers, $duel): void {
-                $duel->prepare($totalPlayers);
+                try {
+                    $duel->prepare($totalPlayers);
 
-                if ($onCompletion !== null) {
-                    $onCompletion($duel);
+                    if ($onCompletion !== null) {
+                        $onCompletion($duel);
+                    }
+                } catch (\Exception $e) {
+                    Habu::getInstance()->getLogger()->error('Failed to prepare duel: ' . $e->getMessage());
+
+                    foreach ($totalPlayers as $player) {
+                        $player->sendMessage('Failed to prepare duel: ' . $e->getMessage());
+
+                        $this->quitPlayer($player);
+                    }
                 }
             }
         );

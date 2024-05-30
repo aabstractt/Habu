@@ -31,7 +31,7 @@ final class KitCreateArgument extends Argument {
 
         $kit = KitRegistry::getInstance()->getKit($args[0]);
         if ($kit === null) {
-            $kit = new Kit($args[0], [], [], 'default');
+            $kit = new Kit($args[0], true, [], [], 'default');
         }
 
         $kit->setInventoryItems($sender->getInventory()->getContents());

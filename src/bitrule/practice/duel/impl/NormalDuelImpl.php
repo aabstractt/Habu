@@ -74,17 +74,13 @@ final class NormalDuelImpl extends Duel {
             (string) $selfDuelStatistics->getDamageDealt(),
         ));
 
-        // Apply elo changes to the duelMember
-        $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
-        if ($profile === null) return;
+        $xuids = [$player->getXuid(), $opponentPlayer->getXuid()];
+        foreach ($xuids as $id => $xuid) {
+            $profile = ProfileRegistry::getInstance()->getProfile($xuid);
+            if ($profile === null) continue;
 
-        $profile->setElo($winElo);
-
-        // Apply elo changes to the loser
-        $profile = ProfileRegistry::getInstance()->getProfile($opponentPlayer->getXuid());
-        if ($profile === null) return;
-
-        $profile->setElo($lostElo);
+            $profile->setElo($id === 0 ? $winElo : $lostElo);
+        }
     }
 
     /**

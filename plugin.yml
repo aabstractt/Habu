@@ -13,6 +13,8 @@ permissions:
     default: op
   arena.command.createkit:
     default: op
+  arena.command.toggleparty:
+    default: op
   arena.command.create:
     default: op
   arena.command.save:
@@ -22,6 +24,8 @@ permissions:
   arena.command.yaw:
     default: op
   practice.command.joinqueue:
+    default: true
+  practice.command.leavequeue:
     default: true
   kb.command:
     default: op

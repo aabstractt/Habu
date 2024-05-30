@@ -9,7 +9,7 @@ lines:
     total-queue-count: ' &fQueueing: &b'
     total-duel-count: ' &fFighting: &b'
     nothing-2: '&b&d&c'
-    nothing-3: '&9play.hyrium.com'
+    nothing-3: '   &9play.hyrium.com'
     nothing-4: '&7-----------------&e'
 
   queue:
@@ -23,8 +23,8 @@ lines:
     queue-type: '&f Type: &b'
     queue-kit: '&f Kit: &b'
     queue-duration: '&f Duration: &b'
-    nothing-4: '&&9&l'
-    nothing-5: '&9play.hyrium.com'
+    nothing-4: '&9&l'
+    nothing-5: '   &9play.hyrium.com'
     nothing-6: '&7-----------------&c'
 
   match-starting:
@@ -35,7 +35,7 @@ lines:
     your-ping: '&fYour Ping: &b'
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-3: '&9&l'
-    nothing-4: '&9play.hyrium.com'
+    nothing-4: '   &9play.hyrium.com'
     nothing-5: '&7-----------------&d'
 
   match-playing:
@@ -46,7 +46,7 @@ lines:
     your-ping: '&fYour Ping: &b'
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-2: '&9&l'
-    nothing-3: '&9play.hyrium.com'
+    nothing-3: '   &9play.hyrium.com'
     nothing-4: '&7-----------------&d'
 
   match-playing-boxing:
@@ -59,7 +59,7 @@ lines:
     your-ping: '&fYour Ping: &b'
     duel-opponent-ping: '&fTheir Ping: &b'
     nothing-2: '&9&l'
-    nothing-3: '&9play.hyrium.com'
+    nothing-3: '   &9play.hyrium.com'
     nothing-4: '&7-----------------&d'
 
   match-playing-fireball:
@@ -73,16 +73,25 @@ lines:
     duel-self-kills: '  &fKills: &b'
     duel-duration: '  &fDuration: &b'
     nothing-4: '&9&l'
-    nothing-5: '&9play.hyrium.com'
+    nothing-5: '   &9play.hyrium.com'
     nothing-6: '&7-----------------&d'
+
+  match-playing-party:
+    nothing-0: '&7-----------------'
+    duel-players: '&fPlayers: &9'
+    nothing-1: '&7'
+    duel-duration: '&fDuration: &9'
+    nothing-2: '&9&l'
+    nothing-3: '   &9play.hyrium.com'
+    nothing-4: '&7-----------------&d'
 
   match-ending:
     nothing-0: '&7-----------------'
-    nothing-1: 'Match ended'
-    duel-ending-defeat: '&c&lDEFEAT'
-    duel-ending-victory: '&a&lVICTORY'
+    nothing-1: ' Match ended'
+    duel-ending-defeat: ' &c&lDEFEAT'
+    duel-ending-victory: ' &a&lVICTORY'
     nothing-2: '&d'
-    duel-duration: '&fDuration: &b'
+    duel-duration: ' &fDuration: &b'
     nothing-3: '&9&l'
-    nothing-4: '&9play.hyrium.com'
+    nothing-4: '   &9play.hyrium.com'
     nothing-5: '&7-----------------&d'

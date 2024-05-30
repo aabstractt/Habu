@@ -64,7 +64,7 @@ final class JoinQueueCommand extends Command {
         $queue = QueueRegistry::getInstance()->createQueue($profile, $kit->getName(), isset($args[1]) && $args[1] === 'ranked');
         if ($queue === null) return;
 
-        $sender->sendMessage(TranslationKey::PLAYER_QUEUE_JOINED()->build(
+        $sender->sendMessage(TranslationKey::QUEUE_PLAYER_JOINED()->build(
             $kit->getName(),
             $queue->isRanked() ? 'Ranked' : 'Unranked'
         ));

@@ -59,6 +59,7 @@ final class KitRegistry {
 
             $this->kits[strtolower($kitName)] = new Kit(
                 $kitName,
+                $kitData['party_playable'] ?? true,
                 array_map(fn(array $itemData) => self::parseItem($itemData), $kitData['inventoryItems']),
                 array_map(fn(array $itemData) => self::parseItem($itemData), $kitData['armorItems']),
                 $kitData['kbProfile']
@@ -78,6 +79,7 @@ final class KitRegistry {
 
         $config = new Config(Habu::getInstance()->getDataFolder() . 'kits.yml');
         $config->set($kit->getName(), [
+            'party_playable' => $kit->isPartyPlayable(),
         	'inventoryItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getInventoryItems()),
         	'armorItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getArmorItems()),
         	'kbProfile' => $kit->getKnockbackProfile()

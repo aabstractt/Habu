@@ -30,11 +30,11 @@ abstract class RoundingDuel extends Duel {
      * @param ArenaProperties $arenaProperties
      * @param Kit             $kit
      * @param RoundingInfo    $roundingInfo
-     * @param int             $id
+     * @param string          $uniqueId
      * @param bool            $ranked
      */
-    public function __construct(ArenaProperties $arenaProperties, Kit $kit, RoundingInfo $roundingInfo, int $id, bool $ranked) {
-        parent::__construct($arenaProperties, $kit, $id, $ranked);
+    public function __construct(ArenaProperties $arenaProperties, Kit $kit, RoundingInfo $roundingInfo, string $uniqueId, bool $ranked) {
+        parent::__construct($arenaProperties, $kit, $uniqueId, $ranked);
 
         $this->roundingInfo = $roundingInfo;
     }
@@ -66,7 +66,7 @@ abstract class RoundingDuel extends Duel {
             $this->getSpectators(),
             fn(DuelMember $duelMember) => !$duelMember->isPlaying()
         );
-        $players = $this->getMembers();
+        $players = $this->getPlaying();
 
         $this->postEnd();
 
@@ -81,7 +81,7 @@ abstract class RoundingDuel extends Duel {
 
         try {
             $duelRegistry = DuelRegistry::getInstance();
-            $duelRegistry->postPrepare(
+            $duelRegistry->prepareDuel(
                 totalPlayers: array_filter(
                     array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $players),
                     fn(?Player $player) => $player !== null && $player->isOnline()

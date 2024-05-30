@@ -11,6 +11,12 @@ duel:
   opponent-found: '&bPractice &8> &7Found a &f<type> <kit>&7 match against &c<player>'
   winner-broadcast: '&a<winner>&7 has won a &e<kit>&7 duel against &c<loser>.'
 
+  party-ffa-end: |-
+    &b&lParty FFA Statistics&r
+      &7Winner: &a<winner>
+      &7Damage Dealt: &b<damage-dealt>
+    &7
+      &7Spectators: &e<spectators>
   player-dead: '&c<player>&7 was slain by &a<killer>'
   player-dead-without-killer: '&c<player>&7 was slain.'
 
@@ -38,8 +44,15 @@ player:
   welcome-message: |-
     &7Welcome to &bPractice&7, &e<player>&7!
     &7Right-click the &b&l&nNether Star &7&7to queue for a duel.
-  queue-joined: '&aYou have joined the &b<type> <kit>&a queue.'
-  queue-leaved: '&aYou have left the &b<type> <kit>&a queue.'
+
+queue:
+  player-joined: '&aYou have joined the &b<type> <kit>&a queue.'
+  player-leaved: '&aYou have left the &b<type> <kit>&a queue.'
+  player-queueing: '&aYou are currently queueing for a &b<type> <kit>&a duel.'
+
+  ladder-selector: |-
+    &9<name>
+    &8Playing: &9<fighting-count> &9| &8In-Queue: &9<queueing-count>
 
 items:
   competitive-duel:

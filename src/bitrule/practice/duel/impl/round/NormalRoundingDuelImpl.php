@@ -25,7 +25,7 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
      * to Ending.
      */
     public function end(): void {
-        foreach ($this->getMembers() as $duelMember) {
+        foreach ($this->getPlaying() as $duelMember) {
             $player = $duelMember->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
@@ -132,7 +132,7 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
     public function getOpponentName(string $xuid): ?string {
         if ($this->getSpawnId($xuid) === -1) return null;
 
-        foreach ($this->getMembers() as $duelMember) {
+        foreach ($this->getPlaying() as $duelMember) {
             if ($duelMember->getXuid() === $xuid) continue;
 
             return $duelMember->getName();
@@ -149,7 +149,7 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
     public function getOpponent(Player $player): ?DuelMember {
         if ($this->getSpawnId($player->getXuid()) === -1) return null;
 
-        foreach ($this->getMembers() as $duelMember) {
+        foreach ($this->getPlaying() as $duelMember) {
             if ($duelMember->getXuid() === $player->getXuid()) continue;
 
             return $duelMember;

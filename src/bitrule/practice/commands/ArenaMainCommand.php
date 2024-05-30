@@ -25,6 +25,7 @@ final class ArenaMainCommand extends BaseCommand {
             new ArenaYawArgument('yaw', 'arena.command.yaw'),
             new ArenaEditArgument('edit', 'arena.command.edit'),
             new KitCreateArgument('createkit', 'arena.command.createkit'),
+            new KitCreateArgument('toggleparty', 'arena.command.toggleparty'),
             new KitKnockbackArgument('knockback', 'arena.command.knockback')
         );
     }

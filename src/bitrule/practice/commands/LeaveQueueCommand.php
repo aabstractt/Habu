@@ -50,7 +50,7 @@ final class LeaveQueueCommand extends Command {
 
         QueueRegistry::getInstance()->removeQueue($profile);
 
-        $sender->sendMessage(TranslationKey::PLAYER_QUEUE_LEFT()->build(
+        $sender->sendMessage(TranslationKey::QUEUE_PLAYER_LEAVED()->build(
             $queue->getKitName(),
             $queue->isRanked() ? 'Ranked' : 'Unranked'
         ));

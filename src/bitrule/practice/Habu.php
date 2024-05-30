@@ -8,8 +8,10 @@ use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\DurabilityCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
+use bitrule\practice\commands\LeaveQueueCommand;
 use bitrule\practice\duel\stage\StageScoreboard;
 use bitrule\practice\listener\defaults\PlayerExhaustListener;
+use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\listener\entity\EntityDamageListener;
@@ -90,10 +92,11 @@ final class Habu extends PluginBase {
         KnockbackRegistry::getInstance()->loadAll($this);
 
         // Default server listeners
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerInteractListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerExhaustListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new BlockBreakListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new WorldSoundListener(), $this);
-        $this->getServer()->getPluginManager()->registerEvents(new PlayerExhaustListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerQuitListener(), $this);
 
         // Match listeners
@@ -112,6 +115,7 @@ final class Habu extends PluginBase {
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),
         	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
+            new LeaveQueueCommand('leavequeue', 'Leave from the queue.', '/leavequeue'),
         	new KnockbackProfileCommand(),
         	new DurabilityCommand('durability')
         ]);

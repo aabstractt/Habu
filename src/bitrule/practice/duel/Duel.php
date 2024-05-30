@@ -49,13 +49,13 @@ abstract class Duel {
     /**
      * @param ArenaProperties $arenaProperties
      * @param Kit             $kit
-     * @param int             $id
+     * @param string          $uniqueId
      * @param bool            $ranked
      */
     public function __construct(
         protected readonly ArenaProperties $arenaProperties,
         protected readonly Kit             $kit,
-        protected readonly int             $id,
+        protected readonly string             $uniqueId,
         protected readonly bool            $ranked
     ) {
         $this->stage = new StartingStage();
@@ -257,7 +257,7 @@ abstract class Duel {
     /**
      * @return DuelMember[]
      */
-    public function getMembers(): array {
+    public function getPlaying(): array {
         return array_filter(
             $this->members,
             fn(DuelMember $duelMember) => $duelMember->isPlaying()
@@ -310,7 +310,7 @@ abstract class Duel {
      */
     public function hasSomeoneDisconnected(): bool {
         return count(array_filter(
-            $this->getMembers(),
+            $this->getPlaying(),
             fn(DuelMember $duelMember): bool => ($player = $duelMember->toPlayer()) === null || !$player->isOnline()
             )) > 0;
     }
@@ -319,7 +319,7 @@ abstract class Duel {
      * @return string
      */
     public function getFullName(): string {
-        return $this->arenaProperties->getOriginalName() . '-' . $this->id;
+        return $this->uniqueId;
     }
 
     /**
@@ -328,13 +328,6 @@ abstract class Duel {
      */
     public function getWorld(): World {
         return Server::getInstance()->getWorldManager()->getWorldByName($this->getFullName()) ?? throw new RuntimeException('World not found.');
-    }
-
-    /**
-     * @return int
-     */
-    public function getId(): int {
-        return $this->id;
     }
 
     /**
