@@ -56,44 +56,44 @@ queue:
 
 items:
   competitive-duel:
-    custom-name: "&r&9Competitive Duel"
+    custom-name: "&r&9Competitive Duel &7[Use]"
     lore: |-
       &7Right-click to queue for a competitive duel.
       &7You will be matched against a player with a similar skill level.
   unranked-duel:
-    custom-name: "&r&eDuel"
+    custom-name: "&r&eFriendly Duel &7[Use]"
     lore: |-
       &7Right-click to queue for a duel.
       &7You will be matched against a random player.
   spectate:
-    custom-name: "&r&aSpectate"
+    custom-name: "&r&aSpectate &7[Use]"
     lore: |-
       &7Right-click to spectate a duel.
       &7You will be teleported to a random duel.
   parties:
-    custom-name: "&r&dParties"
+    custom-name: "&r&dParties &7[Use]"
     lore: |-
       &7Right-click to open the parties menu.
       &7You can create or join a party here.
   settings:
-    custom-name: "&r§sProfile Settings"
+    custom-name: "&r§sProfile Settings &7[Use]"
     lore: |-
       &7Right-click to open the profile settings menu.
       &7You can change your settings here.
 
   party-split:
-    custom-name: "&r&9Party Split"
+    custom-name: "&r&9Party Split &7[Use]"
     lore: |-
       &7Right-click to split the party.
       &7You will be teleported to a random duel.
   party-ffa:
-    custom-name: "&r&eParty FFA"
+    custom-name: "&r&eParty FFA &7[Use]"
     lore: |-
       &7Right-click to queue for a party FFA.
       &7You will be teleported to a random duel.
 
   parties-duel:
-    custom-name: "&r&aParty Duel"
+    custom-name: "&r&aParty Duel &7[Use]"
     lore: |-
       &7Right-click to queue for a party duel.
       &7You will be teleported to a random duel.

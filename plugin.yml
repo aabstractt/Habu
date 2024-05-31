@@ -39,6 +39,8 @@ permissions:
     default: op
   kb.command.hitdelay:
     default: op
+  kb.command.info:
+    default: op
   practice.command.durability:
     default: op
 ...

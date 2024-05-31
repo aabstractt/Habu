@@ -24,7 +24,7 @@ final class KitKnockbackArgument extends Argument {
      */
     public function onPlayerExecute(Player $sender, string $label, array $args): void {
         if (count($args) < 2) {
-            $sender->sendMessage(TextFormat::RED . 'Usage: /' . $label . ' knockback <arena> <profile>');
+            $sender->sendMessage(TextFormat::RED . 'Usage: /' . $label . ' knockback <kit> <knockback>');
 
             return;
         }

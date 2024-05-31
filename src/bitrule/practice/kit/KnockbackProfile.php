@@ -154,8 +154,8 @@ final class KnockbackProfile {
             $motion->y = $verticalKb;
         }
 
-        $victimProfile->initialKnockbackMotion = true;
-        $victim->setMotion($motion);
+        $victimProfile->motion = clone $motion;
+//        $victim->setMotion($motion);
     }
 
     /**

@@ -28,24 +28,24 @@ final class ProjectileLaunchListener implements Listener {
         if (!$owningEntity instanceof Player) return;
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($owningEntity->getXuid());
-        if ($duel !== null) {
-            $duelPlayer = $duel->getMember($owningEntity->getXuid());
-            if ($duelPlayer === null) {
-                throw new RuntimeException('Player not found in the duel');
-            }
+        if ($duel === null) return;
 
-            $remaining = $duelPlayer->getRemainingEnderPearlCountdown();
-            if ($remaining > 0.0) {
-                $owningEntity->sendMessage(TextFormat::RED . 'You can use an ender pearl in ' . $remaining . ' seconds.');
-
-                $ev->cancel();
-
-                return;
-            }
-
-            $duelPlayer->setEnderPearlCountdown(microtime(true) + 15);
-
-            $owningEntity->sendMessage(TextFormat::GREEN . 'You are now on countdown for Ender Pearl!');
+        $duelMember = $duel->getMember($owningEntity->getXuid());
+        if ($duelMember === null) {
+            throw new RuntimeException('Player not found in the duel');
         }
+
+        $remaining = $duelMember->getRemainingEnderPearlCountdown();
+        if ($remaining > 0.0) {
+            $owningEntity->sendMessage(TextFormat::RED . 'You can use an ender pearl in ' . $remaining . ' seconds.');
+
+            $ev->cancel();
+
+            return;
+        }
+
+        $duelMember->setEnderPearlCountdown(microtime(true) + 15);
+
+        $owningEntity->sendMessage(TextFormat::GREEN . 'You are now on countdown for Ender Pearl!');
     }
 }

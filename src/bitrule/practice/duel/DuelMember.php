@@ -143,6 +143,8 @@ final class DuelMember {
         $player->setGamemode(GameMode::SPECTATOR);
         $player->setAllowFlight(true);
         $player->setFlying(true);
+
+        $player->teleport($duel->getWorld()->getSpawnLocation());
     }
 
     /**

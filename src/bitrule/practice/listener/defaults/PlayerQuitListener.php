@@ -24,7 +24,7 @@ final class PlayerQuitListener implements Listener {
 
         $ev->setQuitMessage(TranslationKey::PLAYER_LEFT_MESSAGE()->build($player->getName()));
 
-        ProfileRegistry::getInstance()->quitPlayer($player);
         DuelRegistry::getInstance()->quitPlayer($player);
+        ProfileRegistry::getInstance()->quitPlayer($player);
     }
 }

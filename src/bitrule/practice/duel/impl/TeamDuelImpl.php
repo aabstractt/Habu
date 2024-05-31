@@ -49,13 +49,12 @@ final class TeamDuelImpl extends Duel {
      * @param Player[] $totalPlayers
      */
     public function prepare(array $totalPlayers): void {
-        $teams = [];
         $teamSize = (int) ceil(count($totalPlayers) / 2);
         $teamId = 0;
 
         foreach ($totalPlayers as $player) {
-            if (($team = $teams[$teamId] ?? null) === null) {
-                $teams[$teamId] = $team = new Team($teamId, []);
+            if (($team = $this->teams[$teamId] ?? null) === null) {
+                $this->teams[$teamId] = $team = new Team($teamId);
             }
 
             $team->addPlayer($player->getXuid());
@@ -64,8 +63,6 @@ final class TeamDuelImpl extends Duel {
 
             $teamId++;
         }
-
-        $this->teams = $teams;
     }
 
     /**

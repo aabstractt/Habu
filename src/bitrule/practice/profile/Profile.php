@@ -13,6 +13,7 @@ use bitrule\practice\registry\ProfileRegistry;
 use InvalidArgumentException;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
+use pocketmine\math\Vector3;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use function explode;
@@ -29,10 +30,10 @@ final class Profile {
     /** @var string The knockback profile of the player. */
     private string $knockbackProfile = 'default';
 
-    /** @var bool Whether the player's knockback motion is the initial motion. */
-    public bool $initialKnockbackMotion = false;
-    /** @var bool Whether the player's knockback motion should be cancelled. */
-    public bool $cancelKnockbackMotion = false;
+    /**
+     * @var Vector3|null The motion modified by the knockback profile.
+     */
+    public ?Vector3 $motion = null;
 
     /**
      * @param string $xuid

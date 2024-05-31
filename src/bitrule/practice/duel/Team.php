@@ -17,7 +17,7 @@ final class Team {
      */
     public function __construct(
         private readonly int $id,
-        private array $players
+        private array $players = []
     ) {}
 
     /**

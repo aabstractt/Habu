@@ -9,13 +9,18 @@ use bitrule\practice\form\duel\NormalDuelSelector;
 use bitrule\practice\form\duel\PartyDuelForm;
 use bitrule\practice\registry\DuelRegistry;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerItemUseEvent;
 use pocketmine\utils\TextFormat;
 use function is_string;
 
 final class PlayerInteractListener implements Listener {
 
-    public function onPlayerInteractEvent(PlayerInteractEvent $ev): void {
+    /**
+     * @param PlayerItemUseEvent $ev
+     *
+     * @priority NORMAL
+     */
+    public function onPlayerItemUseEvent(PlayerItemUseEvent $ev): void {
         $player = $ev->getPlayer();
         if (!$player->isOnline()) return;
 

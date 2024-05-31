@@ -37,6 +37,8 @@ final class SumoPlayerMoveListener implements Listener {
             throw new RuntimeException('Error code 1');
         }
 
+        // TODO: Implement death message
+
         $duelMember->convertAsSpectator($duel, false);
     }
 }
