@@ -111,9 +111,8 @@ final class NormalDuelImpl extends Duel {
      * Usually is checked when the player died or left the match.
      *
      * @param Player $player
-     * @param bool   $canEnd
      */
-    public function removePlayer(Player $player, bool $canEnd): void {
+    public function removePlayer(Player $player): void {
         $spawnId = $this->getSpawnId($player->getXuid());
         if ($spawnId === -1) {
             throw new RuntimeException('Player not found in the match.');
@@ -121,19 +120,19 @@ final class NormalDuelImpl extends Duel {
 
         unset($this->playersSpawn[$player->getXuid()]);
 
-        $duelPlayer = $this->getMember($player->getXuid());
-        if ($duelPlayer === null) {
+        if ($this->ending) return;
+
+        $duelMember = $this->getMember($player->getXuid());
+        if ($duelMember === null) {
             throw new RuntimeException('Player not found in the match.');
         }
 
-        if ($duelPlayer->isAlive() && !$this->ending) {
-            $duelPlayer->convertAsSpectator($this, false);
+        if ($duelMember->isAlive()) {
+            $duelMember->convertAsSpectator($this, false);
         }
 
-        if (!$canEnd) return;
-
-        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
-        if (count($this->getAlive()) > $expectedPlayersAlive) return;
+//        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
+        if (count($this->getAlive()) > 2) return;
 
         $this->end();
     }

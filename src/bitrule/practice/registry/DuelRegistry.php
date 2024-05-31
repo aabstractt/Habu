@@ -138,7 +138,7 @@ final class DuelRegistry {
         $duel = $this->duels[$duelId] ?? null;
         if ($duel === null) return;
 
-        $duel->removePlayer($source, true);
+        $duel->removePlayer($source);
         $duel->postRemovePlayer($source);
     }
 

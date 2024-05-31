@@ -21,6 +21,55 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
     use OpponentDuelTrait;
 
     /**
+     * @param Player                            $player
+     * @param DuelMember $duelMember
+     */
+    public function processPlayerPrepare(Player $player, DuelMember $duelMember): void {
+        $this->playersSpawn[$player->getXuid()] = count($this->playersSpawn);
+
+        $opponentName = $this->getOpponentName($player->getXuid());
+        if ($opponentName === null) {
+            throw new RuntimeException('Opponent not found.');
+        }
+
+        $player->sendMessage(TranslationKey::DUEL_OPPONENT_FOUND()->build(
+            $opponentName,
+            $this->ranked ? 'Ranked' : 'Unranked',
+            $this->kit->getName()
+        ));
+    }
+
+    /**
+     * Remove a player from the match.
+     * Check if the match can end.
+     * Usually is checked when the player died or left the match.
+     *
+     * @param Player $player
+     */
+    public function removePlayer(Player $player): void {
+        $spawnId = $this->getSpawnId($player->getXuid());
+        if ($spawnId === -1) return;
+
+        unset($this->playersSpawn[$player->getXuid()]);
+
+        if ($this->ending) return;
+
+        $duelMember = $this->getMember($player->getXuid());
+        if ($duelMember === null) {
+            throw new RuntimeException('Player not found in the match.');
+        }
+
+        if ($duelMember->isAlive()) {
+            $duelMember->convertAsSpectator($this, false);
+        }
+
+//        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
+        if (count($this->getAlive()) > 2) return;
+
+        $this->end();
+    }
+
+    /**
      * Called when the duel stage changes
      * to Ending.
      */
@@ -81,47 +130,6 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
         }
 
         parent::end();
-    }
-
-    /**
-     * @param Player                            $player
-     * @param DuelMember $duelMember
-     */
-    public function processPlayerPrepare(Player $player, DuelMember $duelMember): void {
-        $this->playersSpawn[$player->getXuid()] = count($this->playersSpawn);
-
-        $opponentName = $this->getOpponentName($player->getXuid());
-        if ($opponentName === null) {
-            throw new RuntimeException('Opponent not found.');
-        }
-
-        $player->sendMessage(TranslationKey::DUEL_OPPONENT_FOUND()->build(
-            $opponentName,
-            $this->ranked ? 'Ranked' : 'Unranked',
-            $this->kit->getName()
-        ));
-    }
-
-    /**
-     * Remove a player from the match.
-     * Check if the match can end.
-     * Usually is checked when the player died or left the match.
-     *
-     * @param Player $player
-     * @param bool   $canEnd
-     */
-    public function removePlayer(Player $player, bool $canEnd): void {
-        unset($this->playersSpawn[$player->getXuid()]);
-
-        if (!$canEnd) return;
-
-        $spawnId = $this->getSpawnId($player->getXuid());
-        if ($spawnId === -1) return;
-
-        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
-        if (count($this->getAlive()) > $expectedPlayersAlive) return;
-
-        $this->end();
     }
 
     /**

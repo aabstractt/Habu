@@ -89,9 +89,8 @@ final class PartyFFADuelImpl extends Duel {
      * Usually, this is checked when the player dies or leaves the match.
      *
      * @param Player $player The player to be removed from the match.
-     * @param bool   $canEnd A flag indicating whether the match can end after the player is removed.
      */
-    public function removePlayer(Player $player, bool $canEnd): void {
+    public function removePlayer(Player $player): void {
         $spawnId = $this->getSpawnId($player->getXuid());
         if ($spawnId === -1) {
             throw new RuntimeException('Player not found in the match.');
@@ -99,16 +98,16 @@ final class PartyFFADuelImpl extends Duel {
 
         unset($this->playersSpawn[$player->getXuid()]);
 
+        if ($this->ending) return;
+
         $duelMember = $this->getMember($player->getXuid());
         if ($duelMember === null) {
             throw new RuntimeException('Player not found in the match.');
         }
 
-        if ($duelMember->isAlive() && !$this->ending) {
+        if ($duelMember->isAlive()) {
             $duelMember->convertAsSpectator($this, false);
         }
-
-        if (!$canEnd || $this->ending) return;
 
 //        $expectedPlayersAlive = $duelMember->isPlaying() > 2 ? 1 : 2;
         if (count($this->getAlive()) > 2) return;

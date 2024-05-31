@@ -223,9 +223,8 @@ abstract class Duel {
      * Usually is checked when the player died or left the match.
      *
      * @param Player $player
-     * @param bool   $canEnd
      */
-    abstract public function removePlayer(Player $player, bool $canEnd): void;
+    abstract public function removePlayer(Player $player): void;
 
     /**
      * Remove the player from the cache.
