@@ -268,7 +268,7 @@ abstract class Duel {
             throw new RuntimeException('Local profile not found for player: ' . $player->getName());
         }
 
-        $profile->joinLobby($player, true);
+        $profile->applyDefaultAttributes($player, true);
     }
 
     /**
