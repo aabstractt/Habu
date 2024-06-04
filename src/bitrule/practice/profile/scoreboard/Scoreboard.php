@@ -13,6 +13,7 @@ use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use RuntimeException;
 use function count;
 use function str_contains;
 use function usort;
@@ -55,7 +56,7 @@ final class Scoreboard {
      */
     public function hide(Player $player): void {
         if (!$this->showed) {
-            throw new \RuntimeException('Scoreboard is not showed');
+            throw new RuntimeException('Scoreboard is not showed');
         }
 
         $player->getNetworkSession()->sendDataPacket(RemoveObjectivePacket::create('bitrule'));
@@ -101,6 +102,13 @@ final class Scoreboard {
         if (count($packets) === 0) return;
 
         NetworkBroadcastUtils::broadcastPackets([$player], $packets);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowed(): bool {
+        return $this->showed;
     }
 
     /**
