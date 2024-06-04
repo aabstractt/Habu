@@ -10,6 +10,7 @@ use bitrule\practice\Habu;
 use InvalidArgumentException;
 use pocketmine\entity\Location;
 use pocketmine\item\VanillaItems;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
@@ -27,6 +28,22 @@ abstract class AbstractArenaSetup {
     private ?Location $firstPosition = null;
     /** @var Location|null */
     private ?Location $secondPosition = null;
+
+    /**
+     * The first corner of the arena.
+     * This is used to make the arena cuboid.
+     *
+     * @var Vector3|null $firstCorner
+     */
+    private ?Vector3 $firstCorner = null;
+    /**
+     * The second corner of the arena.
+     * This is used to make the arena cuboid.
+     *
+     * @var Vector3|null $secondCorner
+     */
+    private ?Vector3 $secondCorner = null;
+
     /** @var string|null */
     private ?string $primaryKit = null;
 
@@ -82,6 +99,34 @@ abstract class AbstractArenaSetup {
      */
     public function setSecondPosition(?Location $secondPosition): void {
         $this->secondPosition = $secondPosition;
+    }
+
+    /**
+     * @return Vector3|null
+     */
+    public function getFirstCorner(): ?Vector3 {
+        return $this->firstCorner;
+    }
+
+    /**
+     * @param Vector3|null $firstCorner
+     */
+    public function setFirstCorner(?Vector3 $firstCorner): void {
+        $this->firstCorner = $firstCorner;
+    }
+
+    /**
+     * @return Vector3|null
+     */
+    public function getSecondCorner(): ?Vector3 {
+        return $this->secondCorner;
+    }
+
+    /**
+     * @param Vector3|null $secondCorner
+     */
+    public function setSecondCorner(?Vector3 $secondCorner): void {
+        $this->secondCorner = $secondCorner;
     }
 
     /**
@@ -204,8 +249,13 @@ abstract class AbstractArenaSetup {
      */
     public function load(ArenaProperties $properties): void {
         $this->name = $properties->getOriginalName();
+
         $this->firstPosition = $properties->getFirstPosition();
         $this->secondPosition = $properties->getSecondPosition();
+
+        $this->firstCorner = $properties->getFirstCorner();
+        $this->secondCorner = $properties->getSecondCorner();
+
         $this->primaryKit = $properties->getPrimaryKit();
     }
 
@@ -232,6 +282,14 @@ abstract class AbstractArenaSetup {
             throw new RuntimeException('Second position is not set');
         }
 
+        if ($this->firstCorner === null) {
+            throw new RuntimeException('First corner is not set');
+        }
+
+        if ($this->secondCorner === null) {
+            throw new RuntimeException('Second corner is not set');
+        }
+
         if ($this->primaryKit === null) {
             throw new RuntimeException('Primary kit is not set');
         }
@@ -239,6 +297,8 @@ abstract class AbstractArenaSetup {
         return [
         	'first-position' => $this->firstPosition,
         	'second-position' => $this->secondPosition,
+        	'first-corner' => $this->firstCorner,
+        	'second-corner' => $this->secondCorner,
         	'primary-kit' => $this->primaryKit,
         	'type' => $this->getType()
         ];

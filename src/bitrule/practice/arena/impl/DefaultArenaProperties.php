@@ -9,5 +9,4 @@ use bitrule\practice\arena\ArenaProperties;
 /**
  * Class DefaultArenaProperties is a default arena.
  */
-final class DefaultArenaProperties extends ArenaProperties {
-}
+final class DefaultArenaProperties extends ArenaProperties {}

@@ -46,10 +46,13 @@ final class ArenaSaveArgument extends Argument {
             Habu::getInstance()->getDataFolder() . 'backups/' . $arenaSetup->getName(),
             function () use ($arenaSetup, $sender): void {
                 try {
-                    $arenaProperties = ArenaProperties::parse($arenaSetup->getName(), $properties = $arenaSetup->getProperties());
-                    $arenaProperties->setup($properties);
+                    $properties = $arenaSetup->getProperties();
+                    if (!isset($properties['type'])) {
+                        throw new Exception('Arena type is not set');
+                    }
 
-                    echo 'Creating' . PHP_EOL;
+                    $arenaProperties = ArenaProperties::parse($arenaSetup->getName(), $properties['type']);
+                    $arenaProperties->setProperties($properties);
 
                     ArenaRegistry::getInstance()->createArena($arenaProperties);
                     ArenaRegistry::getInstance()->saveAll();

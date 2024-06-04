@@ -32,12 +32,17 @@ final class SumoPlayerMoveListener implements Listener {
 
         if ($duel->getKit()->getName() !== Kit::SUMO) return;
 
+        $cuboid = $duel->getCuboid();
+        if ($cuboid === null) {
+            throw new RuntimeException('Error code 1');
+        }
+
+        if ($cuboid->isVectorInside($player->getLocation())) return;
+
         $duelMember = $duel->getMember($player->getXuid());
         if ($duelMember === null) {
             throw new RuntimeException('Error code 1');
         }
-
-        // TODO: Implement death message
 
         $duelMember->convertAsSpectator($duel, false);
     }

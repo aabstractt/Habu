@@ -23,6 +23,8 @@ permissions:
     default: op
   arena.command.yaw:
     default: op
+  arena.command.corner:
+    default: op
   practice.command.joinqueue:
     default: true
   practice.command.leavequeue:

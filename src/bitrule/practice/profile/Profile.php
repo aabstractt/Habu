@@ -30,9 +30,7 @@ final class Profile {
     /** @var string The knockback profile of the player. */
     private string $knockbackProfile = 'default';
 
-    /**
-     * @var Vector3|null The motion modified by the knockback profile.
-     */
+    /** @var Vector3|null The motion modified by the knockback profile. */
     public ?Vector3 $motion = null;
 
     /**

@@ -6,7 +6,6 @@ namespace bitrule\practice\commands\knockback;
 
 use abstractplugin\command\Argument;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\kit\KnockbackProfile;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\KnockbackRegistry;
 use pocketmine\command\CommandSender;

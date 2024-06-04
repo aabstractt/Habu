@@ -39,9 +39,15 @@ final class ArenaRegistry {
             }
 
             try {
-                $this->createArena($arenaProperties = ArenaProperties::parse($arenaName, $properties));
+                if (!isset($properties['type'])) {
+                    throw new Exception('Arena type is not set');
+                }
 
-                $arenaProperties->setup($properties);
+                $arenaProperties = ArenaProperties::parse($arenaName, $properties['type']);
+                $arenaProperties->setProperties($properties);
+                $arenaProperties->adaptProperties();
+
+                $this->createArena($arenaProperties);
             } catch (Exception $e) {
                 Habu::getInstance()->getLogger()->error('Failed to load arena ' . $arenaName . ': ' . $e->getMessage());
             }
@@ -122,5 +128,45 @@ final class ArenaRegistry {
            Server::getInstance()->getDataPath() . 'worlds/' . $worldName,
            $onComplete
        ));
+    }
+
+    public static function adapt(array &$properties): void {
+        if (!isset($properties['first-position'])) {
+            throw new RuntimeException('First position not set');
+        }
+
+        if (!is_array($properties['first-position'])) {
+            throw new RuntimeException('Invalid first position data');
+        }
+
+        if (!isset($properties['second-position'])) {
+            throw new RuntimeException('Second position not set');
+        }
+
+        if (!is_array($properties['second-position'])) {
+            throw new RuntimeException('Invalid second position data');
+        }
+
+        $properties['first-position'] = ArenaProperties::deserializeVector($properties['first-position']);
+        $properties['second-position'] = ArenaProperties::deserializeVector($properties['second-position']);
+
+        if (!isset($properties['first-corner'])) {
+            throw new RuntimeException('First corner not set');
+        }
+
+        if (!is_array($properties['first-corner'])) {
+            throw new RuntimeException('Invalid first corner data');
+        }
+
+        if (!isset($properties['second-corner'])) {
+            throw new RuntimeException('Second corner not set');
+        }
+
+        if (!is_array($properties['second-corner'])) {
+            throw new RuntimeException('Invalid second corner data');
+        }
+
+        $properties['first-corner'] = ArenaProperties::deserializeVector($properties['first-corner']);
+        $properties['second-corner'] = ArenaProperties::deserializeVector($properties['second-corner']);
     }
 }

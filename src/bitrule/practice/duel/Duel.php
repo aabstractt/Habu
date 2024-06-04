@@ -14,6 +14,7 @@ use bitrule\practice\kit\Kit;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -24,12 +25,21 @@ use function array_filter;
 use function array_key_first;
 use function count;
 use function gmdate;
+use function max;
+use function min;
 
 abstract class Duel {
 
     public const FIRST_SPAWN_ID = 0;
     public const SECOND_SPAWN_ID = 1;
     public const SPECTATOR_SPAWN_ID = 2;
+
+    /**
+     * The region of the match.
+     *
+     * @var AxisAlignedBB|null $cuboid
+     */
+    private ?AxisAlignedBB $cuboid = null;
 
     /**
      * The current stage of the match.
@@ -114,6 +124,22 @@ abstract class Duel {
         if (!Server::getInstance()->getWorldManager()->loadWorld($this->getFullName())) {
             throw new RuntimeException('Failed to load world ' . $this->getFullName());
         }
+
+        if ($this->cuboid !== null) {
+            throw new RuntimeException('Cuboid already set');
+        }
+
+        $firstCuboid = $this->arenaProperties->getFirstCorner();
+        $secondCuboid = $this->arenaProperties->getSecondCorner();
+
+        $this->cuboid = new AxisAlignedBB(
+            min($firstCuboid->getX(), $secondCuboid->getX()),
+            min($firstCuboid->getY(), $secondCuboid->getY()),
+            min($firstCuboid->getZ(), $secondCuboid->getZ()),
+            max($firstCuboid->getX(), $secondCuboid->getX()),
+            max($firstCuboid->getY(), $secondCuboid->getY()),
+            max($firstCuboid->getZ(), $secondCuboid->getZ())
+        );
 
         foreach ($totalPlayers as $player) {
             if (!$player->isOnline()) {
@@ -368,6 +394,13 @@ abstract class Duel {
      */
     public function isRanked(): bool {
         return $this->ranked;
+    }
+
+    /**
+     * @return AxisAlignedBB|null
+     */
+    public function getCuboid(): ?AxisAlignedBB {
+        return $this->cuboid;
     }
 
     /**

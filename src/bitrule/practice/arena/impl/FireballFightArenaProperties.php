@@ -7,6 +7,7 @@ namespace bitrule\practice\arena\impl;
 use bitrule\practice\arena\ArenaProperties;
 use pocketmine\math\Vector3;
 use RuntimeException;
+use function is_array;
 
 final class FireballFightArenaProperties extends ArenaProperties {
 
@@ -30,38 +31,29 @@ final class FireballFightArenaProperties extends ArenaProperties {
     }
 
     /**
-     * Returns the original properties of the arena.
-     *
-     * @return array
+     * Adapts the properties of the arena.
+     * This method should be called after the properties have been set.
      */
-    public function getOriginalProperties(): array {
-        $properties = parent::getOriginalProperties();
-        $properties['first-bed-position'] = self::serializeVector($properties['first-bed-position']);
-        $properties['second-bed-position'] = self::serializeVector($properties['second-bed-position']);
+    public function adaptProperties(): void {
+        parent::adaptProperties();
 
-        return $properties;
-    }
-
-    /**
-     * @param array $properties
-     */
-    public function setup(array $properties): void {
-        if (!isset($properties['first-bed-position'])) {
+        if (!isset($this->properties['first-bed-position'])) {
             throw new RuntimeException('First bed position not set');
         }
 
-        if (!isset($properties['second-bed-position'])) {
+        if (!is_array($this->properties['first-bed-position'])) {
+            throw new RuntimeException('Invalid first bed position data');
+        }
+
+        if (!isset($this->properties['second-bed-position'])) {
             throw new RuntimeException('Second bed position not set');
         }
 
-        if (!$properties['first-bed-position'] instanceof Vector3) {
-            $properties['first-bed-position'] = self::deserializeVector($properties['first-bed-position']);
+        if (!is_array($this->properties['second-bed-position'])) {
+            throw new RuntimeException('Invalid second bed position data');
         }
 
-        if (!$properties['second-bed-position'] instanceof Vector3) {
-            $properties['second-bed-position'] = self::deserializeVector($properties['second-bed-position']);
-        }
-
-        parent::setup($properties);
+        $this->properties['first-bed-position'] = self::deserializeVector($this->properties['first-bed-position']);
+        $this->properties['second-bed-position'] = self::deserializeVector($this->properties['second-bed-position']);
     }
 }
