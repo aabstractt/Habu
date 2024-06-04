@@ -118,7 +118,7 @@ final class Profile {
      * @param Player $player
      * @param bool   $showScoreboard
      */
-    public function joinLobby(Player $player, bool $showScoreboard): void {
+    public function applyDefaultAttributes(Player $player, bool $showScoreboard): void {
         self::setDefaultAttributes($player);
         $this->setKnockbackProfile('default');
         // TODO: Give lobby items

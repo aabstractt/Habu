@@ -44,7 +44,7 @@ final class ProfileRegistry {
 
         $this->profiles[$player->getXuid()] = $profile = new Profile($player->getXuid(), $player->getName(), 1_000);
 
-        $profile->joinLobby($player, true);
+        $profile->applyDefaultAttributes($player, true);
     }
 
     /**
