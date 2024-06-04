@@ -208,6 +208,22 @@ abstract class Duel {
             if ($player === null) continue;
 
             $this->processPlayerEnd($player, $duelMember);
+
+            $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
+            if ($profile === null) continue;
+
+            $scoreboard = $profile->getScoreboard();
+            if ($scoreboard === null || !$scoreboard->isShowed()) continue;
+
+            /**
+             * I remove the player's scoreboard because if the player has a very long
+             * line, it will be annoying throughout the game. So what I do is delete it here
+             * and it {@see EndingStage::update()} I show it again one second later,
+             * because if I do it immediately, the changes will not be seen and
+             * the scoreboard will continue to look horrible
+             */
+            $profile->setScoreboard(null);
+            $scoreboard->hide($player);
         }
     }
 
@@ -224,8 +240,6 @@ abstract class Duel {
             }
 
             DuelRegistry::getInstance()->quitPlayer($player);
-//            $this->removePlayer($player, false);
-//            $this->postRemovePlayer($player);
         }
 
         $this->loaded = false;
