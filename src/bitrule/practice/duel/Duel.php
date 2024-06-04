@@ -56,6 +56,14 @@ abstract class Duel {
     protected array $members = [];
     /** @var array<string, int> */
     protected array $playersSpawn = [];
+    /**
+     * This property allows us to know the selected knockback.
+     * This is chosen by the first player who select the knockback.
+     * And is used to apply the same knockback to all players.
+     *
+     * @var string|null $selectedKnockback
+     */
+    private ?string $selectedKnockback = null;
 
     /**
      * @param ArenaProperties $arenaProperties
@@ -154,8 +162,6 @@ abstract class Duel {
             $this->members[$player->getXuid()] = DuelMember::normal($player, $profile->getElo());
 
             Profile::setDefaultAttributes($player);
-
-            $profile->setKnockbackProfile($this->kit->getKnockbackProfile());
         }
 
         foreach ($this->members as $duelMember) {
@@ -224,8 +230,6 @@ abstract class Duel {
             }
 
             DuelRegistry::getInstance()->quitPlayer($player);
-//            $this->removePlayer($player, false);
-//            $this->postRemovePlayer($player);
         }
 
         $this->loaded = false;
@@ -268,7 +272,7 @@ abstract class Duel {
             throw new RuntimeException('Local profile not found for player: ' . $player->getName());
         }
 
-        $profile->joinLobby($player, true);
+        $profile->applyDefaultAttributes($player, true);
     }
 
     /**
@@ -401,6 +405,20 @@ abstract class Duel {
      */
     public function getCuboid(): ?AxisAlignedBB {
         return $this->cuboid;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSelectedKnockback(): ?string {
+        return $this->selectedKnockback;
+    }
+
+    /**
+     * @param string|null $selectedKnockback
+     */
+    public function setSelectedKnockback(?string $selectedKnockback): void {
+        $this->selectedKnockback = $selectedKnockback;
     }
 
     /**

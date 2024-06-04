@@ -18,6 +18,7 @@ use bitrule\practice\listener\entity\EntityDamageListener;
 use bitrule\practice\listener\entity\EntityMotionListener;
 use bitrule\practice\listener\entity\EntityTeleportListener;
 use bitrule\practice\listener\entity\ProjectileLaunchListener;
+use bitrule\practice\listener\match\DuelStartedListener;
 use bitrule\practice\listener\match\PlayerKitAppliedListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
 use bitrule\practice\listener\party\PartyCreateListener;
@@ -106,6 +107,7 @@ final class Habu extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityMotionListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityDamageListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new DuelStartedListener(), $this);
 
         // Party listeners
         $this->getServer()->getPluginManager()->registerEvents(new PartyCreateListener(), $this);
