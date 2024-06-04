@@ -14,7 +14,7 @@ final class EndingStage implements AbstractStage {
      * @param int $countdown
      * @param int $duration
      */
-    public function __construct(
+    private function __construct(
         private int $countdown,
         private readonly int $duration
     ) {}
@@ -66,7 +66,7 @@ final class EndingStage implements AbstractStage {
      */
     public static function create(int $duration): self {
         return new self(
-            5,
+            is_int($value = Habu::getInstance()->getConfig()->get('duel.end-countdown', 5)) ? $value : 5,
             $duration
         );
     }

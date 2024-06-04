@@ -66,6 +66,8 @@ final class DuelMember {
      * @return Player|null
      */
     public function toPlayer(): ?Player {
+        // TODO: Optimize this a bit because this iterate all the players to return the player
+        // TODO: So I going to cache the player object into an array by his xuid to prevent iterate the players
         return Server::getInstance()->getPlayerExact($this->name);
     }
 
@@ -74,13 +76,6 @@ final class DuelMember {
      */
     public function isAlive(): bool {
         return $this->alive;
-    }
-
-    /**
-     * @param bool $alive
-     */
-    public function setAlive(bool $alive): void {
-        $this->alive = $alive;
     }
 
     /**
