@@ -29,7 +29,9 @@ final class EntityDamageListener implements Listener {
 
         $profile = ProfileRegistry::getInstance()->getProfile($victim->getXuid());
         if ($profile === null) {
-            throw new RuntimeException('Profile is null');
+            $ev->cancel();
+
+            return;
         }
 
         if ($ev instanceof EntityDamageByEntityEvent) {

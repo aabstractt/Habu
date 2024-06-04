@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\match;
 
-use bitrule\practice\arena\impl\FireballFightArenaProperties;
+use bitrule\practice\arena\impl\BedFightArenaProperties;
 use bitrule\practice\event\player\PlayerKitAppliedEvent;
 use bitrule\practice\registry\DuelRegistry;
 use pocketmine\block\utils\DyeColor;
@@ -29,7 +29,7 @@ final class PlayerKitAppliedListener implements Listener {
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel === null) return;
-        if (!$duel->getArenaProperties() instanceof FireballFightArenaProperties) return;
+        if (!$duel->getArenaProperties() instanceof BedFightArenaProperties) return;
 
         $spawnId = $duel->getSpawnId($player->getXuid());
         if ($spawnId === -1) {
@@ -38,7 +38,7 @@ final class PlayerKitAppliedListener implements Listener {
 
         $player->setGamemode(GameMode::SURVIVAL);
 
-        $color = $spawnId === FireballFightArenaProperties::TEAM_RED_ID ? DyeColor::RED() : DyeColor::BLUE();
+        $color = $spawnId === BedFightArenaProperties::TEAM_RED_ID ? DyeColor::RED() : DyeColor::BLUE();
 
         foreach ($player->getArmorInventory()->getContents() as $slot => $item) {
             if (!$item instanceof Armor) continue;

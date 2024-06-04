@@ -41,9 +41,11 @@ final class BoxingPlayingStage extends PlayingStage implements AttackDamageStage
     }
 
     /**
+     * @param Duel $duel
+     *
      * @return string
      */
-    public function getScoreboardId(): string {
+    public function getScoreboardId(Duel $duel): string {
         return 'match-playing-boxing';
     }
 

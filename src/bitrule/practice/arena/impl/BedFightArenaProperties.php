@@ -9,9 +9,9 @@ use pocketmine\math\Vector3;
 use RuntimeException;
 use function is_array;
 
-final class FireballFightArenaProperties extends ArenaProperties {
+final class BedFightArenaProperties extends ArenaProperties {
 
-    public const IDENTIFIER = 'Fireball Fight';
+    public const IDENTIFIER = 'BedFight';
 
     public const TEAM_RED_ID = 0;
     public const TEAM_BLUE_ID = 1;

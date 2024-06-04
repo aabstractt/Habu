@@ -5,56 +5,25 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage\impl;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\TranslationKey;
 use LogicException;
-use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\entity\Entity;
 use pocketmine\player\Player;
 
-final class DefaultPlayingStage extends PlayingStage implements AnythingDamageStageListener, AttackDamageStageListener {
+final class DefaultPlayingStage extends KillablePlayingStage {
 
     /**
-     * This method is called when a player is damaged by another player.
-     *
-     * @param Duel                      $duel
-     * @param Player                    $victim
-     * @param EntityDamageByEntityEvent $ev
+     * @param Duel        $duel
+     * @param Player      $victim
+     * @param Entity|null $attacker
+     * @param int         $cause
      */
-    public function onEntityDamageByEntityEvent(Duel $duel, Player $victim, EntityDamageByEntityEvent $ev): void {
-        $this->onAnythingDamageEvent($duel, $victim, $ev);
-    }
-
-    /**
-     * This method is called when a player is damaged by anything
-     * except another player.
-     *
-     * @param Duel              $duel
-     * @param Player            $victim
-     * @param EntityDamageEvent $ev
-     */
-    public function onAnythingDamageEvent(Duel $duel, Player $victim, EntityDamageEvent $ev): void {
+    public function killPlayer(Duel $duel, Player $victim, ?Entity $attacker, int $cause): void {
         $victimProfile = $duel->getMember($victim->getXuid());
-        if ($victimProfile === null || !$victimProfile->isAlive()) {
-            $ev->cancel();
-
-            return;
-        }
-
-        if ($victim->getHealth() - $ev->getFinalDamage() > 0) return;
-
-        $ev->cancel();
-
-        $victim->setHealth($victim->getMaxHealth());
-
-        $attacker = $ev instanceof EntityDamageByEntityEvent ? $ev->getDamager() : null;
+        if ($victimProfile === null || !$victimProfile->isAlive()) return;
 
         $attackerProfile = $attacker instanceof Player ? $duel->getMember($attacker->getXuid()) : null;
-        if ($attacker !== null && ($attackerProfile === null || !$attackerProfile->isAlive())) {
-            $ev->cancel();
-
-            return;
-        }
+        if ($attacker !== null && ($attackerProfile === null || !$attackerProfile->isAlive())) return;
 
         $victimSpawnId = $duel->getSpawnId($victim->getXuid());
         if ($victimSpawnId > 1) {

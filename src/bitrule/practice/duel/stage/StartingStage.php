@@ -40,7 +40,7 @@ final class StartingStage implements AbstractStage {
 
         (new DuelStartedEvent($duel))->call();
 
-        $scoreboardId = $stage instanceof StageScoreboard ? $stage->getScoreboardId() : ProfileRegistry::MATCH_PLAYING_SCOREBOARD;
+        $scoreboardId = $stage instanceof StageScoreboard ? $stage->getScoreboardId($duel) : ProfileRegistry::MATCH_PLAYING_SCOREBOARD;
         if ($duel instanceof PartyFFADuelImpl) $scoreboardId .= '-party';
 
         foreach ($duel->getEveryone() as $duelMember) {

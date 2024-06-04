@@ -9,7 +9,7 @@ lines:
     total-queue-count: ' &fQueueing: &b'
     total-duel-count: ' &fFighting: &b'
     nothing-2: '&b&d&c'
-    nothing-3: '   &9play.server.com'
+    nothing-3: ' &9play.server.com'
     nothing-4: '&7---------------&e'
 
   queue:
@@ -24,7 +24,7 @@ lines:
     queue-kit: '&f Kit: &b'
     queue-duration: '&f Duration: &b'
     nothing-4: '&9&l'
-    nothing-5: '&9play.server.com'
+    nothing-5: ' &9play.server.com'
     nothing-6: '&7---------------&c'
 
   match-starting:
@@ -83,7 +83,7 @@ lines:
     nothing-3: ' &9play.server.com'
     nothing-4: '&7-------------&d'
 
-  match-playing-fireball:
+  match-playing-bed-fight:
     nothing-0: '&7---------------'
     nothing-1: ' &9&lTeams'
     duel-teams-red: '   &cR &fRed: &a'
@@ -105,5 +105,5 @@ lines:
     nothing-2: '&d'
     duel-duration: ' &fDuration: &b'
     nothing-3: '&9&l'
-    nothing-4: '&9play.server.com'
+    nothing-4: ' &9play.server.com'
     nothing-5: '&7---------------&d'

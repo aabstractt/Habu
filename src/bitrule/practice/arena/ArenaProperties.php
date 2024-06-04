@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena;
 
+use bitrule\practice\arena\impl\BedFightArenaProperties;
 use bitrule\practice\arena\impl\BridgeArenaProperties;
 use bitrule\practice\arena\impl\DefaultArenaProperties;
-use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 use RuntimeException;
@@ -146,7 +146,7 @@ abstract class ArenaProperties {
     public static function parse(string $arenaName, string $type): self {
         return match (strtolower($type)) {
             'default' => new DefaultArenaProperties($arenaName),
-            strtolower(FireballFightArenaProperties::IDENTIFIER) => new FireballFightArenaProperties($arenaName),
+            strtolower(BedFightArenaProperties::IDENTIFIER) => new BedFightArenaProperties($arenaName),
             strtolower(BridgeArenaProperties::IDENTIFIER) => new BridgeArenaProperties($arenaName),
             default => throw new RuntimeException('Invalid arena type: ' . $type)
         };
@@ -158,9 +158,9 @@ abstract class ArenaProperties {
      * @return string
      */
     public static function getArenaTypeByKit(string $kitName): string {
-        return match ($kitName) {
+        return match (strtolower($kitName)) {
             'bridge' => BridgeArenaProperties::IDENTIFIER,
-            FireballFightArenaProperties::IDENTIFIER => FireballFightArenaProperties::IDENTIFIER,
+            strtolower(BedFightArenaProperties::IDENTIFIER), 'fireball fight' => BedFightArenaProperties::IDENTIFIER,
             default => 'default'
         };
     }

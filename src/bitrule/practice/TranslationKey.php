@@ -29,8 +29,8 @@ use function ucwords;
  * @method static self BOXING_DUEL_COMBO_SELF()
  * @method static self BOXING_DUEL_COMBO_NONE()
  *
- * @method static self FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()
- * @method static self FIREBALL_FIGHT_PLAYER_DEAD()
+ * @method static self BED_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()
+ * @method static self BED_FIGHT_PLAYER_DEAD()
  * @method static self DUEL_PLAYER_DEAD_WITHOUT_KILLER()
  * @method static self DUEL_PLAYER_DEAD()
  *
@@ -163,15 +163,15 @@ final class TranslationKey {
                 []
             ),
             self::create(
-                'FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER',
-                'duel.fireball-fight.player-dead-without-killer',
+                'BED_FIGHT_PLAYER_DEAD_WITHOUT_KILLER',
+                'duel.bed-fight.player-dead-without-killer',
                 [
                 	'player'
                 ]
             ),
             self::create(
-                'FIREBALL_FIGHT_PLAYER_DEAD',
-                'duel.fireball-fight.player-dead',
+                'BED_FIGHT_PLAYER_DEAD',
+                'duel.bed-fight.player-dead',
                 [
                 	'player',
                 	'killer'

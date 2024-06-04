@@ -34,7 +34,7 @@ duel:
       self: '&a<amount> Combo'
       none: '&fNo Combo'
 
-  fireball-fight:
+  bed-fight:
     player-dead: '<player>&e was slain by <killer>'
     player-dead-without-killer: '<player>&e was slain.'
 

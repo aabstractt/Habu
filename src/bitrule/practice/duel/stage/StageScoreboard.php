@@ -13,9 +13,11 @@ interface StageScoreboard {
     /**
      * This is the scoreboard identifier of the arena.
      *
+     * @param Duel $duel
+     *
      * @return string
      */
-    public function getScoreboardId(): string;
+    public function getScoreboardId(Duel $duel): string;
 
     /**
      * Replace placeholders in the text.
