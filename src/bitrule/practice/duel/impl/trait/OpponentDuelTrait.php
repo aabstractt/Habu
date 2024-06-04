@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel\impl\trait;
 
+use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\NormalDuelImpl;
-use bitrule\practice\profile\DuelProfile;
 use pocketmine\player\Player;
 use RuntimeException;
 use function str_starts_with;
@@ -26,10 +26,10 @@ trait OpponentDuelTrait {
 
         if ($this->getSpawnId($xuid) === -1) return null;
 
-        foreach ($this->getPlayers() as $duelProfile) {
-            if ($duelProfile->getXuid() === $xuid) continue;
+        foreach ($this->getPlaying() as $duelMember) {
+            if ($duelMember->getXuid() === $xuid) continue;
 
-            return $duelProfile->getName();
+            return $duelMember->getName();
         }
 
         return null;
@@ -38,19 +38,19 @@ trait OpponentDuelTrait {
     /**
      * @param Player $player
      *
-     * @return DuelProfile|null
+     * @return DuelMember|null
      */
-    public function getOpponent(Player $player): ?DuelProfile {
+    public function getOpponent(Player $player): ?DuelMember {
         if (!$this instanceof NormalDuelImpl) {
             throw new RuntimeException('This trait can only be used in NormalDuelImpl class.');
         }
 
         if ($this->getSpawnId($player->getXuid()) === -1) return null;
 
-        foreach ($this->getPlayers() as $duelProfile) {
-            if ($duelProfile->getXuid() === $player->getXuid()) continue;
+        foreach ($this->getPlaying() as $duelMember) {
+            if ($duelMember->getXuid() === $player->getXuid()) continue;
 
-            return $duelProfile;
+            return $duelMember;
         }
 
         return null;
@@ -67,6 +67,7 @@ trait OpponentDuelTrait {
             throw new RuntimeException('This trait can only be used in NormalDuelImpl class.');
         }
 
+        // TODO: I dont think this going to work... Idk
         $parent = parent::replacePlaceholders($player, $identifier);
         if ($parent !== null) return $parent;
 

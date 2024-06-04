@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\match;
 
+use bitrule\practice\duel\stage\impl\KillablePlayingStage;
 use bitrule\practice\duel\stage\PlayingStage;
-use bitrule\practice\kit\Kit;
 use bitrule\practice\registry\DuelRegistry;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\player\GameMode;
+use pocketmine\utils\TextFormat;
 use RuntimeException;
 
 final class SumoPlayerMoveListener implements Listener {
@@ -30,13 +33,33 @@ final class SumoPlayerMoveListener implements Listener {
         if ($duel === null || !$duel->getStage() instanceof PlayingStage) return;
         // TODO: Kill player
 
-        if ($duel->getKit()->getName() !== Kit::SUMO) return;
-
-        $duelProfile = $duel->getPlayer($player->getXuid());
-        if ($duelProfile === null) {
+        $cuboid = $duel->getCuboid();
+        if ($cuboid === null) {
             throw new RuntimeException('Error code 1');
         }
 
-        $duelProfile->convertAsSpectator($duel, false);
+        if ($cuboid->isVectorInside($player->getLocation())) return;
+
+        if ($player->getGamemode() === GameMode::SPECTATOR) {
+            $duel->teleportSpawn($player);
+
+            $player->sendMessage(TextFormat::RED . 'You cannot leave the arena!');
+
+            return;
+        }
+
+        $stage = $duel->getStage();
+        if ($stage instanceof KillablePlayingStage) {
+            $stage->killPlayer($duel, $player, null, EntityDamageEvent::CAUSE_VOID);
+
+            return;
+        }
+
+        $duelMember = $duel->getMember($player->getXuid());
+        if ($duelMember === null) {
+            throw new RuntimeException('Error code 1');
+        }
+
+        $duelMember->convertAsSpectator($duel, false);
     }
 }

@@ -18,12 +18,14 @@ final class Kit {
 
     /**
      * @param string           $name
+     * @param bool             $partyPlayable
      * @param array<int, Item> $inventoryItems
      * @param array<int, Item> $armorItems
      * @param string           $knockbackProfile
      */
     public function __construct(
         private readonly string $name,
+        private bool $partyPlayable,
         private array $inventoryItems,
         private array $armorItems,
         private string $knockbackProfile
@@ -34,6 +36,22 @@ final class Kit {
      */
     public function getName(): string {
         return $this->name;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPartyPlayable(): bool {
+        return $this->partyPlayable;
+    }
+
+    /**
+     * Set if the kit is party playable
+     *
+     * @param bool $partyPlayable
+     */
+    public function setPartyPlayable(bool $partyPlayable): void {
+        $this->partyPlayable = $partyPlayable;
     }
 
     /**

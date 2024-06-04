@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\arena\ArenaProperties;
+use bitrule\practice\arena\impl\BedFightArenaProperties;
 use bitrule\practice\arena\impl\BridgeArenaProperties;
-use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\stage\impl\BedFightPlayingStage;
 use bitrule\practice\duel\stage\impl\BoxingPlayingStage;
 use bitrule\practice\duel\stage\impl\BridgePlayingStage;
 use bitrule\practice\duel\stage\impl\DefaultPlayingStage;
-use bitrule\practice\duel\stage\impl\FireballFightPlayingStage;
+use RuntimeException;
 
 abstract class PlayingStage implements AbstractStage {
 
@@ -25,7 +26,7 @@ abstract class PlayingStage implements AbstractStage {
      */
     public function update(Duel $duel): void {
         if (!$duel->isLoaded()) {
-            throw new \RuntimeException('Match is not loaded.');
+            throw new RuntimeException('Match is not loaded.');
         }
 
         $this->seconds++;
@@ -46,7 +47,7 @@ abstract class PlayingStage implements AbstractStage {
     public static function create(ArenaProperties $arenaProperties): self {
         if ($arenaProperties->getPrimaryKit() === 'Boxing') return new BoxingPlayingStage();
         if ($arenaProperties instanceof BridgeArenaProperties) return new BridgePlayingStage();
-        if ($arenaProperties instanceof FireballFightArenaProperties) return new FireballFightPlayingStage();
+        if ($arenaProperties instanceof BedFightArenaProperties) return new BedFightPlayingStage();
 
         return new DefaultPlayingStage();
     }

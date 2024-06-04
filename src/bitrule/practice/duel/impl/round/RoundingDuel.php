@@ -7,16 +7,17 @@ namespace bitrule\practice\duel\impl\round;
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
+use bitrule\practice\Habu;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\Practice;
-use bitrule\practice\profile\DuelProfile;
 use bitrule\practice\registry\DuelRegistry;
 use Exception;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use function array_filter;
 use function array_map;
+use function count;
 
 abstract class RoundingDuel extends Duel {
     use SpectatingDuelTrait;
@@ -30,11 +31,11 @@ abstract class RoundingDuel extends Duel {
      * @param ArenaProperties $arenaProperties
      * @param Kit             $kit
      * @param RoundingInfo    $roundingInfo
-     * @param int             $id
+     * @param string          $uniqueId
      * @param bool            $ranked
      */
-    public function __construct(ArenaProperties $arenaProperties, Kit $kit, RoundingInfo $roundingInfo, int $id, bool $ranked) {
-        parent::__construct($arenaProperties, $kit, $id, $ranked);
+    public function __construct(ArenaProperties $arenaProperties, Kit $kit, RoundingInfo $roundingInfo, string $uniqueId, bool $ranked) {
+        parent::__construct($arenaProperties, $kit, $uniqueId, $ranked);
 
         $this->roundingInfo = $roundingInfo;
     }
@@ -54,8 +55,8 @@ abstract class RoundingDuel extends Duel {
         }
 
         $winnerXuid = $this->roundingInfo->findWinner();
-        $winnerDuelProfile = $winnerXuid !== null ? $this->players[$winnerXuid] ?? null : null;
-        if ($winnerDuelProfile !== null) {
+        $winnerduelMember = $winnerXuid !== null ? $this->members[$winnerXuid] ?? null : null;
+        if ($winnerduelMember !== null) {
             parent::end();
             $this->ended = true;
 
@@ -64,37 +65,51 @@ abstract class RoundingDuel extends Duel {
 
         $literalSpectators = array_filter(
             $this->getSpectators(),
-            fn(DuelProfile $duelProfile) => !$duelProfile->isPlaying()
+            fn(DuelMember $duelMember) => !$duelMember->isPlaying()
         );
-        $players = $this->getPlayers();
+        $players = $this->getPlaying();
 
         $this->postEnd();
 
-        foreach ($players as $duelProfile) {
-            if (!$duelProfile->isAlive()) continue;
+        foreach ($players as $duelMember) {
+            if (!$duelMember->isAlive()) continue;
 
-            $player = $duelProfile->toPlayer();
+            $player = $duelMember->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
-            $this->roundingInfo->increaseWin($duelProfile->getXuid());
+            $this->roundingInfo->increaseWin($duelMember->getXuid());
         }
 
         try {
-            DuelRegistry::getInstance()->createDuel(
-                array_filter(
-                    array_map(fn (DuelProfile $duelProfile) => $duelProfile->toPlayer(), $players),
+            $duelRegistry = DuelRegistry::getInstance();
+            $duelRegistry->prepareDuel(
+                totalPlayers: array_filter(
+                    array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $players),
                     fn(?Player $player) => $player !== null && $player->isOnline()
                 ),
-                array_filter(
-                    array_map(fn (DuelProfile $duelProfile) => $duelProfile->toPlayer(), $literalSpectators),
-                    fn(?Player $player) => $player !== null && $player->isOnline()
+                duel: $duelRegistry->createRoundingDuel(
+                    $this->kit,
+                    $this->ranked,
+                    $this->roundingInfo
                 ),
-                $this->kit,
-                $this->ranked,
-                $this->roundingInfo
+                onCompletion: function (Duel $duel) use ($literalSpectators): void {
+                    $spectators = array_filter(
+                        array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $literalSpectators),
+                        fn(?Player $player) => $player !== null && $player->isOnline()
+                    );
+                    if (count($spectators) === 0) {
+                        Habu::getInstance()->getLogger()->info('No spectators found for the duel.');
+
+                        return;
+                    }
+
+                    foreach ($spectators as $spectator) {
+                        $duel->joinSpectator($spectator);
+                    }
+                }
             );
         } catch (Exception $e) {
-            Practice::getInstance()->getLogger()->error($e->getMessage());
+            Habu::getInstance()->getLogger()->error($e->getMessage());
 
             parent::end();
             $this->ended = true;

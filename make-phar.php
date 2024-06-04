@@ -53,7 +53,7 @@ function main(): Generator {
 
     $files = [];
 
-    $exclusions = ['.idea', '.gitignore', 'composer.json', 'composer.lock', 'make-phar.php', '.git', 'composer.phar', $pharName];
+    $exclusions = ['.idea', '.gitignore', 'composer.json', 'composer.lock', 'make-phar.php', '.git', 'vendor', 'composer.phar', $pharName];
 
     foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($basePath)) as $path => $file) {
         $bool = true;

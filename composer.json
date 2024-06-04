@@ -5,26 +5,20 @@
   "license": "Apache-2.0",
 
   "require": {
-    "php": "^8.1",
-    "ext-yaml": "*",
-    "ext-json": "*",
-    "ext-mysqli": "*",
-    "ext-curl": "*",
-    "abstract/command-framework": "^0.4",
-    "bitrule/forms": "dev-master",
-    "ext-igbinary": "*"
+    "php": "^8.1"
   },
 
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^v3.12.0",
     "phpstan/phpstan": "^1.2.0",
     "phpstan/phpstan-strict-rules": "^1.1.0",
-    "pocketmine/pocketmine-mp": "^5.8.2"
+    "pocketmine/pocketmine-mp": "^5.8.2",
+    "bitrule/parties": "dev-master"
   },
 
   "repositories": [
     {"type": "vcs", "url": "git@github.com:Abstract-Resources/command-framework"},
-    {"type": "vcs", "url": "git@github.com:aabstractt/PMMP-Forms"}
+    {"type": "vcs", "url": "git@github.com:aabstractt/Parties"}
   ],
 
   "autoload": {

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\impl;
 
 use bitrule\practice\duel\Duel;
+use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\OpponentDuelTrait;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
-use bitrule\practice\profile\DuelProfile;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
@@ -22,74 +23,10 @@ final class NormalDuelImpl extends Duel {
     use OpponentDuelTrait;
 
     /**
-     * Called when the duel stage changes
-     * to Ending.
+     * @param Player     $player
+     * @param DuelMember $duelMember
      */
-    public function end(): void {
-        parent::end();
-
-        $duelProfile = $this->getWinner();
-        if ($duelProfile === null) return;
-
-        $player = $duelProfile->toPlayer();
-        if ($player === null || !$player->isOnline()) return;
-
-        $opponent = $this->getOpponent($player);
-        if ($opponent === null) return;
-
-        Server::getInstance()->broadcastMessage(TranslationKey::DUEL_WINNER_BROADCAST()->build(
-            $player->getName(),
-            $opponent->getName(),
-            $this->kit->getName()
-        ));
-
-        [$winElo, $lostElo] = $this->ranked ? DuelRegistry::calculateElo(
-            $duelProfile->getElo(),
-            $opponent->getElo()
-        ) : [0, 0];
-
-        $matchStatistics = $duelProfile->getDuelStatistics();
-        $opponentMatchStatistics = $opponent->getDuelStatistics();
-
-        $player->sendMessage(TranslationKey::DUEL_END_STATISTICS_NORMAL()->build(
-            $opponent->getName(),
-            $winElo > 0 ? TranslationKey::DUEL_ELO_CHANGES_WIN()->build((string) $winElo) : TextFormat::YELLOW . 'No changes',
-            (string) $matchStatistics->getCritics(),
-            (string) $matchStatistics->getDamageDealt(),
-            (string) $opponentMatchStatistics->getCritics(),
-            (string) $opponentMatchStatistics->getDamageDealt(),
-        ));
-
-        $opponentPlayer = $opponent->toPlayer();
-        if ($opponentPlayer === null || !$opponentPlayer->isOnline()) return;
-
-        $opponentPlayer->sendMessage(TranslationKey::DUEL_END_STATISTICS_NORMAL()->build(
-            $duelProfile->getName(),
-            $lostElo > 0 ? TranslationKey::DUEL_ELO_CHANGES_LOST()->build((string) $lostElo) : TextFormat::YELLOW . 'No changes',
-            (string) $opponentMatchStatistics->getCritics(),
-            (string) $opponentMatchStatistics->getDamageDealt(),
-            (string) $matchStatistics->getCritics(),
-            (string) $matchStatistics->getDamageDealt(),
-        ));
-
-        // Apply elo changes to the duelProfile
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-        if ($localProfile === null) return;
-
-        $localProfile->setElo($winElo);
-
-        // Apply elo changes to the loser
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($opponentPlayer->getXuid());
-        if ($localProfile === null) return;
-
-        $localProfile->setElo($lostElo);
-    }
-
-    /**
-     * @param Player      $player
-     * @param DuelProfile $duelProfile
-     */
-    public function processPlayerPrepare(Player $player, DuelProfile $duelProfile): void {
+    public function processPlayerPrepare(Player $player, DuelMember $duelMember): void {
         $this->playersSpawn[$player->getXuid()] = count($this->playersSpawn);
 
         $opponentName = $this->getOpponentName($player->getXuid());
@@ -102,6 +39,70 @@ final class NormalDuelImpl extends Duel {
             $this->ranked ? 'Ranked' : 'Unranked',
             $this->kit->getName()
         ));
+
+        Habu::applyScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
+    }
+
+    /**
+     * Called when the duel stage changes
+     * to Ending.
+     */
+    public function end(): void {
+        if ($this->ending) return;
+
+        parent::end();
+
+        $duelMember = $this->getWinner();
+        if ($duelMember === null) return;
+
+        $player = $duelMember->toPlayer();
+        if ($player === null || !$player->isOnline()) return;
+
+        $opponent = $this->getOpponent($player);
+        if ($opponent === null) return;
+
+        Server::getInstance()->broadcastMessage(TranslationKey::DUEL_WINNER_BROADCAST()->build(
+            $player->getName(),
+            $opponent->getName(),
+            $this->kit->getName()
+        ));
+
+        [$winElo, $lostElo] = $this->ranked ? DuelRegistry::calculateElo(
+            $duelMember->getElo(),
+            $opponent->getElo()
+        ) : [0, 0];
+
+        $selfDuelStatistics = $duelMember->getDuelStatistics();
+        $opponentDuelStatistics = $opponent->getDuelStatistics();
+
+        $player->sendMessage(TranslationKey::DUEL_END_STATISTICS_NORMAL()->build(
+            $opponent->getName(),
+            $winElo > 0 ? TranslationKey::DUEL_ELO_CHANGES_WIN()->build((string) $winElo) : TextFormat::YELLOW . 'No changes',
+            (string) $selfDuelStatistics->getCritics(),
+            (string) $selfDuelStatistics->getDamageDealt(),
+            (string) $opponentDuelStatistics->getCritics(),
+            (string) $opponentDuelStatistics->getDamageDealt(),
+        ));
+
+        $opponentPlayer = $opponent->toPlayer();
+        if ($opponentPlayer === null || !$opponentPlayer->isOnline()) return;
+
+        $opponentPlayer->sendMessage(TranslationKey::DUEL_END_STATISTICS_NORMAL()->build(
+            $duelMember->getName(),
+            $lostElo > 0 ? TranslationKey::DUEL_ELO_CHANGES_LOST()->build((string) $lostElo) : TextFormat::YELLOW . 'No changes',
+            (string) $opponentDuelStatistics->getCritics(),
+            (string) $opponentDuelStatistics->getDamageDealt(),
+            (string) $selfDuelStatistics->getCritics(),
+            (string) $selfDuelStatistics->getDamageDealt(),
+        ));
+
+        $xuids = [$player->getXuid(), $opponentPlayer->getXuid()];
+        foreach ($xuids as $id => $xuid) {
+            $profile = ProfileRegistry::getInstance()->getProfile($xuid);
+            if ($profile === null) continue;
+
+            $profile->setElo($id === 0 ? $winElo : $lostElo);
+        }
     }
 
     /**
@@ -110,9 +111,8 @@ final class NormalDuelImpl extends Duel {
      * Usually is checked when the player died or left the match.
      *
      * @param Player $player
-     * @param bool   $canEnd
      */
-    public function removePlayer(Player $player, bool $canEnd): void {
+    public function removePlayer(Player $player): void {
         $spawnId = $this->getSpawnId($player->getXuid());
         if ($spawnId === -1) {
             throw new RuntimeException('Player not found in the match.');
@@ -120,19 +120,19 @@ final class NormalDuelImpl extends Duel {
 
         unset($this->playersSpawn[$player->getXuid()]);
 
-        $duelPlayer = $this->getPlayer($player->getXuid());
-        if ($duelPlayer === null) {
+        if ($this->ending) return;
+
+        $duelMember = $this->getMember($player->getXuid());
+        if ($duelMember === null) {
             throw new RuntimeException('Player not found in the match.');
         }
 
-        if ($duelPlayer->isAlive() && !$this->ending) {
-            $duelPlayer->convertAsSpectator($this, false);
+        if ($duelMember->isAlive()) {
+            $duelMember->convertAsSpectator($this, false);
         }
 
-        if (!$canEnd) return;
-
-        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
-        if (count($this->getAlive()) > $expectedPlayersAlive) return;
+//        $expectedPlayersAlive = $spawnId > 2 ? 1 : 2;
+        if (count($this->getAlive()) > 2) return;
 
         $this->end();
     }

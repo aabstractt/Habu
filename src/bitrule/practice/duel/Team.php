@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel;
 
-use bitrule\practice\profile\DuelProfile;
 use function array_filter;
 use function array_map;
 use function array_search;
@@ -18,7 +17,7 @@ final class Team {
      */
     public function __construct(
         private readonly int $id,
-        private array $players
+        private array $players = []
     ) {}
 
     /**
@@ -51,7 +50,7 @@ final class Team {
     }
 
     /**
-     * @return DuelProfile[]
+     * @return DuelMember[]
      */
     public function getPlayers(Duel $duel): array {
         return array_filter(
@@ -59,7 +58,7 @@ final class Team {
                 fn (string $xuid) => $duel->getEveryone()[$xuid] ?? null,
                 $this->players
             ),
-            fn (?DuelProfile $duelProfile) => $duelProfile !== null
+            fn (?DuelMember $duelMember) => $duelMember !== null
         );
     }
 

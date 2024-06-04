@@ -6,6 +6,7 @@ namespace bitrule\practice\commands\arena;
 
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\KnockbackRegistry;
 use Exception;
@@ -23,7 +24,7 @@ final class KitKnockbackArgument extends Argument {
      */
     public function onPlayerExecute(Player $sender, string $label, array $args): void {
         if (count($args) < 2) {
-            $sender->sendMessage(TextFormat::RED . 'Usage: /' . $label . ' knockback <arena> <profile>');
+            $sender->sendMessage(TextFormat::RED . 'Usage: /' . $label . ' knockback <kit> <knockback>');
 
             return;
         }
@@ -46,7 +47,7 @@ final class KitKnockbackArgument extends Argument {
             $kit->setKnockbackProfile($knockbackProfile->getName());
             KitRegistry::getInstance()->createKit($kit);
 
-            $sender->sendMessage(TextFormat::GREEN . 'Knockback profile set to ' . $knockbackProfile->getName() . ' for kit ' . $kit->getName());
+            $sender->sendMessage(Habu::prefix() . TextFormat::GREEN . 'Knockback set to ' . $knockbackProfile->getName() . ' for kit ' . $kit->getName());
         } catch (Exception $e) {
             $sender->sendMessage(TextFormat::RED . 'An error occurred while saving the kit: ' . $e->getMessage());
         }

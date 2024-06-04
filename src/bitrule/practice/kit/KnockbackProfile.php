@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\kit;
 
-use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\profile\Profile;
 use InvalidArgumentException;
 use pocketmine\entity\Attribute;
 use pocketmine\entity\Entity;
@@ -101,11 +101,11 @@ final class KnockbackProfile {
     /**
      * Applies the knockback profile to the given player.
      *
-     * @param Player       $victim
-     * @param LocalProfile $victimProfile
-     * @param Entity|null  $attacker
+     * @param Player      $victim
+     * @param Profile     $victimProfile
+     * @param Entity|null $attacker
      */
-    public function applyOn(Player $victim, LocalProfile $victimProfile, ?Entity $attacker): void {
+    public function applyOn(Player $victim, Profile $victimProfile, ?Entity $attacker): void {
         if ($attacker === null) {
             throw new InvalidArgumentException('Attacker cannot be null');
         }
@@ -154,8 +154,8 @@ final class KnockbackProfile {
             $motion->y = $verticalKb;
         }
 
-        $victimProfile->initialKnockbackMotion = true;
-        $victim->setMotion($motion);
+        $victimProfile->motion = clone $motion;
+//        $victim->setMotion($motion);
     }
 
     /**

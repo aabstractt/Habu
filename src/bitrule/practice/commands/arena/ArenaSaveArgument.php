@@ -8,7 +8,7 @@ use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use Exception;
@@ -25,36 +25,39 @@ final class ArenaSaveArgument extends Argument {
      * @param array  $args
      */
     public function onPlayerExecute(Player $sender, string $label, array $args): void {
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($sender->getXuid());
-        if ($localProfile === null) {
+        $profile = ProfileRegistry::getInstance()->getProfile($sender->getXuid());
+        if ($profile === null) {
             $sender->sendMessage(TextFormat::RED . 'Error code 1');
 
             return;
         }
 
-        $arenaSetup = $localProfile->getArenaSetup();
+        $arenaSetup = $profile->getArenaSetup();
         if ($arenaSetup === null) {
             $sender->sendMessage(TextFormat::RED . 'You are not editing an arena');
 
             return;
         }
 
-        $localProfile->setArenaSetup(null);
+        $profile->setArenaSetup(null);
 
         Server::getInstance()->getAsyncPool()->submitTask(new FileCopyAsyncTask(
             Server::getInstance()->getDataPath() . 'worlds/' . $arenaSetup->getName(),
-            Practice::getInstance()->getDataFolder() . 'backups/' . $arenaSetup->getName(),
+            Habu::getInstance()->getDataFolder() . 'backups/' . $arenaSetup->getName(),
             function () use ($arenaSetup, $sender): void {
                 try {
-                    $arenaProperties = ArenaProperties::parse($arenaSetup->getName(), $properties = $arenaSetup->getProperties());
-                    $arenaProperties->setup($properties);
+                    $properties = $arenaSetup->getProperties();
+                    if (!isset($properties['type'])) {
+                        throw new Exception('Arena type is not set');
+                    }
 
-                    echo 'Creating' . PHP_EOL;
+                    $arenaProperties = ArenaProperties::parse($arenaSetup->getName(), $properties['type']);
+                    $arenaProperties->setProperties($properties);
 
                     ArenaRegistry::getInstance()->createArena($arenaProperties);
                     ArenaRegistry::getInstance()->saveAll();
 
-                    $sender->sendMessage(TextFormat::GREEN . 'Arena saved successfully!');
+                    $sender->sendMessage(Habu::prefix() . TextFormat::GREEN . 'Arena saved successfully!');
 
                     Server::getInstance()->getLogger()->info('Arena backup saved successfully!');
                 } catch (Exception $e) {

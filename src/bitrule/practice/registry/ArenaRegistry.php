@@ -6,8 +6,8 @@ namespace bitrule\practice\registry;
 
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
+use bitrule\practice\Habu;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\Practice;
 use Closure;
 use Exception;
 use pocketmine\Server;
@@ -32,18 +32,24 @@ final class ArenaRegistry {
      * Load all arenas from the arenas.yml file.
      */
     public function loadAll(): void {
-        $config = new Config(Practice::getInstance()->getDataFolder() . 'arenas.yml', Config::YAML);
+        $config = new Config(Habu::getInstance()->getDataFolder() . 'arenas.yml', Config::YAML);
         foreach ($config->getAll() as $arenaName => $properties) {
             if (!is_string($arenaName) || !is_array($properties)) {
                 throw new RuntimeException('Invalid arena data');
             }
 
             try {
-                $this->createArena($arenaProperties = ArenaProperties::parse($arenaName, $properties));
+                if (!isset($properties['type'])) {
+                    throw new Exception('Arena type is not set');
+                }
 
-                $arenaProperties->setup($properties);
+                $arenaProperties = ArenaProperties::parse($arenaName, $properties['type']);
+                $arenaProperties->setProperties($properties);
+                $arenaProperties->adaptProperties();
+
+                $this->createArena($arenaProperties);
             } catch (Exception $e) {
-                Practice::getInstance()->getLogger()->error('Failed to load arena ' . $arenaName . ': ' . $e->getMessage());
+                Habu::getInstance()->getLogger()->error('Failed to load arena ' . $arenaName . ': ' . $e->getMessage());
             }
         }
     }
@@ -52,7 +58,7 @@ final class ArenaRegistry {
      * Save all arenas to the arenas.yml file.
      */
     public function saveAll(): void {
-        $config = new Config(Practice::getInstance()->getDataFolder() . 'arenas.yml');
+        $config = new Config(Habu::getInstance()->getDataFolder() . 'arenas.yml');
 
         foreach ($this->arenas as $arena) {
             $config->set($arena->getOriginalName(), $arena->getOriginalProperties());
@@ -61,7 +67,7 @@ final class ArenaRegistry {
         try {
             $config->save();
         } catch (Exception $e) {
-            Practice::getInstance()->getLogger()->error('Failed to save arenas: ' . $e->getMessage());
+            Habu::getInstance()->getLogger()->error('Failed to save arenas: ' . $e->getMessage());
         }
     }
 
@@ -118,9 +124,49 @@ final class ArenaRegistry {
      */
     public function loadWorld(string $arenaName, string $worldName, Closure $onComplete): void {
        Server::getInstance()->getAsyncPool()->submitTask(new FileCopyAsyncTask(
-           Practice::getInstance()->getDataFolder() . 'backups/' . $arenaName,
+           Habu::getInstance()->getDataFolder() . 'backups/' . $arenaName,
            Server::getInstance()->getDataPath() . 'worlds/' . $worldName,
            $onComplete
        ));
+    }
+
+    public static function adapt(array &$properties): void {
+        if (!isset($properties['first-position'])) {
+            throw new RuntimeException('First position not set');
+        }
+
+        if (!is_array($properties['first-position'])) {
+            throw new RuntimeException('Invalid first position data');
+        }
+
+        if (!isset($properties['second-position'])) {
+            throw new RuntimeException('Second position not set');
+        }
+
+        if (!is_array($properties['second-position'])) {
+            throw new RuntimeException('Invalid second position data');
+        }
+
+        $properties['first-position'] = ArenaProperties::deserializeVector($properties['first-position']);
+        $properties['second-position'] = ArenaProperties::deserializeVector($properties['second-position']);
+
+        if (!isset($properties['first-corner'])) {
+            throw new RuntimeException('First corner not set');
+        }
+
+        if (!is_array($properties['first-corner'])) {
+            throw new RuntimeException('Invalid first corner data');
+        }
+
+        if (!isset($properties['second-corner'])) {
+            throw new RuntimeException('Second corner not set');
+        }
+
+        if (!is_array($properties['second-corner'])) {
+            throw new RuntimeException('Invalid second corner data');
+        }
+
+        $properties['first-corner'] = ArenaProperties::deserializeVector($properties['first-corner']);
+        $properties['second-corner'] = ArenaProperties::deserializeVector($properties['second-corner']);
     }
 }

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\DuelScoreboard;
+use bitrule\practice\duel\impl\PartyFFADuelImpl;
 use bitrule\practice\event\duel\DuelStartedEvent;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\ProfileRegistry;
 use function count;
 
@@ -40,13 +40,14 @@ final class StartingStage implements AbstractStage {
 
         (new DuelStartedEvent($duel))->call();
 
-        $scoreboardId = $stage instanceof DuelScoreboard ? $stage->getScoreboardId() : ProfileRegistry::MATCH_PLAYING_SCOREBOARD;
+        $scoreboardId = $stage instanceof StageScoreboard ? $stage->getScoreboardId($duel) : ProfileRegistry::MATCH_PLAYING_SCOREBOARD;
+        if ($duel instanceof PartyFFADuelImpl) $scoreboardId .= '-party';
 
-        foreach ($duel->getEveryone() as $duelProfile) {
-            $player = $duelProfile->toPlayer();
+        foreach ($duel->getEveryone() as $duelMember) {
+            $player = $duelMember->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
-            Practice::setProfileScoreboard(
+            Habu::applyScoreboard(
                 $player,
                 $scoreboardId
             );

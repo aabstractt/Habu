@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace bitrule\practice\arena\setup;
 
 use bitrule\practice\arena\ArenaProperties;
-use bitrule\practice\arena\impl\FireballFightArenaProperties;
+use bitrule\practice\arena\impl\BedFightArenaProperties;
 use InvalidArgumentException;
 use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 
-final class FireballFightArenaSetup extends AbstractArenaSetup {
+final class BedFightArenaSetup extends AbstractArenaSetup {
 
     /** @var Vector3|null $firstBedPosition */
     private ?Vector3 $firstBedPosition = null;
@@ -68,7 +68,7 @@ final class FireballFightArenaSetup extends AbstractArenaSetup {
     public function load(ArenaProperties $properties): void {
         parent::load($properties);
 
-        if (!$properties instanceof FireballFightArenaProperties) {
+        if (!$properties instanceof BedFightArenaProperties) {
             throw new InvalidArgumentException('Invalid arena properties');
         }
 
@@ -82,6 +82,6 @@ final class FireballFightArenaSetup extends AbstractArenaSetup {
      * @return string
      */
     public function getType(): string {
-        return FireballFightArenaProperties::IDENTIFIER;
+        return BedFightArenaProperties::IDENTIFIER;
     }
 }

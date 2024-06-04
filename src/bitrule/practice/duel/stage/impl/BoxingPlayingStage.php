@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace bitrule\practice\duel\stage\impl;
 
 use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\DuelScoreboard;
 use bitrule\practice\duel\impl\NormalDuelImpl;
 use bitrule\practice\duel\impl\round\NormalRoundingDuelImpl;
 use bitrule\practice\duel\stage\PlayingStage;
-use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\duel\stage\StageScoreboard;
+use bitrule\practice\profile\Profile;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\player\Player;
 use function abs;
 
-final class BoxingPlayingStage extends PlayingStage implements AttackDamageStageListener, DuelScoreboard {
+final class BoxingPlayingStage extends PlayingStage implements AttackDamageStageListener, StageScoreboard {
 
     /**
      * This method is called when a player is damaged by another player.
@@ -28,46 +28,48 @@ final class BoxingPlayingStage extends PlayingStage implements AttackDamageStage
         $attacker = $ev->getDamager();
         if (!$attacker instanceof Player) return;
 
-        $attackerProfile = $duel->getPlayer($attacker->getXuid());
+        $attackerProfile = $duel->getMember($attacker->getXuid());
         if ($attackerProfile === null || !$attackerProfile->isAlive()) return;
 
         $attackerDuelStatistics = $attackerProfile->getDuelStatistics();
         if ($attackerDuelStatistics->getTotalHits() < 100) return;
 
-        $victimProfile = $duel->getPlayer($victim->getXuid());
+        $victimProfile = $duel->getMember($victim->getXuid());
         if ($victimProfile === null || !$victimProfile->isAlive()) return;
 
         $victimProfile->convertAsSpectator($duel, false);
     }
 
     /**
+     * @param Duel $duel
+     *
      * @return string
      */
-    public function getScoreboardId(): string {
+    public function getScoreboardId(Duel $duel): string {
         return 'match-playing-boxing';
     }
 
     /**
      * Replace placeholders in the text.
      *
-     * @param Duel         $duel
-     * @param Player       $source
-     * @param LocalProfile $localProfile
-     * @param string       $identifier
+     * @param Duel    $duel
+     * @param Player  $source
+     * @param Profile $profile
+     * @param string  $identifier
      *
      * @return string|null
      */
-    public function replacePlaceholders(Duel $duel, Player $source, LocalProfile $localProfile, string $identifier): ?string {
+    public function replacePlaceholders(Duel $duel, Player $source, Profile $profile, string $identifier): ?string {
         if (!$duel instanceof NormalDuelImpl && !$duel instanceof NormalRoundingDuelImpl) return null;
 
-        $duelProfile = $duel->getPlayer($source->getXuid());
-        if ($duelProfile === null) return null;
+        $duelMember = $duel->getMember($source->getXuid());
+        if ($duelMember === null) return null;
 
         $opponent = $duel->getOpponent($source);
         if ($opponent === null) return null;
 
         $opponentDuelStatistics = $opponent->getDuelStatistics();
-        $duelStatistics = $duelProfile->getDuelStatistics();
+        $duelStatistics = $duelMember->getDuelStatistics();
 
         if ($identifier === 'duel-hits-difference') {
             $difference = $duelStatistics->getTotalHits() - $opponentDuelStatistics->getTotalHits();

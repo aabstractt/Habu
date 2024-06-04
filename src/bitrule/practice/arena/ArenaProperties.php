@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace bitrule\practice\arena;
 
+use bitrule\practice\arena\impl\BedFightArenaProperties;
 use bitrule\practice\arena\impl\BridgeArenaProperties;
 use bitrule\practice\arena\impl\DefaultArenaProperties;
-use bitrule\practice\arena\impl\FireballFightArenaProperties;
 use pocketmine\entity\Location;
+use pocketmine\math\Vector3;
 use RuntimeException;
 use function count;
 use function is_array;
@@ -23,6 +24,13 @@ abstract class ArenaProperties {
         protected string $originalName,
         protected array $properties = []
     ) {}
+
+    /**
+     * @param array $properties
+     */
+    public function setProperties(array $properties): void {
+        $this->properties = $properties;
+    }
 
     /**
      * @return string
@@ -53,69 +61,94 @@ abstract class ArenaProperties {
     }
 
     /**
+     * @return Vector3
+     */
+    public function getFirstCorner(): Vector3 {
+        return $this->properties['first-corner'] ?? throw new RuntimeException('First corner not set');
+    }
+
+    /**
+     * @return Vector3
+     */
+    public function getSecondCorner(): Vector3 {
+        return $this->properties['second-corner'] ?? throw new RuntimeException('Second corner not set');
+    }
+
+    /**
      * Returns the original properties of the arena.
      *
      * @return array
      */
     public function getOriginalProperties(): array {
-        $properties = $this->properties;
-        $properties['first-position'] = self::serializeVector($properties['first-position']);
-        $properties['second-position'] = self::serializeVector($properties['second-position']);
+        $properties = [];
+
+        foreach ($this->properties as $propertyName => $propertyValue) {
+            $properties[$propertyName] = $propertyValue instanceof Location ? self::serializeVector($propertyValue) : $propertyValue;
+        }
 
         return $properties;
     }
 
     /**
-     * @param array $properties
+     * Adapts the properties of the arena.
+     * This method should be called after the properties have been set.
      */
-    public function setup(array $properties): void {
-        if (!isset($properties['first-position'])) {
+    public function adaptProperties(): void {
+        if (count($this->properties) === 0) {
+            throw new RuntimeException('Properties not set');
+        }
+
+        if (!isset($this->properties['first-position'])) {
             throw new RuntimeException('First position not set');
         }
 
-        if (!isset($properties['second-position'])) {
+        if (!is_array($this->properties['first-position'])) {
+            throw new RuntimeException('Invalid first position data');
+        }
+
+        if (!isset($this->properties['second-position'])) {
             throw new RuntimeException('Second position not set');
         }
 
-        if (!isset($properties['primary-kit'])) {
-            throw new RuntimeException('Primary kit not set');
+        if (!is_array($this->properties['second-position'])) {
+            throw new RuntimeException('Invalid second position data');
         }
 
-        if (!$properties['first-position'] instanceof Location) {
-            if (!is_array($properties['first-position'])) {
-                throw new RuntimeException('Invalid first position data');
-            }
+        $this->properties['first-position'] = self::deserializeVector($this->properties['first-position']);
+        $this->properties['second-position'] = self::deserializeVector($this->properties['second-position']);
 
-            $properties['first-position'] = self::deserializeVector($properties['first-position']);
+        if (!isset($this->properties['first-corner'])) {
+            throw new RuntimeException('First corner not set');
         }
 
-        if (!$properties['second-position'] instanceof Location) {
-            if (!is_array($properties['second-position'])) {
-                throw new RuntimeException('Invalid second position data');
-            }
-
-            $properties['second-position'] = self::deserializeVector($properties['second-position']);
+        if (!is_array($this->properties['first-corner'])) {
+            throw new RuntimeException('Invalid first corner data');
         }
 
-        $this->properties = $properties;
+        if (!isset($this->properties['second-corner'])) {
+            throw new RuntimeException('Second corner not set');
+        }
+
+        if (!is_array($this->properties['second-corner'])) {
+            throw new RuntimeException('Invalid second corner data');
+        }
+
+        $this->properties['first-corner'] = self::deserializeVector($this->properties['first-corner']);
+        $this->properties['second-corner'] = self::deserializeVector($this->properties['second-corner']);
     }
 
     /**
      * @param string $arenaName
-     * @param array  $properties
+     * @param string $type
      *
      * @return self
      */
-    public static function parse(string $arenaName, array $properties): self {
-        if (!isset($properties['type'])) {
-            throw new RuntimeException('Type not set');
-        }
-
-        return match (strtolower($properties['type'])) {
+    public static function parse(string $arenaName, string $type): self {
+        return match (strtolower($type)) {
             'default' => new DefaultArenaProperties($arenaName),
-            strtolower(FireballFightArenaProperties::IDENTIFIER) => new FireballFightArenaProperties($arenaName),
+            strtolower(BedFightArenaProperties::IDENTIFIER) => new BedFightArenaProperties($arenaName),
             strtolower(BridgeArenaProperties::IDENTIFIER) => new BridgeArenaProperties($arenaName),
-            default => throw new RuntimeException('Invalid arena type: ' . $properties['type'])
+            default => throw new RuntimeException('Invalid arena type: ' . $type)
         };
     }
 
@@ -125,9 +158,9 @@ abstract class ArenaProperties {
      * @return string
      */
     public static function getArenaTypeByKit(string $kitName): string {
-        return match ($kitName) {
+        return match (strtolower($kitName)) {
             'bridge' => BridgeArenaProperties::IDENTIFIER,
-            FireballFightArenaProperties::IDENTIFIER => FireballFightArenaProperties::IDENTIFIER,
+            strtolower(BedFightArenaProperties::IDENTIFIER), 'fireball fight' => BedFightArenaProperties::IDENTIFIER,
             default => 'default'
         };
     }

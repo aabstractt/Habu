@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
+use bitrule\practice\Habu;
 use bitrule\practice\kit\KnockbackProfile;
-use bitrule\practice\Practice;
 use Exception;
 use InvalidArgumentException;
 use pocketmine\utils\Config;
@@ -29,9 +29,9 @@ final class KnockbackRegistry {
     /**
      * Loads all knockback profiles from the config.
      *
-     * @param Practice $plugin
+     * @param Habu $plugin
      */
-    public function loadAll(Practice $plugin): void {
+    public function loadAll(Habu $plugin): void {
         $configData = (new Config($plugin->getDataFolder() . 'knockback.yml'))->getAll();
         if (count($configData) === 0) {
             $plugin->getLogger()->warning('No knockback profiles found.');
@@ -86,7 +86,7 @@ final class KnockbackRegistry {
     }
 
     public function saveAll(): void {
-        $config = new Config(Practice::getInstance()->getDataFolder() . 'knockback.yml');
+        $config = new Config(Habu::getInstance()->getDataFolder() . 'knockback.yml');
         foreach (array_keys($config->getAll()) as $key) {
             if (!is_string($key)) {
                 throw new InvalidArgumentException('Knockback profile name must be a string');
@@ -109,7 +109,7 @@ final class KnockbackRegistry {
         try {
             $config->save();
         } catch (Exception $e) {
-            Practice::getInstance()->getLogger()->error('Failed to save knockback profiles: ' . $e->getMessage());
+            Habu::getInstance()->getLogger()->error('Failed to save knockback profiles: ' . $e->getMessage());
         }
     }
 }

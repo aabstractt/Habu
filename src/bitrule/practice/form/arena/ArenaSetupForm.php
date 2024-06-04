@@ -6,6 +6,7 @@ namespace bitrule\practice\form\arena;
 
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
+use bitrule\practice\kit\Kit;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use cosmicpe\form\ClosableForm;
@@ -18,7 +19,6 @@ use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
 use RuntimeException;
-use function array_keys;
 use function is_int;
 
 final class ArenaSetupForm extends CustomForm implements ClosableForm {
@@ -51,8 +51,13 @@ final class ArenaSetupForm extends CustomForm implements ClosableForm {
      * This is where you should add all the form entries.
      */
     public function setup(World $world): void {
+        $options = [];
+        foreach (KitRegistry::getInstance()->getKits() as $kit) {
+            $options[] = $kit->getName();
+        }
+
         $this->addEntry(
-            new DropdownEntry(TextFormat::GRAY . 'Arena Kit', $options = array_keys(KitRegistry::getInstance()->getKits())),
+            new DropdownEntry(TextFormat::GRAY . 'Arena Kit', $options),
             function (Player $player, CustomFormEntry $entry, $value) use ($options): void {
                 if (!is_int($value)) {
                     throw new FormValidationException('Please select a kit.');
@@ -84,8 +89,8 @@ final class ArenaSetupForm extends CustomForm implements ClosableForm {
             throw new RuntimeException('Arena setup form not initialized.');
         }
 
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-        if ($localProfile === null) {
+        $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
+        if ($profile === null) {
             throw new RuntimeException('Local player not found.');
         }
 
@@ -96,7 +101,7 @@ final class ArenaSetupForm extends CustomForm implements ClosableForm {
 
             $arenaSetup->setup($player);
 
-            $localProfile->setArenaSetup($arenaSetup);
+            $profile->setArenaSetup($arenaSetup);
 
             $player->sendMessage(TextFormat::GREEN . 'Arena setup started.');
         } catch (Exception $e) {

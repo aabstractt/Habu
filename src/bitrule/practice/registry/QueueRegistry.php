@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
+use bitrule\practice\duel\impl\NormalDuelImpl;
 use bitrule\practice\duel\queue\Queue;
-use bitrule\practice\Practice;
-use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\Habu;
+use bitrule\practice\profile\Profile;
 use Exception;
 use pocketmine\player\Player;
-use pocketmine\promise\Promise;
-use pocketmine\promise\PromiseResolver;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
+use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use function time;
 
@@ -30,61 +30,51 @@ final class QueueRegistry {
      * Also checks if there is an opponent in the queue
      * If there is, it will remove both players from the queue
      *
-     * @param LocalProfile $sourceLocalProfile
-     * @param string       $kitName
-     * @param bool         $ranked
+     * @param Profile $sourceProfile
+     * @param string  $kitName
+     * @param bool    $ranked
      *
-     * @return Promise<Queue>
+     * @return Queue|null
      */
-    public function createQueue(LocalProfile $sourceLocalProfile, string $kitName, bool $ranked): Promise {
-        $promiseResolver = new PromiseResolver();
-
+    public function createQueue(Profile $sourceProfile, string $kitName, bool $ranked): ?Queue {
         if (($kit = KitRegistry::getInstance()->getKit($kitName)) === null) {
-            $promiseResolver->reject();
-
-            return $promiseResolver->getPromise();
+            throw new RuntimeException('Kit not found.');
         }
 
-        $this->queues[$sourceXuid = $sourceLocalProfile->getXuid()] = $queue = new Queue($sourceXuid, $kitName, $ranked, time());
+        $this->queues[$sourceXuid = $sourceProfile->getXuid()] = $queue = new Queue($sourceXuid, $kitName, $ranked, time());
 
         $opponentMatchQueue = $this->lookupOpponent($queue);
-        if ($opponentMatchQueue === null) {
-            $promiseResolver->resolve($queue);
+        if ($opponentMatchQueue === null) return $queue;
 
-            return $promiseResolver->getPromise();
-        }
-
-        $this->removeQueue($sourceLocalProfile);
-
-        if (($opponentLocalProfile = ProfileRegistry::getInstance()->getLocalProfile($opponentMatchQueue->getXuid())) === null) {
+        if (($opponentProfile = ProfileRegistry::getInstance()->getProfile($opponentMatchQueue->getXuid())) === null) {
             throw new RuntimeException('Opponent profile no exists.');
         }
 
-        $this->removeQueue($opponentLocalProfile);
-
         /** @var Player[] $totalPlayers */
         $totalPlayers = [];
-        foreach ([$sourceLocalProfile, $opponentLocalProfile] as $localProfile) {
-            $player = Server::getInstance()->getPlayerExact($localProfile->getName());
+        foreach ([$sourceProfile, $opponentProfile] as $profile) {
+            $player = Server::getInstance()->getPlayerExact($profile->getName());
             if ($player === null || !$player->isOnline()) continue;
 
             $totalPlayers[] = $player;
+
+            $this->removeQueue($profile);
         }
 
-        $promiseResolver->resolve($queue);
-
         try {
-            DuelRegistry::getInstance()->createDuel(
+            $arenaProperties = ArenaRegistry::getInstance()->getRandomArena($kit);
+            if ($arenaProperties === null) {
+                throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
+            }
+
+            DuelRegistry::getInstance()->prepareDuel(
                 $totalPlayers,
-                [],
-                $kit,
-                $ranked
-//            new RoundingInfo(
-//                0,
-//                3,
-//                [],
-//                []
-//            )
+                new NormalDuelImpl(
+                    $arenaProperties,
+                    $kit,
+                    Uuid::uuid4()->toString(),
+                    $ranked
+                )
             );
         } catch (Exception $e) {
             foreach ($totalPlayers as $player) {
@@ -93,22 +83,22 @@ final class QueueRegistry {
             }
         }
 
-        return $promiseResolver->getPromise();
+        return null;
     }
 
     /**
      * Removes a player from the queue
      * Using their xuid and kit name
      *
-     * @param LocalProfile $localProfile
+     * @param Profile $profile
      */
-    public function removeQueue(LocalProfile $localProfile): void {
-        unset($this->queues[$localProfile->getXuid()]);
+    public function removeQueue(Profile $profile): void {
+        unset($this->queues[$profile->getXuid()]);
 
-        if (($player = Server::getInstance()->getPlayerExact($localProfile->getName())) === null) return;
+        if (($player = Server::getInstance()->getPlayerExact($profile->getName())) === null) return;
 
-        $localProfile->setQueue(null);
-        Practice::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
+        $profile->setQueue(null);
+        Habu::applyScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
     }
 
     /**

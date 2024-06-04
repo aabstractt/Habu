@@ -6,6 +6,7 @@ namespace bitrule\practice\commands\arena;
 
 use abstractplugin\command\Argument;
 use abstractplugin\command\PlayerArgumentTrait;
+use bitrule\practice\Habu;
 use bitrule\practice\registry\ProfileRegistry;
 use pocketmine\entity\Location;
 use pocketmine\player\Player;
@@ -22,14 +23,14 @@ final class ArenaYawArgument extends Argument {
      * @param array  $args
      */
     public function onPlayerExecute(Player $sender, string $label, array $args): void {
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($sender->getXuid());
-        if ($localProfile === null) {
+        $profile = ProfileRegistry::getInstance()->getProfile($sender->getXuid());
+        if ($profile === null) {
             $sender->sendMessage(TextFormat::RED . 'Error code 1');
 
             return;
         }
 
-        $arenaSetup = $localProfile->getArenaSetup();
+        $arenaSetup = $profile->getArenaSetup();
         if ($arenaSetup === null) {
             $sender->sendMessage(TextFormat::RED . 'You are not editing an arena');
 
@@ -69,6 +70,6 @@ final class ArenaYawArgument extends Argument {
             $arenaSetup->setSecondPosition($location);
         }
 
-        $sender->sendMessage(TextFormat::GREEN . 'Yaw set for spawn ' . $spawnId);
+        $sender->sendMessage(Habu::prefix() . TextFormat::GREEN . 'Yaw set for spawn ' . $spawnId);
     }
 }

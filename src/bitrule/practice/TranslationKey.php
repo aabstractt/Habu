@@ -12,11 +12,13 @@ use function str_replace;
 use function ucwords;
 
 /**
+ * @method static self DUEL_END_STATISTICS_POT()
  * @method static self DUEL_END_STATISTICS_NORMAL()
  * @method static self DUEL_ELO_CHANGES_LOST()
  * @method static self DUEL_ELO_CHANGES_WIN()
  *
- * @method static self DUEL_END_STATISTICS_POT()
+ * @method static self PARTY_DUEL_FFA_END()
+ *
  * @method static self DUEL_OPPONENT_FOUND()
  * @method static self DUEL_WINNER_BROADCAST()
  *
@@ -27,13 +29,18 @@ use function ucwords;
  * @method static self BOXING_DUEL_COMBO_SELF()
  * @method static self BOXING_DUEL_COMBO_NONE()
  *
- * @method static self FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()
- * @method static self FIREBALL_FIGHT_PLAYER_DEAD()
+ * @method static self BED_FIGHT_PLAYER_DEAD_WITHOUT_KILLER()
+ * @method static self BED_FIGHT_PLAYER_DEAD()
+ * @method static self DUEL_PLAYER_DEAD_WITHOUT_KILLER()
+ * @method static self DUEL_PLAYER_DEAD()
  *
  * @method static self PLAYER_JOINED_MESSAGE()
  * @method static self PLAYER_WELCOME_MESSAGE()
  * @method static self PLAYER_LEFT_MESSAGE()
- * @method static self PLAYER_QUEUE_JOINED()
+ * @method static self QUEUE_PLAYER_JOINED()
+ * @method static self QUEUE_PLAYER_LEAVED()
+ *
+ * @method static self QUEUE_LADDER_SELECTOR()
  */
 final class TranslationKey {
     use EnumTrait;
@@ -50,6 +57,20 @@ final class TranslationKey {
      */
     protected static function setup(): void {
         self::registerAll(
+            self::create(
+                'DUEL_END_STATISTICS_POT',
+                'duel.end-statistics-pot',
+                [
+                	'opponent',
+                	'self-elo-changes',
+                	'self-critics',
+                	'self-damage-dealt',
+                	'self-total-potions',
+                	'opponent-critics',
+                	'opponent-damage-dealt',
+                	'opponent-total-potions'
+                ]
+            ),
             self::create(
                 'DUEL_END_STATISTICS_NORMAL',
                 'duel.end-statistics-normal',
@@ -77,17 +98,12 @@ final class TranslationKey {
                 ]
             ),
             self::create(
-                'DUEL_END_STATISTICS_POT',
-                'duel.end-statistics-pot',
+                'PARTY_DUEL_FFA_END',
+                'duel.party-ffa-end',
                 [
-                	'opponent',
-                	'self-elo-changes',
-                	'self-critics',
-                	'self-damage-dealt',
-                	'self-total-potions',
-                	'opponent-critics',
-                	'opponent-damage-dealt',
-                	'opponent-total-potions'
+                	'winner',
+                	'spectators',
+                	'damage-dealt'
                 ]
             ),
             self::create(
@@ -147,15 +163,30 @@ final class TranslationKey {
                 []
             ),
             self::create(
-                'FIREBALL_FIGHT_PLAYER_DEAD_WITHOUT_KILLER',
-                'duel.fireball-fight.player-dead-without-killer',
+                'BED_FIGHT_PLAYER_DEAD_WITHOUT_KILLER',
+                'duel.bed-fight.player-dead-without-killer',
                 [
                 	'player'
                 ]
             ),
             self::create(
-                'FIREBALL_FIGHT_PLAYER_DEAD',
-                'duel.fireball-fight.player-dead',
+                'BED_FIGHT_PLAYER_DEAD',
+                'duel.bed-fight.player-dead',
+                [
+                	'player',
+                	'killer'
+                ]
+            ),
+            self::create(
+                'DUEL_PLAYER_DEAD_WITHOUT_KILLER',
+                'duel.player-dead-without-killer',
+                [
+                	'player'
+                ]
+            ),
+            self::create(
+                'DUEL_PLAYER_DEAD',
+                'duel.player-dead',
                 [
                 	'player',
                 	'killer'
@@ -184,11 +215,28 @@ final class TranslationKey {
                 ]
             ),
             self::create(
-                'PLAYER_QUEUE_JOINED',
-                'player.queue-joined',
+                'QUEUE_PLAYER_JOINED',
+                'queue.player-joined',
                 [
                 	'kit',
                 	'type'
+                ]
+            ),
+            self::create(
+                'QUEUE_PLAYER_LEAVED',
+                'queue.player-leaved',
+                [
+                	'kit',
+                	'type'
+                ]
+            ),
+            self::create(
+                'QUEUE_LADDER_SELECTOR',
+                'queue.ladder-selector',
+                [
+                	'name',
+                	'queueing-count',
+                	'fighting-count',
                 ]
             )
         );
@@ -208,7 +256,7 @@ final class TranslationKey {
             throw new InvalidArgumentException('The message key is not set.');
         }
 
-        return Practice::wrapMessage($this->messageKey, array_combine($this->arguments, $arguments));
+        return Habu::wrapMessage($this->messageKey, array_combine($this->arguments, $arguments));
     }
 
     /**

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
-use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\profile\Profile;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
 use RuntimeException;
+use function round;
 
 final class ProfileRegistry {
     use SingletonTrait;
@@ -16,32 +18,33 @@ final class ProfileRegistry {
     public const LOBBY_SCOREBOARD = 'lobby';
     public const QUEUE_SCOREBOARD = 'queue';
     public const MATCH_STARTING_SCOREBOARD = 'match-starting';
+    public const MATCH_STARTING_PARTY_SCOREBOARD = 'match-starting-party';
     public const MATCH_PLAYING_SCOREBOARD = 'match-playing';
     public const MATCH_ENDING_SCOREBOARD = 'match-ending';
 
-    /** @var array<string, LocalProfile> */
-    private array $localProfiles = [];
+    /** @var array<string, Profile> */
+    private array $profiles = [];
 
     /**
      * @param string $xuid
      *
-     * @return LocalProfile|null
+     * @return Profile|null
      */
-    public function getLocalProfile(string $xuid): ?LocalProfile {
-        return $this->localProfiles[$xuid] ?? null;
+    public function getProfile(string $xuid): ?Profile {
+        return $this->profiles[$xuid] ?? null;
     }
 
     /**
      * @param Player $player
      */
-    public function addLocalProfile(Player $player): void {
-        if (isset($this->localProfiles[$player->getXuid()])) {
+    public function addProfile(Player $player): void {
+        if (isset($this->profiles[$player->getXuid()])) {
             throw new RuntimeException('Player already exists in local players list');
         }
 
-        $this->localProfiles[$player->getXuid()] = $localProfile = new LocalProfile($player->getXuid(), $player->getName(), 1_000);
+        $this->profiles[$player->getXuid()] = $profile = new Profile($player->getXuid(), $player->getName(), 1_000);
 
-        $localProfile->joinLobby($player, true);
+        $profile->joinLobby($player, true);
     }
 
     /**
@@ -53,31 +56,44 @@ final class ProfileRegistry {
      * @param Player $player
      */
     public function quitPlayer(Player $player): void {
-        $localProfile = $this->localProfiles[$player->getXuid()] ?? null;
-        if ($localProfile === null) return;
+        $profile = $this->profiles[$player->getXuid()] ?? null;
+        if ($profile === null) return;
 
-        $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
-        if ($duel !== null) {
-            $duel->removePlayer($player, true);
-            $duel->postRemovePlayer($player);
-        }
+        QueueRegistry::getInstance()->removeQueue($profile);
 
-        QueueRegistry::getInstance()->removeQueue($localProfile);
-
-        unset($this->localProfiles[$player->getXuid()]);
+        unset($this->profiles[$player->getXuid()]);
     }
 
     /**
      * Tick the scoreboard for all players
      */
     public function tickScoreboard(): void {
-        foreach ($this->localProfiles as $localProfile) {
-            if (($scoreboard = $localProfile->getScoreboard()) === null) continue;
+        foreach ($this->profiles as $profile) {
+            if (($scoreboard = $profile->getScoreboard()) === null) continue;
 
-            $player = Server::getInstance()->getPlayerExact($localProfile->getName());
+            // TODO: Optimize this
+            $player = Server::getInstance()->getPlayerExact($profile->getName());
             if ($player === null || !$player->isOnline()) continue;
 
-            $scoreboard->update($player, $localProfile);
+            $scoreboard->update($player, $profile);
+
+            $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
+            if ($duel === null) continue;
+
+            $duelMember = $duel->getMember($player->getXuid());
+            if ($duelMember === null) continue;
+
+            if ($duelMember->getEnderPearlCountdown() > 0.0) {
+                $remainingCountdown = $duelMember->getRemainingEnderPearlCountdown();
+                if ($remainingCountdown > 0.0) {
+                    $player->getXpManager()->setXpAndProgressNoEvent((int) round($remainingCountdown), $remainingCountdown / 15);
+                } else {
+                    $player->sendMessage(TextFormat::GREEN . 'Your enderpearl cooldown expired.');
+                    $player->getXpManager()->setXpAndProgressNoEvent(0, 0.0);
+
+                    $duelMember->setEnderPearlCountdown(0.0);
+                }
+            }
         }
     }
 }

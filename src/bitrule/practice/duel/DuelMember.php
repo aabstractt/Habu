@@ -2,19 +2,22 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\profile;
+namespace bitrule\practice\duel;
 
-use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\DuelStatistics;
+use bitrule\practice\profile\Profile;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use function count;
+use function microtime;
+use function round;
 
-final class DuelProfile {
+final class DuelMember {
 
     /** @var bool */
     private bool $alive = true;
+    /** @var float The last time the player used an ender pearl. */
+    private float $enderPearlCountdown = 0.0;
 
     /**
      * @param string         $xuid
@@ -81,6 +84,27 @@ final class DuelProfile {
     }
 
     /**
+     * @return float
+     */
+    public function getRemainingEnderPearlCountdown(): float {
+        return round($this->enderPearlCountdown - microtime(true), 1);
+    }
+
+    /**
+     * @return float
+     */
+    public function getEnderPearlCountdown(): float {
+        return $this->enderPearlCountdown;
+    }
+
+    /**
+     * @param float $enderPearlCountdown
+     */
+    public function setEnderPearlCountdown(float $enderPearlCountdown): void {
+        $this->enderPearlCountdown = $enderPearlCountdown;
+    }
+
+    /**
      * @return bool
      */
     public function isPlaying(): bool {
@@ -114,11 +138,13 @@ final class DuelProfile {
             $duel->end();
         }
 
-        LocalProfile::resetInventory($player);
+        Profile::resetInventory($player);
 
         $player->setGamemode(GameMode::SPECTATOR);
         $player->setAllowFlight(true);
         $player->setFlying(true);
+
+        $player->teleport($duel->getWorld()->getSpawnLocation());
     }
 
     /**

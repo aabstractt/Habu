@@ -3,13 +3,17 @@ name: Habu
 author: bitrule
 version: "2024.505"
 api: 5.0.0
-main: bitrule\practice\Practice
+main: bitrule\practice\Habu
+softdepend:
+- Gorufus
 permissions:
   arena.command:
     default: op
   arena.command.knockback:
     default: op
   arena.command.createkit:
+    default: op
+  arena.command.toggleparty:
     default: op
   arena.command.create:
     default: op
@@ -19,7 +23,11 @@ permissions:
     default: op
   arena.command.yaw:
     default: op
+  arena.command.corner:
+    default: op
   practice.command.joinqueue:
+    default: true
+  practice.command.leavequeue:
     default: true
   kb.command:
     default: op
@@ -30,6 +38,10 @@ permissions:
   kb.command.vertical:
     default: op
   kb.command.highestlimit:
+    default: op
+  kb.command.hitdelay:
+    default: op
+  kb.command.info:
     default: op
   practice.command.durability:
     default: op

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
+use bitrule\practice\Habu;
 use bitrule\practice\kit\Kit;
-use bitrule\practice\Practice;
 use JsonException;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 use pocketmine\item\Durable;
@@ -39,7 +39,7 @@ final class KitRegistry {
      * This method is called when the plugin is enabled.
      */
     public function loadAll(): void {
-        $config = new Config(Practice::getInstance()->getDataFolder() . 'kits.yml');
+        $config = new Config(Habu::getInstance()->getDataFolder() . 'kits.yml');
         foreach ($config->getAll() as $kitName => $kitData) {
             if (!is_string($kitName) || !is_array($kitData)) {
                 throw new RuntimeException('Kit name is not a string or kit data is not an array');
@@ -59,13 +59,14 @@ final class KitRegistry {
 
             $this->kits[strtolower($kitName)] = new Kit(
                 $kitName,
+                $kitData['party_playable'] ?? true,
                 array_map(fn(array $itemData) => self::parseItem($itemData), $kitData['inventoryItems']),
                 array_map(fn(array $itemData) => self::parseItem($itemData), $kitData['armorItems']),
                 $kitData['kbProfile']
             );
         }
 
-        Practice::getInstance()->getLogger()->info(TextFormat::GREEN . 'Loaded ' . count($this->kits) . ' kit(s)');
+        Habu::getInstance()->getLogger()->info(TextFormat::GREEN . 'Loaded ' . count($this->kits) . ' kit(s)');
     }
 
     /**
@@ -76,8 +77,9 @@ final class KitRegistry {
     public function createKit(Kit $kit): void {
         $this->kits[strtolower($kit->getName())] = $kit;
 
-        $config = new Config(Practice::getInstance()->getDataFolder() . 'kits.yml');
+        $config = new Config(Habu::getInstance()->getDataFolder() . 'kits.yml');
         $config->set($kit->getName(), [
+        	'party_playable' => $kit->isPartyPlayable(),
         	'inventoryItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getInventoryItems()),
         	'armorItems' => array_map(fn(Item $item) => self::writeItem($item), $kit->getArmorItems()),
         	'kbProfile' => $kit->getKnockbackProfile()

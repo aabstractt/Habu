@@ -8,17 +8,24 @@ use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\DurabilityCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
-use bitrule\practice\duel\DuelScoreboard;
+use bitrule\practice\commands\LeaveQueueCommand;
+use bitrule\practice\duel\stage\StageScoreboard;
 use bitrule\practice\listener\defaults\PlayerExhaustListener;
+use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\listener\entity\EntityDamageListener;
 use bitrule\practice\listener\entity\EntityMotionListener;
 use bitrule\practice\listener\entity\EntityTeleportListener;
+use bitrule\practice\listener\entity\ProjectileLaunchListener;
 use bitrule\practice\listener\match\PlayerKitAppliedListener;
 use bitrule\practice\listener\match\SumoPlayerMoveListener;
+use bitrule\practice\listener\party\PartyCreateListener;
+use bitrule\practice\listener\party\PartyDisbandListener;
+use bitrule\practice\listener\party\PartyTransferListener;
 use bitrule\practice\listener\world\BlockBreakListener;
-use bitrule\practice\profile\LocalProfile;
+use bitrule\practice\listener\world\WorldSoundListener;
+use bitrule\practice\profile\Profile;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\DuelRegistry;
@@ -43,7 +50,7 @@ use function str_replace;
 use function str_starts_with;
 use function time;
 
-final class Practice extends PluginBase {
+final class Habu extends PluginBase {
     use SingletonTrait {
         setInstance as private;
         reset as private;
@@ -57,57 +64,58 @@ final class Practice extends PluginBase {
     protected function onEnable(): void {
         self::setInstance($this);
 
-        $bootstrap = 'phar://' . $this->getServer()->getPluginPath() . $this->getName() . '.phar/vendor/autoload.php';
-        if (!is_file($bootstrap)) {
-            $this->getLogger()->error('Could not find autoload.php in plugin phar, directory: ' . $bootstrap);
-            $this->getServer()->getPluginManager()->disablePlugin($this);
-            return;
-        }
-
-        require_once $bootstrap;
+//        $bootstrap = 'phar://' . $this->getServer()->getPluginPath() . $this->getName() . '.phar/vendor/autoload.php';
+//        if (!is_file($bootstrap)) {
+//            throw new RuntimeException('Could not find autoload.php in plugin phar, directory: ' . $bootstrap);
+//        }
+//
+//        require_once $bootstrap;
 
         $this->saveDefaultConfig();
         $this->saveResource('scoreboard.yml', true);
         $this->saveResource('messages.yml', true);
 
         $config = new Config($this->getDataFolder() . 'scoreboard.yml');
-
         if (!is_array($scoreboardLine = $config->get('lines'))) {
             throw new RuntimeException('Invalid scoreboard.yml');
         }
 
         $this->scoreboardLines = $scoreboardLine;
 
-        $this->messagesConfig = new Config($this->getDataFolder() . 'messages.yml');
-
         try {
             KitRegistry::getInstance()->loadAll();
         } catch (Exception $e) {
-            $this->getLogger()->error('Error loading kits: ' . $e->getMessage());
-
-            $this->getServer()->shutdown();
-            return;
+            throw new RuntimeException('Error loading kits: ' . $e->getMessage());
         }
 
         ArenaRegistry::getInstance()->loadAll();
         KnockbackRegistry::getInstance()->loadAll($this);
 
-        // TODO: Default server listeners
+        // Default server listeners
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerInteractListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerExhaustListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new BlockBreakListener(), $this);
-        $this->getServer()->getPluginManager()->registerEvents(new PlayerExhaustListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new WorldSoundListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerQuitListener(), $this);
 
-        // TODO: Match listeners
+        // Match listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerKitAppliedListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new ProjectileLaunchListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityTeleportListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SumoPlayerMoveListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityMotionListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityDamageListener(), $this);
 
+        // Party listeners
+        $this->getServer()->getPluginManager()->registerEvents(new PartyCreateListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PartyDisbandListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PartyTransferListener(), $this);
+
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
         	new ArenaMainCommand(),
         	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
+        	new LeaveQueueCommand('leavequeue', 'Leave from the queue.', '/leavequeue'),
         	new KnockbackProfileCommand(),
         	new DurabilityCommand('durability')
         ]);
@@ -125,6 +133,8 @@ final class Practice extends PluginBase {
             }),
             5
         );
+
+        $this->messagesConfig = new Config($this->getDataFolder() . 'messages.yml');
     }
 
     // TODO: Make more clean this code
@@ -139,7 +149,6 @@ final class Practice extends PluginBase {
         }
 
         return TextFormat::colorize($message);
-
     }
 
     /**
@@ -155,40 +164,40 @@ final class Practice extends PluginBase {
      * @param Player $player
      * @param string $identifier
      */
-    public static function setProfileScoreboard(Player $player, string $identifier): void {
-        $localProfile = ProfileRegistry::getInstance()->getLocalProfile($player->getXuid());
-        if ($localProfile === null) {
+    public static function applyScoreboard(Player $player, string $identifier): void {
+        $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
+        if ($profile === null) {
             throw new RuntimeException('Local profile not found for player: ' . $player->getName());
         }
 
-        if (($scoreboard = $localProfile->getScoreboard()) !== null) {
+        if (($scoreboard = $profile->getScoreboard()) !== null) {
             $scoreboard->hide($player); // TODO: Yes ??????
         }
 
-        $localProfile->setScoreboard($scoreboard = new Scoreboard());
+        $profile->setScoreboard($scoreboard = new Scoreboard());
 
         // TODO: Please make this more clean :sad:
         $scoreboard->load(self::getInstance()->scoreboardLines[$identifier] ?? throw new RuntimeException('Scoreboard not found: ' . $identifier));
         $scoreboard->show($player);
-        $scoreboard->update($player, $localProfile);
+        $scoreboard->update($player, $profile);
     }
 
     /**
      * Replace placeholders in the text.
      *
-     * @param Player       $player
-     * @param LocalProfile $localProfile
-     * @param string       $identifier
+     * @param Player  $player
+     * @param Profile $profile
+     * @param string  $identifier
      *
      * @return string|null
      */
-    public static function replacePlaceholders(Player $player, LocalProfile $localProfile, string $identifier): ?string {
+    public static function replacePlaceholders(Player $player, Profile $profile, string $identifier): ?string {
         if ($identifier === 'total-queue-count') return (string) (QueueRegistry::getInstance()->getQueueCount());
         if ($identifier === 'total-duel-count') return (string) (DuelRegistry::getInstance()->getDuelsCount());
         if ($identifier === 'online-players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
 
         if (str_starts_with($identifier, 'queue-')) {
-            if (($queue = $localProfile->getQueue()) === null) return null;
+            if (($queue = $profile->getQueue()) === null) return null;
 
             if ($identifier === 'queue-type') return $queue->isRanked() ? 'Ranked' : 'Unranked';
             if ($identifier === 'queue-kit') return $queue->getKitName();
@@ -202,8 +211,15 @@ final class Practice extends PluginBase {
         if ($result !== null) return $result;
 
         $stage = $duel->getStage();
-        if ($stage instanceof DuelScoreboard) return $stage->replacePlaceholders($duel, $player, $localProfile, $identifier);
+        if ($stage instanceof StageScoreboard) return $stage->replacePlaceholders($duel, $player, $profile, $identifier);
 
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public static function prefix(): string {
+        return TextFormat::GOLD . TextFormat::BOLD . 'Habu ' . TextFormat::GRAY . '» ' . TextFormat::RESET;
     }
 }

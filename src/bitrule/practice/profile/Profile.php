@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile;
 
+use bitrule\parties\PartiesPlugin;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\duel\queue\Queue;
-use bitrule\practice\Practice;
+use bitrule\practice\Habu;
 use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ProfileRegistry;
 use InvalidArgumentException;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
+use pocketmine\math\Vector3;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use function explode;
 use function is_string;
 
-final class LocalProfile {
+final class Profile {
 
     /** @var AbstractArenaSetup|null */
     private ?AbstractArenaSetup $arenaSetup = null;
@@ -28,10 +30,8 @@ final class LocalProfile {
     /** @var string The knockback profile of the player. */
     private string $knockbackProfile = 'default';
 
-    /** @var bool Whether the player's knockback motion is the initial motion. */
-    public bool $initialKnockbackMotion = false;
-    /** @var bool Whether the player's knockback motion should be cancelled. */
-    public bool $cancelKnockbackMotion = false;
+    /** @var Vector3|null The motion modified by the knockback profile. */
+    public ?Vector3 $motion = null;
 
     /**
      * @param string $xuid
@@ -125,7 +125,7 @@ final class LocalProfile {
 
         if (!$showScoreboard) return;
 
-        Practice::setProfileScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
+        Habu::applyScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
     }
 
     /**
@@ -153,14 +153,31 @@ final class LocalProfile {
 
         $player->setGamemode(GameMode::ADVENTURE);
 
-        /** @var array<int, array<int, string|Item>> $items */
-        $items = [
-        	0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],
-        	1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
-        	4 => ['spectate', VanillaItems::CLOCK()],
-        	7 => ['parties', VanillaItems::PAPER()],
-        	8 => ['settings', VanillaItems::COMPASS()]
-        ];
+        $partyAdapter = PartiesPlugin::getInstance()->getPartyAdapter();
+        if ($partyAdapter === null) {
+            throw new InvalidArgumentException('Party adapter not found');
+        }
+
+        $party = $partyAdapter->getPartyByPlayer($player->getXuid());
+        if ($party !== null && $party->getOwnership()->getXuid() === $player->getXuid()) {
+            /** @var array<int, array<int, string|Item>> $items */
+            $items = [
+            	0 => ['party-split', VanillaItems::DIAMOND_SWORD()],
+            	1 => ['party-ffa', VanillaItems::GOLDEN_SWORD()],
+            	4 => ['parties-duel', VanillaItems::CLOCK()],
+            	7 => ['parties', VanillaItems::PAPER()],
+            	8 => ['settings', VanillaItems::COMPASS()]
+            ];
+        } else {
+            /** @var array<int, array<int, string|Item>> $items */
+            $items = [
+            	0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],
+            	1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
+            	4 => ['spectate', VanillaItems::CLOCK()],
+            	7 => ['parties', VanillaItems::PAPER()],
+            	8 => ['settings', VanillaItems::COMPASS()]
+            ];
+        }
 
         foreach ($items as $inventorySlot => [$itemType, $item]) {
             if (!is_string($itemType)) {
@@ -171,8 +188,8 @@ final class LocalProfile {
                 throw new InvalidArgumentException('Item must be an instance of Item');
             }
 
-            $item->setCustomName(Practice::wrapMessage('items.' . $itemType . '.custom-name'));
-            $item->setLore(explode("\n", Practice::wrapMessage('items.' . $itemType . '.lore')));
+            $item->setCustomName(Habu::wrapMessage('items.' . $itemType . '.custom-name'));
+            $item->setLore(explode("\n", Habu::wrapMessage('items.' . $itemType . '.lore')));
 
             $nbt = $item->getNamedTag();
 

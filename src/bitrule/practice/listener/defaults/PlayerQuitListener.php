@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\defaults;
 
+use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\Listener;
@@ -23,6 +24,7 @@ final class PlayerQuitListener implements Listener {
 
         $ev->setQuitMessage(TranslationKey::PLAYER_LEFT_MESSAGE()->build($player->getName()));
 
+        DuelRegistry::getInstance()->quitPlayer($player);
         ProfileRegistry::getInstance()->quitPlayer($player);
     }
 }
