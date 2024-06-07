@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel\impl\round;
 
+use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\OpponentDuelTrait;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
+use bitrule\practice\kit\Kit;
+use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use function count;
 
@@ -164,5 +168,33 @@ final class NormalRoundingDuelImpl extends RoundingDuel {
         }
 
         return null;
+    }
+
+    /**
+     * Create a round duel.
+     *
+     * @param bool                 $ranked
+     * @param Kit                  $kit
+     * @param RoundingInfo         $roundingInfo
+     * @param ArenaProperties|null $arenaProperties
+     *
+     * @return self
+     */
+    public static function create(bool $ranked, Kit $kit, RoundingInfo $roundingInfo, ?ArenaProperties $arenaProperties = null): self {
+        if ($arenaProperties === null) {
+            $arenaProperties = ArenaRegistry::getInstance()->getRandomArena($kit);
+        }
+
+        if ($arenaProperties === null) {
+            throw new RuntimeException('No arena found for the kit.');
+        }
+
+        return new self(
+            $arenaProperties,
+            $kit,
+            $roundingInfo,
+            Uuid::uuid4()->toString(),
+            $ranked
+        );
     }
 }

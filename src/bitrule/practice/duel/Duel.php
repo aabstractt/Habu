@@ -209,6 +209,8 @@ abstract class Duel {
 
             $this->processPlayerEnd($player, $duelMember);
 
+            // TODO: No longer storing the scoreboard in the profile
+            // Move all scoreboard code to a library and cache it on his registry
             $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
             if ($profile === null) continue;
 

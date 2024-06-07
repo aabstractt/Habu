@@ -7,6 +7,7 @@ namespace bitrule\practice\duel\stage;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\Habu;
 use bitrule\practice\registry\ProfileRegistry;
+use function is_int;
 
 final class EndingStage implements AbstractStage {
 

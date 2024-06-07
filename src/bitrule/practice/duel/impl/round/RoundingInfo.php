@@ -53,7 +53,7 @@ final class RoundingInfo {
     /**
      * @return string|null
      */
-    public function findWinner(): ?string {
+    public function getWinner(): ?string {
         $winnerXuid = null;
 
         foreach ($this->players as $playerXuid => $wins) {

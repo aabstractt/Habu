@@ -54,10 +54,21 @@ abstract class RoundingDuel extends Duel {
             return;
         }
 
-        $winnerXuid = $this->roundingInfo->findWinner();
-        $winnerduelMember = $winnerXuid !== null ? $this->members[$winnerXuid] ?? null : null;
-        if ($winnerduelMember !== null) {
+        $duelMembers = $this->getPlaying();
+        foreach ($duelMembers as $duelMember) {
+            if (!$duelMember->isAlive()) continue;
+
+            $player = $duelMember->toPlayer();
+            if ($player === null || !$player->isOnline()) continue;
+
+            $this->roundingInfo->increaseWin($duelMember->getXuid());
+        }
+
+        $winnerXuid = $this->roundingInfo->getWinner();
+        $winnerDuelMember = $winnerXuid !== null ? $this->members[$winnerXuid] ?? null : null;
+        if ($winnerDuelMember !== null) {
             parent::end();
+
             $this->ended = true;
 
             return;
@@ -67,31 +78,17 @@ abstract class RoundingDuel extends Duel {
             $this->getSpectators(),
             fn(DuelMember $duelMember) => !$duelMember->isPlaying()
         );
-        $players = $this->getPlaying();
 
         $this->postEnd();
-
-        foreach ($players as $duelMember) {
-            if (!$duelMember->isAlive()) continue;
-
-            $player = $duelMember->toPlayer();
-            if ($player === null || !$player->isOnline()) continue;
-
-            $this->roundingInfo->increaseWin($duelMember->getXuid());
-        }
 
         try {
             $duelRegistry = DuelRegistry::getInstance();
             $duelRegistry->prepareDuel(
                 totalPlayers: array_filter(
-                    array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $players),
+                    array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $duelMembers),
                     fn(?Player $player) => $player !== null && $player->isOnline()
                 ),
-                duel: $duelRegistry->createRoundingDuel(
-                    $this->kit,
-                    $this->ranked,
-                    $this->roundingInfo
-                ),
+                duel: NormalRoundingDuelImpl::create($this->ranked, $this->kit, $this->roundingInfo, $this->arenaProperties),
                 onCompletion: function (Duel $duel) use ($literalSpectators): void {
                     $spectators = array_filter(
                         array_map(fn (DuelMember $duelMember) => $duelMember->toPlayer(), $literalSpectators),

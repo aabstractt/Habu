@@ -4,21 +4,16 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
-use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\duel\Duel;
-use bitrule\practice\duel\impl\round\NormalRoundingDuelImpl;
 use bitrule\practice\duel\impl\round\RoundingDuel;
-use bitrule\practice\duel\impl\round\RoundingInfo;
 use bitrule\practice\Habu;
-use bitrule\practice\kit\Kit;
 use Closure;
+use Exception;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
-use Ramsey\Uuid\Uuid;
-use RuntimeException;
 use function abs;
 use function count;
 use function pow;
@@ -28,33 +23,8 @@ final class DuelRegistry {
 
     /** @var array<string, Duel> */
     private array $duels = [];
-    /** @var int */
-    private int $duelsPlayed = 0;
     /** @var array<string, string> */
     private array $playersDuel = [];
-
-    /**
-     * @param Kit                  $kit
-     * @param bool                 $ranked
-     * @param RoundingInfo         $roundingInfo
-     * @param ArenaProperties|null $arenaProperties
-     *
-     * @return Duel
-     */
-    public function createRoundingDuel(Kit $kit, bool $ranked, RoundingInfo $roundingInfo, ?ArenaProperties $arenaProperties = null): Duel {
-        $arenaProperties ??= ArenaRegistry::getInstance()->getRandomArena($kit);
-        if ($arenaProperties === null) {
-            throw new RuntimeException('No arenas available for duel type: ' . $kit->getName());
-        }
-
-        return new NormalRoundingDuelImpl(
-            $arenaProperties,
-            $kit,
-            $roundingInfo,
-            Uuid::uuid4()->toString(),
-            $ranked
-        );
-    }
 
     /**
      * @param Player[]        $totalPlayers
@@ -62,13 +32,13 @@ final class DuelRegistry {
      * @param ?Closure(Duel): void $onCompletion
      */
     public function prepareDuel(array $totalPlayers, Duel $duel, ?Closure $onCompletion = null): void {
-        // TODO: Cache the player duel to prevent make many iterations for only a player
+        // Cache the player duel to prevent make many iterations for only a player
         // that helps a bit with the performance
         foreach ($totalPlayers as $player) {
             $this->playersDuel[$player->getXuid()] = $duel->getFullName();
         }
 
-        // TODO: Copy the world from the backup to the worlds folder
+        // Copy the world from the backup to the worlds folder
         // after that, load the world and prepare our duel!
         ArenaRegistry::getInstance()->loadWorld(
             $duel->getArenaProperties()->getOriginalName(),
@@ -77,10 +47,8 @@ final class DuelRegistry {
                 try {
                     $duel->prepare($totalPlayers);
 
-                    if ($onCompletion !== null) {
-                        $onCompletion($duel);
-                    }
-                } catch (\Exception $e) {
+                    if ($onCompletion !== null) $onCompletion($duel);
+                } catch (Exception $e) {
                     Habu::getInstance()->getLogger()->error('Failed to prepare duel: ' . $e->getMessage());
 
                     foreach ($totalPlayers as $player) {
