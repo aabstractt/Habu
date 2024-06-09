@@ -35,6 +35,14 @@ abstract class KillablePlayingStage extends PlayingStage implements AnythingDama
      * @param EntityDamageEvent $ev
      */
     public function onAnythingDamageEvent(Duel $duel, Player $victim, EntityDamageEvent $ev): void {
+        $attacker = $ev instanceof EntityDamageByEntityEvent ? $ev->getDamager() : null;
+        // Prevent players from attacking each other in the same spawn.
+        if ($attacker instanceof Player && $duel->getSpawnId($victim->getXuid()) === $duel->getSpawnId($attacker->getXuid())) {
+            $ev->cancel();
+
+            return;
+        }
+
         if ($victim->getHealth() - $ev->getFinalDamage() > 0) return;
 
         Profile::resetInventory($victim);
