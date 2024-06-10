@@ -8,8 +8,8 @@ use bitrule\parties\PartiesPlugin;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Habu;
-use bitrule\practice\profile\scoreboard\Scoreboard;
 use bitrule\practice\registry\ProfileRegistry;
+use bitrule\scoreboard\Scoreboard;
 use InvalidArgumentException;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
@@ -23,7 +23,7 @@ final class Profile {
 
     /** @var AbstractArenaSetup|null */
     private ?AbstractArenaSetup $arenaSetup = null;
-    /** @var Scoreboard|null */
+    /** @var \bitrule\scoreboard\Scoreboard|null */
     private ?Scoreboard $scoreboard = null;
     /** @var Queue|null */
     private ?Queue $queue = null;

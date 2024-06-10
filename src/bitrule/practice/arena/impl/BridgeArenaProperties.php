@@ -12,9 +12,6 @@ final class BridgeArenaProperties extends ArenaProperties {
 
     public const IDENTIFIER = 'Bridge';
 
-    public const TEAM_RED_ID = 0;
-    public const TEAM_BLUE_ID = 1;
-
     /**
      * The first portal is for the Red Team
      *

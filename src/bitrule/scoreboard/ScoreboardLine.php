@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\profile\scoreboard;
+namespace bitrule\scoreboard;
 
 final class ScoreboardLine {
 

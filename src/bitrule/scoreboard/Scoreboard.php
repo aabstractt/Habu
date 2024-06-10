@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bitrule\practice\profile\scoreboard;
+namespace bitrule\scoreboard;
 
 use bitrule\practice\Habu;
 use bitrule\practice\profile\Profile;
