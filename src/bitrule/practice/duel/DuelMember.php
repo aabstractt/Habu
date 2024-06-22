@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\duel;
 
 use bitrule\practice\profile\Profile;
+use bitrule\practice\registry\DuelRegistry;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -66,9 +67,7 @@ final class DuelMember {
      * @return Player|null
      */
     public function toPlayer(): ?Player {
-        // TODO: Optimize this a bit because this iterate all the players to return the player
-        // TODO: So I going to cache the player object into an array by his xuid to prevent iterate the players
-        return Server::getInstance()->getPlayerExact($this->name);
+        return DuelRegistry::getInstance()->getPlayerObject($this->xuid);
     }
 
     /**
