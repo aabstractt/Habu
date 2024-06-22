@@ -1,0 +1,137 @@
+<?php
+
+declare(strict_types=1);
+
+namespace bitrule\practice\duel\events\stage;
+
+use bitrule\practice\duel\events\SumoEvent;
+use bitrule\practice\profile\Profile;
+use bitrule\practice\registry\DuelRegistry;
+use bitrule\practice\registry\KitRegistry;
+use LogicException;
+
+final class StartedEventStage implements EventStage {
+
+    /**
+     * @var int $round
+     */
+    private int $round = 1;
+    /**
+     * @var int $roundTimeElapsed
+     */
+    private int $roundTimeElapsed = 0;
+
+    /**
+     * The first player xuid
+     * @var string|null $firstPlayerXuid
+     */
+    private ?string $firstPlayerXuid = null;
+    /**
+     * The second player xuid
+     * @var string|null $secondPlayerXuid
+     */
+    private ?string $secondPlayerXuid = null;
+
+    /**
+     * @param SumoEvent $event
+     */
+    public function update(SumoEvent $event): void {
+        $this->roundTimeElapsed++;
+
+        if ($this->roundTimeElapsed <= 3) {
+            $event->broadcast('Round #' . $this->round . ' starting in ' . (3 - $this->roundTimeElapsed) . ' seconds');
+        } elseif ($this->roundTimeElapsed === 4) {
+            $event->broadcast('Round started!');
+        }
+
+        if ($this->roundTimeElapsed < 90) return;
+
+        $this->end($event);
+    }
+
+    /**
+     * @param string $xuid
+     *
+     * @return bool
+     */
+    public function isOpponent(string $xuid): bool {
+        return $this->firstPlayerXuid === $xuid || $this->secondPlayerXuid === $xuid;
+    }
+
+    /**
+     * @param SumoEvent $event
+     */
+    public function end(SumoEvent $event): void {
+        // TODO: I need know who won the round
+        $firstPlayer = $this->firstPlayerXuid !== null ? DuelRegistry::getInstance()->getPlayerObject($this->firstPlayerXuid) : null;
+        if ($firstPlayer !== null) {
+            Profile::setDefaultAttributes($firstPlayer); // TODO: Change his knockback profile
+        }
+
+        $secondPlayer = $this->secondPlayerXuid !== null ? DuelRegistry::getInstance()->getPlayerObject($this->secondPlayerXuid) : null;
+        if ($secondPlayer !== null) {
+            Profile::setDefaultAttributes($secondPlayer); // TODO: Change his knockback profile
+        }
+
+        $playersAlive = $event->getPlayersAlive();
+        if (count($playersAlive) === 1) {
+            $event->end();
+
+            return;
+        }
+
+        $this->roundTimeElapsed = 0;
+        $this->round++;
+
+        shuffle($playersAlive);
+
+        $firstKey = array_rand($playersAlive);
+        if (!is_string($firstKey)) {
+            throw new LogicException('Invalid key type');
+        }
+
+        $firstXuid = $playersAlive[$firstKey] ?? null;
+        if ($firstXuid === null) {
+            throw new LogicException('First player is not online');
+        }
+
+        $secondKey = array_rand($playersAlive);
+        if (!is_string($secondKey)) {
+            throw new LogicException('Invalid key type');
+        }
+
+        $secondXuid = $playersAlive[$secondKey] ?? null;
+        if ($secondXuid === null) {
+            throw new LogicException('Second player is not online');
+        }
+
+        $firstPlayer = DuelRegistry::getInstance()->getPlayerObject($firstXuid);
+        if ($firstPlayer === null) {
+            throw new LogicException('First player is not online');
+        }
+
+        $secondPlayer = DuelRegistry::getInstance()->getPlayerObject($secondXuid);
+        if ($secondPlayer === null) {
+            throw new LogicException('Second player is not online');
+        }
+
+        $this->firstPlayerXuid = $firstPlayer->getXuid();
+        $this->secondPlayerXuid = $secondPlayer->getXuid();
+
+        $kit = KitRegistry::getInstance()->getKit('Sumo');
+        if ($kit === null) {
+            throw new LogicException('Kit not found');
+        }
+
+        foreach ([$firstPlayer, $secondPlayer] as $index => $player) {
+            $spawn = $index === 0 ? $event->getFirstSpawn() : $event->getSecondSpawn();
+            if ($spawn === null) {
+                throw new LogicException('Spawn is not set');
+            }
+
+            $player->teleport($spawn);
+
+            $kit->applyOn($player);
+        }
+    }
+}

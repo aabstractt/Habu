@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\defaults;
 
+use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
 use pocketmine\event\Listener;
@@ -30,6 +31,8 @@ final class PlayerJoinListener implements Listener {
             $player->getName(),
             count(Server::getInstance()->getOnlinePlayers())
         ));
+
+        DuelRegistry::getInstance()->setPlayerObject($player);
 
         ProfileRegistry::getInstance()->addProfile($player);
     }

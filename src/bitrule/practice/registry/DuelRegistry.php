@@ -25,6 +25,8 @@ final class DuelRegistry {
     private array $duels = [];
     /** @var array<string, string> */
     private array $playersDuel = [];
+    /** @var array<string, Player> */
+    private array $playerObject = [];
 
     /**
      * @param Player[]        $totalPlayers
@@ -108,6 +110,29 @@ final class DuelRegistry {
 
         $duel->removePlayer($source);
         $duel->postRemovePlayer($source);
+    }
+
+    /**
+     * @param string $sourceXuid
+     */
+    public function disconnectPlayer(string $sourceXuid): void {
+        unset($this->playerObject[$sourceXuid]);
+    }
+
+    /**
+     * @param string $xuid
+     *
+     * @return Player|null
+     */
+    public function getPlayerObject(string $xuid): ?Player {
+        return $this->playerObject[$xuid] ?? null;
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function setPlayerObject(Player $player): void {
+        $this->playerObject[$player->getXuid()] = $player;
     }
 
     /**

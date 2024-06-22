@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\entity;
 
+use bitrule\practice\duel\events\SumoEvent;
 use bitrule\practice\registry\DuelRegistry;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
@@ -19,6 +20,14 @@ final class EntityTeleportListener implements Listener {
     public function onEntityTeleportEvent(EntityTeleportEvent $ev): void {
         $entity = $ev->getEntity();
         if (!$entity instanceof Player || !$entity->isOnline()) return;
+
+        $to = $ev->getTo();
+        $from = $ev->getFrom();
+        if ($to->getWorld() === $from->getWorld()) return;
+
+        if ($to->getWorld()->getFolderName() !== SumoEvent::getInstance()->getWorldName()) {
+            SumoEvent::getInstance()->quitPlayer($entity);
+        }
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($entity->getXuid());
         if ($duel === null) return;

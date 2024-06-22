@@ -9,6 +9,7 @@ use bitrule\practice\commands\DurabilityCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
 use bitrule\practice\commands\LeaveQueueCommand;
+use bitrule\practice\duel\events\SumoEvent;
 use bitrule\practice\duel\stage\StageScoreboard;
 use bitrule\practice\listener\defaults\PlayerExhaustListener;
 use bitrule\practice\listener\defaults\PlayerInteractListener;
@@ -119,9 +120,14 @@ final class Habu extends PluginBase {
         	new DurabilityCommand('durability')
         ]);
 
+        $sumoEvent = SumoEvent::getInstance();
+        $sumoEvent->loadAll(new Config($this->getDataFolder() . 'sumo.yml'));
+
         $this->getScheduler()->scheduleRepeatingTask(
-            new ClosureTask(function (): void {
+            new ClosureTask(function () use ($sumoEvent): void {
                 DuelRegistry::getInstance()->tickStages();
+
+                $sumoEvent->getStage()->update($sumoEvent);
             }),
             20
         );
