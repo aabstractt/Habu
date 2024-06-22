@@ -22,6 +22,6 @@ final class StartingEventStage implements EventStage {
         if ($this->countdown > 0) return;
 
         $event->setStage($stage = new StartedEventStage());
-        $stage->end($event);
+        $stage->end($event, null);
     }
 }

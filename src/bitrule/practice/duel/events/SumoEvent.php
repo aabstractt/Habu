@@ -103,8 +103,9 @@ final class SumoEvent {
 
     /**
      * @param Player $player
+     * @param bool   $died
      */
-    public function quitPlayer(Player $player): void {
+    public function quitPlayer(Player $player, bool $died): void {
         if (!$this->enabled) return;
 
         $xuid = $player->getXuid();
@@ -112,13 +113,28 @@ final class SumoEvent {
 
         unset($this->playersAlive[array_search($xuid, $this->playersAlive, true)]);
 
+        if ($died) return;
         if (!$this->stage instanceof StartedEventStage) return;
         if (!$this->stage->isOpponent($xuid)) return;
 
-        $this->stage->end($this);
+        $this->stage->end($this, $player->getXuid());
     }
 
     public function end(): void {}
+
+    /**
+     * @return bool
+     */
+    public function isEnabled(): bool {
+        return $this->enabled;
+    }
+
+    /**
+     * @param bool $enabled
+     */
+    public function setEnabled(bool $enabled): void {
+        $this->enabled = $enabled;
+    }
 
     /**
      * @return string

@@ -46,7 +46,7 @@ final class StartedEventStage implements EventStage {
 
         if ($this->roundTimeElapsed < 90) return;
 
-        $this->end($event);
+        $this->end($event, null);
     }
 
     /**
@@ -59,18 +59,23 @@ final class StartedEventStage implements EventStage {
     }
 
     /**
-     * @param SumoEvent $event
+     * @param SumoEvent   $event
+     * @param string|null $whoDiedXuid
      */
-    public function end(SumoEvent $event): void {
+    public function end(SumoEvent $event, ?string $whoDiedXuid): void {
         // TODO: I need know who won the round
         $firstPlayer = $this->firstPlayerXuid !== null ? DuelRegistry::getInstance()->getPlayerObject($this->firstPlayerXuid) : null;
         if ($firstPlayer !== null) {
             Profile::setDefaultAttributes($firstPlayer); // TODO: Change his knockback profile
+
+            if ($firstPlayer->getXuid() === $whoDiedXuid) $event->quitPlayer($firstPlayer, true);
         }
 
         $secondPlayer = $this->secondPlayerXuid !== null ? DuelRegistry::getInstance()->getPlayerObject($this->secondPlayerXuid) : null;
         if ($secondPlayer !== null) {
             Profile::setDefaultAttributes($secondPlayer); // TODO: Change his knockback profile
+
+            if ($secondPlayer->getXuid() === $whoDiedXuid) $event->quitPlayer($secondPlayer, true);
         }
 
         $playersAlive = $event->getPlayersAlive();
