@@ -24,6 +24,7 @@ final class Profile {
     /** @var string The knockback profile of the player. */
     private string $knockbackProfile = 'default';
 
+    // TODO: Move this to knockback registry
     /** @var Vector3|null The motion modified by the knockback profile. */
     public ?Vector3 $motion = null;
 
@@ -53,6 +54,7 @@ final class Profile {
     }
 
     /**
+     * TODO: Move this to StatisticsRegistry
      * @return int
      */
     public function getElo(): int {
@@ -60,6 +62,7 @@ final class Profile {
     }
 
     /**
+     * TODO: Move this to StatisticsRegistry
      * @param int $elo
      */
     public function setElo(int $elo): void {
@@ -67,6 +70,7 @@ final class Profile {
     }
 
     /**
+     * TODO: Move this to ArenaRegistry
      * @return AbstractArenaSetup|null
      */
     public function getArenaSetup(): ?AbstractArenaSetup {
@@ -74,6 +78,7 @@ final class Profile {
     }
 
     /**
+     * TODO: Move this to ArenaRegistry
      * @param AbstractArenaSetup|null $arenaSetup
      */
     public function setArenaSetup(?AbstractArenaSetup $arenaSetup): void {
@@ -81,6 +86,7 @@ final class Profile {
     }
 
     /**
+     * TODO: Move this to Habu class
      * @param Player $player
      * @param bool   $showScoreboard
      */
@@ -95,6 +101,7 @@ final class Profile {
     }
 
     /**
+     * TODO: Move this to KnockbackRegistry
      * @param string $knockbackProfile
      */
     public function setKnockbackProfile(string $knockbackProfile): void {
@@ -102,6 +109,7 @@ final class Profile {
     }
 
     /**
+     * TODO: Move this to KnockbackRegistry
      * @return string
      */
     public function getKnockbackProfile(): string {
