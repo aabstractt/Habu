@@ -19,6 +19,7 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
 
 final class SumoEvent {
@@ -30,8 +31,6 @@ final class SumoEvent {
      * @var bool $enabled
      */
     private bool $enabled = false;
-
-    private string $worldName = 'Sumo';
     /**
      * The time given to the players to join the event
      *
@@ -46,10 +45,20 @@ final class SumoEvent {
      * @var string[] $playersAlive
      */
     private array $playersAlive = [];
-
+    /**
+     * The arena properties of the sumo event
+     * @var ArenaProperties|null $arenaProperties
+     */
     private ?ArenaProperties $arenaProperties = null;
-
+    /**
+     * The cuboid of the arena
+     * @var AxisAlignedBB|null $arenaCuboid
+     */
     private ?AxisAlignedBB $arenaCuboid = null;
+    /**
+     * The cuboid of the fight area
+     * @var AxisAlignedBB|null $fightCuboid
+     */
     private ?AxisAlignedBB $fightCuboid = null;
 
     /**
@@ -137,7 +146,21 @@ final class SumoEvent {
         $this->stage->end($this, $player->getXuid());
     }
 
-    public function end(): void {}
+    /**
+     * @param string|null $winnerXuid
+     */
+    public function end(?string $winnerXuid): void {
+        $this->disable();
+
+        $player = $winnerXuid !== null ? DuelRegistry::getInstance()->getPlayerObject($winnerXuid) : null;
+        Server::getInstance()->broadcastMessage(TextFormat::GREEN . 'The sumo event has ended. ' . ($player !== null ? $player->getName() : 'Nobody') . ' has won the event');
+    }
+
+    public function update(): void {
+        if (!$this->enabled || $this->stage === null) return;
+
+        $this->stage->update($this);
+    }
 
     /**
      * @return bool
@@ -165,13 +188,6 @@ final class SumoEvent {
      */
     public function setStage(EventStage $stage): void {
         $this->stage = $stage;
-    }
-
-    /**
-     * @return EventStage
-     */
-    public function getStage(): EventStage {
-        return $this->stage ?? throw new LogicException('Sumo event stage is not set');
     }
 
     /**

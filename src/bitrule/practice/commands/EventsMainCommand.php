@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\commands;
 
 use abstractplugin\command\BaseCommand;
+use bitrule\practice\commands\events\EventsJoinArgument;
 use bitrule\practice\commands\events\EventsStartArgument;
 
 final class EventsMainCommand extends BaseCommand {
@@ -14,7 +15,10 @@ final class EventsMainCommand extends BaseCommand {
 
         $this->setPermission($this->getPermission());
 
-        $this->registerParent(new EventsStartArgument('start', $this->getPermission() . '.start'));
+        $this->registerParent(
+            new EventsStartArgument('start', $this->getPermission() . '.start'),
+            new EventsJoinArgument('join')
+        );
     }
 
     /**

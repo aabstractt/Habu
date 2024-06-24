@@ -126,7 +126,7 @@ final class Habu extends PluginBase {
             new ClosureTask(function (): void {
                 DuelRegistry::getInstance()->tickStages();
 
-                SumoEvent::getInstance()->getStage()->update(SumoEvent::getInstance());
+                SumoEvent::getInstance()->update();
             }),
             20
         );

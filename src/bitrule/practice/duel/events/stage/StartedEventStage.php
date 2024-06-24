@@ -80,7 +80,7 @@ final class StartedEventStage implements EventStage {
 
         $playersAlive = $event->getPlayersAlive();
         if (count($playersAlive) === 1) {
-            $event->end();
+            $event->end($playersAlive[array_key_first($playersAlive)] ?? null);
 
             return;
         }
