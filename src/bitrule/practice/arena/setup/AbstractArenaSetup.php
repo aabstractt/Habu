@@ -6,6 +6,8 @@ namespace bitrule\practice\arena\setup;
 
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\impl\BedFightArenaProperties;
+use bitrule\practice\arena\impl\BridgeArenaProperties;
+use bitrule\practice\arena\impl\EventArenaProperties;
 use bitrule\practice\Habu;
 use InvalidArgumentException;
 use pocketmine\entity\Location;
@@ -312,8 +314,9 @@ abstract class AbstractArenaSetup {
     public static function from(string $type): self {
         return match (strtolower($type)) {
             'default', 'boxing' => new DefaultArenaSetup($type), // BoxingArenaSetup
-            'bridge' => new BridgeArenaSetup(),
+            strtolower(BridgeArenaProperties::IDENTIFIER) => new BridgeArenaSetup(),
             strtolower(BedFightArenaProperties::IDENTIFIER) => new BedFightArenaSetup(),
+            strtolower(EventArenaProperties::IDENTIFIER) => new EventArenaSetup(),
             default => throw new InvalidArgumentException('Invalid arena setup type ' . $type),
         };
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\match;
 
+use bitrule\practice\duel\events\SumoEvent;
 use bitrule\practice\duel\stage\impl\KillablePlayingStage;
 use bitrule\practice\duel\stage\PlayingStage;
 use bitrule\practice\registry\DuelRegistry;
@@ -29,9 +30,13 @@ final class SumoPlayerMoveListener implements Listener {
         if (!$player->isOnline()) return;
         if ($player->getLocation()->getFloorY() > self::MIN_Y) return;
 
+        $sumoEvent = SumoEvent::getInstance();
+        if ($sumoEvent->isPlaying($player) && !$sumoEvent->isVectorInside($ev->getTo(), false)) {
+            $sumoEvent->quitPlayer($player, false);
+        }
+
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel === null || !$duel->getStage() instanceof PlayingStage) return;
-        // TODO: Kill player
 
         $cuboid = $duel->getCuboid();
         if ($cuboid === null) {
@@ -50,6 +55,7 @@ final class SumoPlayerMoveListener implements Listener {
 
         $stage = $duel->getStage();
         if ($stage instanceof KillablePlayingStage) {
+            // TODO: Get the last attacker to give the kill to him
             $stage->killPlayer($duel, $player, null, EntityDamageEvent::CAUSE_VOID);
 
             return;
@@ -57,7 +63,7 @@ final class SumoPlayerMoveListener implements Listener {
 
         $duelMember = $duel->getMember($player->getXuid());
         if ($duelMember === null) {
-            throw new RuntimeException('Error code 1');
+            throw new RuntimeException('Error code 2');
         }
 
         $duelMember->convertAsSpectator($duel, false);

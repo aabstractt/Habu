@@ -6,6 +6,7 @@ namespace bitrule\practice;
 
 use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\DurabilityCommand;
+use bitrule\practice\commands\EventsMainCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
 use bitrule\practice\commands\LeaveQueueCommand;
@@ -113,21 +114,19 @@ final class Habu extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new PartyTransferListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
-        	new ArenaMainCommand(),
-        	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
-        	new LeaveQueueCommand('leavequeue', 'Leave from the queue.', '/leavequeue'),
-        	new KnockbackProfileCommand(),
-        	new DurabilityCommand('durability')
+            new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
+            new LeaveQueueCommand('leavequeue', 'Leave from the queue.', '/leavequeue'),
+            new DurabilityCommand('durability'),
+            new KnockbackProfileCommand(),
+            new EventsMainCommand(),
+            new ArenaMainCommand()
         ]);
 
-        $sumoEvent = SumoEvent::getInstance();
-        $sumoEvent->loadAll(new Config($this->getDataFolder() . 'sumo.yml'));
-
         $this->getScheduler()->scheduleRepeatingTask(
-            new ClosureTask(function () use ($sumoEvent): void {
+            new ClosureTask(function (): void {
                 DuelRegistry::getInstance()->tickStages();
 
-                $sumoEvent->getStage()->update($sumoEvent);
+                SumoEvent::getInstance()->getStage()->update(SumoEvent::getInstance());
             }),
             20
         );

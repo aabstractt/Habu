@@ -7,6 +7,7 @@ namespace bitrule\practice\arena;
 use bitrule\practice\arena\impl\BedFightArenaProperties;
 use bitrule\practice\arena\impl\BridgeArenaProperties;
 use bitrule\practice\arena\impl\DefaultArenaProperties;
+use bitrule\practice\arena\impl\EventArenaProperties;
 use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 use RuntimeException;
@@ -161,6 +162,7 @@ abstract class ArenaProperties {
         return match (strtolower($kitName)) {
             'bridge' => BridgeArenaProperties::IDENTIFIER,
             strtolower(BedFightArenaProperties::IDENTIFIER), 'fireball fight' => BedFightArenaProperties::IDENTIFIER,
+            'sumo event' => EventArenaProperties::IDENTIFIER,
             default => 'default'
         };
     }

@@ -23,7 +23,7 @@ final class Profile {
 
     /** @var AbstractArenaSetup|null */
     private ?AbstractArenaSetup $arenaSetup = null;
-    /** @var \bitrule\scoreboard\Scoreboard|null */
+    /** @var Scoreboard|null */
     private ?Scoreboard $scoreboard = null;
     /** @var Queue|null */
     private ?Queue $queue = null;

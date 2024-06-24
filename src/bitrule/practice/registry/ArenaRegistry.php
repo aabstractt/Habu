@@ -6,6 +6,8 @@ namespace bitrule\practice\registry;
 
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\asyncio\FileCopyAsyncTask;
+use bitrule\practice\arena\impl\EventArenaProperties;
+use bitrule\practice\duel\events\SumoEvent;
 use bitrule\practice\Habu;
 use bitrule\practice\kit\Kit;
 use Closure;
@@ -52,6 +54,11 @@ final class ArenaRegistry {
                 Habu::getInstance()->getLogger()->error('Failed to load arena ' . $arenaName . ': ' . $e->getMessage());
             }
         }
+
+        SumoEvent::getInstance()->loadAll(
+            ($arenaProperties = $this->getArena('Sumo Event')) instanceof EventArenaProperties ? $arenaProperties : null,
+            new Config(Habu::getInstance()->getDataFolder() . 'sumo.yml')
+        );
     }
 
     /**
@@ -104,17 +111,18 @@ final class ArenaRegistry {
      * @return ArenaProperties|null
      */
     public function getRandomArena(Kit $kit): ?ArenaProperties {
-        $arenasFiltered = [];
+        $arenas = [];
 
         foreach ($this->arenas as $arena) {
             if ($arena->getPrimaryKit() !== $kit->getName()) continue;
+            if (str_contains($arena->getOriginalName(), 'Event')) continue;
 
-            $arenasFiltered[] = $arena;
+            $arenas[] = $arena;
         }
 
-        if (count($arenasFiltered) === 0) return null;
+        if (count($arenas) === 0) return null;
 
-        return $arenasFiltered[array_rand($arenasFiltered)] ?? null;
+        return $arenas[array_rand($arenas)] ?? null;
     }
 
     /**
@@ -128,45 +136,5 @@ final class ArenaRegistry {
            Server::getInstance()->getDataPath() . 'worlds/' . $worldName,
            $onComplete
        ));
-    }
-
-    public static function adapt(array &$properties): void {
-        if (!isset($properties['first-position'])) {
-            throw new RuntimeException('First position not set');
-        }
-
-        if (!is_array($properties['first-position'])) {
-            throw new RuntimeException('Invalid first position data');
-        }
-
-        if (!isset($properties['second-position'])) {
-            throw new RuntimeException('Second position not set');
-        }
-
-        if (!is_array($properties['second-position'])) {
-            throw new RuntimeException('Invalid second position data');
-        }
-
-        $properties['first-position'] = ArenaProperties::deserializeVector($properties['first-position']);
-        $properties['second-position'] = ArenaProperties::deserializeVector($properties['second-position']);
-
-        if (!isset($properties['first-corner'])) {
-            throw new RuntimeException('First corner not set');
-        }
-
-        if (!is_array($properties['first-corner'])) {
-            throw new RuntimeException('Invalid first corner data');
-        }
-
-        if (!isset($properties['second-corner'])) {
-            throw new RuntimeException('Second corner not set');
-        }
-
-        if (!is_array($properties['second-corner'])) {
-            throw new RuntimeException('Invalid second corner data');
-        }
-
-        $properties['first-corner'] = ArenaProperties::deserializeVector($properties['first-corner']);
-        $properties['second-corner'] = ArenaProperties::deserializeVector($properties['second-corner']);
     }
 }

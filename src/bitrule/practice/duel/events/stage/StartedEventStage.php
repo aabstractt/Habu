@@ -123,18 +123,18 @@ final class StartedEventStage implements EventStage {
         $this->firstPlayerXuid = $firstPlayer->getXuid();
         $this->secondPlayerXuid = $secondPlayer->getXuid();
 
-        $kit = KitRegistry::getInstance()->getKit('Sumo');
+        $arenaProperties = $event->getArenaProperties();
+        if ($arenaProperties === null) {
+            throw new LogicException('ArenaProperties is not set');
+        }
+
+        $kit = KitRegistry::getInstance()->getKit($arenaProperties->getPrimaryKit());
         if ($kit === null) {
             throw new LogicException('Kit not found');
         }
 
         foreach ([$firstPlayer, $secondPlayer] as $index => $player) {
-            $spawn = $index === 0 ? $event->getFirstSpawn() : $event->getSecondSpawn();
-            if ($spawn === null) {
-                throw new LogicException('Spawn is not set');
-            }
-
-            $player->teleport($spawn);
+            $player->teleport($index === 0 ? $arenaProperties->getFirstPosition() : $arenaProperties->getSecondPosition());
 
             $kit->applyOn($player);
         }

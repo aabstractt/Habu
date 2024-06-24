@@ -25,8 +25,9 @@ final class EntityTeleportListener implements Listener {
         $from = $ev->getFrom();
         if ($to->getWorld() === $from->getWorld()) return;
 
-        if ($to->getWorld()->getFolderName() !== SumoEvent::getInstance()->getWorldName()) {
-            SumoEvent::getInstance()->quitPlayer($entity);
+        $sumoEvent = SumoEvent::getInstance();
+        if ($sumoEvent->isPlaying($entity) && !$sumoEvent->isVectorInside($ev->getTo(), false)) {
+            $sumoEvent->quitPlayer($entity, false);
         }
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($entity->getXuid());

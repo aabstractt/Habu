@@ -25,6 +25,10 @@ permissions:
     default: op
   arena.command.corner:
     default: op
+  practice.command.events:
+    default: op
+  practice.command.events.start:
+    default: op
   practice.command.joinqueue:
     default: true
   practice.command.leavequeue:

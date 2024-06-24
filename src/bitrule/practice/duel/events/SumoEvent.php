@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\duel\events;
 
+use bitrule\practice\arena\ArenaProperties;
+use bitrule\practice\arena\impl\EventArenaProperties;
 use bitrule\practice\duel\events\stage\EventStage;
 use bitrule\practice\duel\events\stage\StartingEventStage;
 use bitrule\practice\duel\events\stage\StartedEventStage;
@@ -11,12 +13,13 @@ use bitrule\practice\Habu;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
 use LogicException;
-use pocketmine\entity\Location;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\world\Position;
 
 final class SumoEvent {
     use SingletonTrait;
@@ -43,36 +46,45 @@ final class SumoEvent {
      * @var string[] $playersAlive
      */
     private array $playersAlive = [];
-    /**
-     * This is the spawn for the first player
-     * @var Location|null $firstSpawn
-     */
-    private ?Location $firstSpawn = null;
-    /**
-     * This is the spawn for the second player
-     * @var Location|null $secondSpawn
-     */
-    private ?Location $secondSpawn = null;
-    /**
-     * This is the spawn for players non fighting
-     * @var Location|null $thirdSpawn
-     */
-    private ?Location $thirdSpawn = null;
+
+    private ?ArenaProperties $arenaProperties = null;
+
+    private ?AxisAlignedBB $arenaCuboid = null;
+    private ?AxisAlignedBB $fightCuboid = null;
 
     /**
-     * @param Config $config
+     * @param EventArenaProperties|null $arenaProperties
+     * @param Config                    $config
      */
-    public function loadAll(Config $config): void {
-        $this->worldName = is_string($value = $config->get('sumo-world-name')) ? $value : 'Sumo';
-        if (!Server::getInstance()->getWorldManager()->isWorldGenerated($this->worldName)) {
-            throw new LogicException('Sumo world is not generated');
+    public function loadAll(?EventArenaProperties $arenaProperties, Config $config): void {
+        $this->waitingTime = is_int($value = $config->get('waiting-time')) ? $value : 30;
+        $this->stage = new StartingEventStage($this->waitingTime);
+
+        if ($arenaProperties === null) return;
+
+        $first = [$arenaProperties->getFirstFightCorner(), $arenaProperties->getSecondFightCorner()];
+        $second = [$arenaProperties->getFirstFightCorner(), $arenaProperties->getSecondFightCorner()];
+
+        foreach ([$first, $second] as $index => [$firstCorner, $secondCorner]) {
+            $cuboid = new AxisAlignedBB(
+                min($firstCorner->getX(), $secondCorner->getX()),
+                min($firstCorner->getY(), $secondCorner->getY()),
+                min($firstCorner->getZ(), $secondCorner->getZ()),
+                max($firstCorner->getX(), $secondCorner->getX()),
+                max($firstCorner->getY(), $secondCorner->getY()),
+                max($firstCorner->getZ(), $secondCorner->getZ())
+            );
+
+            if ($index === 0) {
+                $this->arenaCuboid = $cuboid;
+            } else {
+                $this->fightCuboid = $cuboid;
+            }
         }
 
-        Server::getInstance()->getWorldManager()->loadWorld($this->worldName);
+        $this->arenaProperties = $arenaProperties;
 
-        $this->waitingTime = is_int($value = $config->get('sumo-waiting-time')) ? $value : 30;
-
-        $this->stage = new StartingEventStage($this->waitingTime);
+        Server::getInstance()->getWorldManager()->loadWorld($arenaProperties->getOriginalName());
     }
 
     /**
@@ -84,8 +96,13 @@ final class SumoEvent {
             throw new LogicException('Sumo event is not enabled');
         }
 
-        if ($this->thirdSpawn == null) {
-            throw new LogicException('Sumo event third spawn is not set');
+        if ($this->arenaProperties === null) {
+            throw new LogicException('Sumo event arena properties are not set');
+        }
+
+        $world = Server::getInstance()->getWorldManager()->getWorldByName($this->arenaProperties->getOriginalName());
+        if ($world === null) {
+            throw new LogicException('Sumo event world is not loaded');
         }
 
         $xuid = $player->getXuid();
@@ -95,7 +112,7 @@ final class SumoEvent {
 
         if ($add) $this->playersAlive[] = $xuid;
 
-        $player->teleport($this->thirdSpawn);
+        $player->teleport($world->getSpawnLocation());
 
         Profile::resetInventory($player);
         $player->setGamemode(GameMode::ADVENTURE);
@@ -137,24 +154,10 @@ final class SumoEvent {
     }
 
     /**
-     * @return string
+     * @return ArenaProperties|null
      */
-    public function getWorldName(): string {
-        return $this->worldName ?? throw new LogicException('Sumo event world name is not set');
-    }
-
-    /**
-     * @return Location|null
-     */
-    public function getFirstSpawn(): ?Location {
-        return $this->firstSpawn;
-    }
-
-    /**
-     * @return Location|null
-     */
-    public function getSecondSpawn(): ?Location {
-        return $this->secondSpawn;
+    public function getArenaProperties(): ?ArenaProperties {
+        return $this->arenaProperties;
     }
 
     /**
@@ -188,6 +191,28 @@ final class SumoEvent {
      */
     public function getPlayersAlive(): array {
         return $this->playersAlive;
+    }
+
+    /**
+     * @param Position $to
+     * @param bool     $fight
+     *
+     * @return bool
+     */
+    public function isVectorInside(Position $to, bool $fight): bool {
+        if ($this->arenaCuboid === null || $this->fightCuboid === null || $this->arenaProperties === null) return false;
+        if ($to->getWorld()->getFolderName() !== $this->arenaProperties->getOriginalName()) return false;
+
+        return ($fight ? $this->fightCuboid : $this->arenaCuboid)->isVectorInside($to);
+    }
+
+    /**
+     * @param Player $source
+     *
+     * @return bool
+     */
+    public function isPlaying(Player $source): bool {
+        return $this->enabled && in_array($source->getXuid(), $this->playersAlive, true);
     }
 
     public function disable(): void {
