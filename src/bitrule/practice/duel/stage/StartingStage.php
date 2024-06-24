@@ -7,8 +7,8 @@ namespace bitrule\practice\duel\stage;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\impl\PartyFFADuelImpl;
 use bitrule\practice\event\duel\DuelStartedEvent;
-use bitrule\practice\Habu;
 use bitrule\practice\registry\ProfileRegistry;
+use bitrule\scoreboard\ScoreboardRegistry;
 use function count;
 
 final class StartingStage implements AbstractStage {
@@ -47,10 +47,7 @@ final class StartingStage implements AbstractStage {
             $player = $duelMember->toPlayer();
             if ($player === null || !$player->isOnline()) continue;
 
-            Habu::applyScoreboard(
-                $player,
-                $scoreboardId
-            );
+            ScoreboardRegistry::getInstance()->apply($player, $scoreboardId);
         }
     }
 

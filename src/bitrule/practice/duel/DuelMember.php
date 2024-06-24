@@ -8,7 +8,6 @@ use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
-use pocketmine\Server;
 use function count;
 use function microtime;
 use function round;

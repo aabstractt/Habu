@@ -14,6 +14,7 @@ use bitrule\practice\kit\Kit;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
+use bitrule\scoreboard\ScoreboardRegistry;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -207,16 +208,6 @@ abstract class Duel {
             $player = $duelMember->toPlayer();
             if ($player === null) continue;
 
-            $this->processPlayerEnd($player, $duelMember);
-
-            // TODO: No longer storing the scoreboard in the profile
-            // Move all scoreboard code to a library and cache it on his registry
-            $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
-            if ($profile === null) continue;
-
-            $scoreboard = $profile->getScoreboard();
-            if ($scoreboard === null || !$scoreboard->isShowed()) continue;
-
             /**
              * I remove the player's scoreboard because if the player has a very long
              * line, it will be annoying throughout the game. So what I do is delete it here
@@ -224,8 +215,9 @@ abstract class Duel {
              * because if I do it immediately, the changes will not be seen and
              * the scoreboard will continue to look horrible
              */
-            $profile->setScoreboard(null);
-            $scoreboard->hide($player);
+            ScoreboardRegistry::getInstance()->clear($player, true);
+
+            $this->processPlayerEnd($player, $duelMember);
         }
     }
 
@@ -256,7 +248,7 @@ abstract class Duel {
      * @param DuelMember $duelMember
      */
     public function processPlayerEnd(Player $player, DuelMember $duelMember): void {
-        Habu::applyScoreboard($player, ProfileRegistry::MATCH_ENDING_SCOREBOARD);
+//        ScoreboardRegistry::getInstance()->apply($player, Habu::MATCH_ENDING_SCOREBOARD);
     }
 
     /**

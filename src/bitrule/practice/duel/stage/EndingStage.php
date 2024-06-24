@@ -6,7 +6,7 @@ namespace bitrule\practice\duel\stage;
 
 use bitrule\practice\duel\Duel;
 use bitrule\practice\Habu;
-use bitrule\practice\registry\ProfileRegistry;
+use bitrule\scoreboard\ScoreboardRegistry;
 use function is_int;
 
 final class EndingStage implements AbstractStage {
@@ -41,10 +41,7 @@ final class EndingStage implements AbstractStage {
                 $player = $duelMember->toPlayer();
                 if ($player === null || !$player->isOnline()) continue;
 
-                Habu::applyScoreboard(
-                    $player,
-                    ProfileRegistry::MATCH_ENDING_SCOREBOARD
-                );
+                ScoreboardRegistry::getInstance()->apply($player, Habu::MATCH_ENDING_SCOREBOARD);
             }
         }
 

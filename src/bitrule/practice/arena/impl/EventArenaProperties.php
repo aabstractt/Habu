@@ -7,6 +7,7 @@ namespace bitrule\practice\arena\impl;
 use bitrule\practice\arena\ArenaProperties;
 use pocketmine\math\Vector3;
 use RuntimeException;
+use function is_array;
 
 final class EventArenaProperties extends ArenaProperties {
 

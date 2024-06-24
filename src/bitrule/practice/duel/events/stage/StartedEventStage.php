@@ -9,16 +9,17 @@ use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\KitRegistry;
 use LogicException;
+use function array_key_first;
+use function array_rand;
+use function count;
+use function is_string;
+use function shuffle;
 
 final class StartedEventStage implements EventStage {
 
-    /**
-     * @var int $round
-     */
+    /** @var int $round */
     private int $round = 1;
-    /**
-     * @var int $roundTimeElapsed
-     */
+    /** @var int $roundTimeElapsed */
     private int $roundTimeElapsed = 0;
 
     /**

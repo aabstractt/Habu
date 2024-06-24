@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\registry;
 
 use bitrule\practice\profile\Profile;
+use bitrule\scoreboard\ScoreboardRegistry;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\SingletonTrait;
@@ -59,7 +60,7 @@ final class ProfileRegistry {
         $profile = $this->profiles[$player->getXuid()] ?? null;
         if ($profile === null) return;
 
-        QueueRegistry::getInstance()->removeQueue($profile);
+        QueueRegistry::getInstance()->removeQueue($player);
 
         unset($this->profiles[$player->getXuid()]);
     }
@@ -68,31 +69,26 @@ final class ProfileRegistry {
      * Tick the scoreboard for all players
      */
     public function tickScoreboard(): void {
-        foreach ($this->profiles as $profile) {
-            if (($scoreboard = $profile->getScoreboard()) === null) continue;
+        foreach (Server::getInstance()->getOnlinePlayers() as $player) {
+            if (!$player->isOnline()) continue;
 
-            // TODO: Optimize this
-            $player = Server::getInstance()->getPlayerExact($profile->getName());
-            if ($player === null || !$player->isOnline()) continue;
-
-            $scoreboard->update($player, $profile);
+            ScoreboardRegistry::getInstance()->update($player);
 
             $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
             if ($duel === null) continue;
 
             $duelMember = $duel->getMember($player->getXuid());
             if ($duelMember === null) continue;
+            if ($duelMember->getEnderPearlCountdown() <= 0.0) continue;
 
-            if ($duelMember->getEnderPearlCountdown() > 0.0) {
-                $remainingCountdown = $duelMember->getRemainingEnderPearlCountdown();
-                if ($remainingCountdown > 0.0) {
-                    $player->getXpManager()->setXpAndProgressNoEvent((int) round($remainingCountdown), $remainingCountdown / 15);
-                } else {
-                    $player->sendMessage(TextFormat::GREEN . 'Your enderpearl cooldown expired.');
-                    $player->getXpManager()->setXpAndProgressNoEvent(0, 0.0);
+            $remainingCountdown = $duelMember->getRemainingEnderPearlCountdown();
+            if ($remainingCountdown > 0.0) {
+                $player->getXpManager()->setXpAndProgressNoEvent((int) round($remainingCountdown), $remainingCountdown / 15);
+            } else {
+                $player->sendMessage(TextFormat::GREEN . 'Your enderpearl cooldown expired.');
+                $player->getXpManager()->setXpAndProgressNoEvent(0, 0.0);
 
-                    $duelMember->setEnderPearlCountdown(0.0);
-                }
+                $duelMember->setEnderPearlCountdown(0.0);
             }
         }
     }

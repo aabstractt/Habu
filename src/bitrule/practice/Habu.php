@@ -11,7 +11,6 @@ use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
 use bitrule\practice\commands\LeaveQueueCommand;
 use bitrule\practice\duel\events\SumoEvent;
-use bitrule\practice\duel\stage\StageScoreboard;
 use bitrule\practice\listener\defaults\PlayerExhaustListener;
 use bitrule\practice\listener\defaults\PlayerInteractListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
@@ -27,29 +26,22 @@ use bitrule\practice\listener\party\PartyDisbandListener;
 use bitrule\practice\listener\party\PartyTransferListener;
 use bitrule\practice\listener\world\BlockBreakListener;
 use bitrule\practice\listener\world\WorldSoundListener;
-use bitrule\practice\profile\Profile;
+use bitrule\practice\profile\DefaultScoreboardPlaceholders;
 use bitrule\practice\registry\ArenaRegistry;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\KitRegistry;
 use bitrule\practice\registry\KnockbackRegistry;
 use bitrule\practice\registry\ProfileRegistry;
-use bitrule\practice\registry\QueueRegistry;
-use bitrule\scoreboard\Scoreboard;
+use bitrule\scoreboard\ScoreboardRegistry;
 use Exception;
-use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use RuntimeException;
-use function count;
-use function gmdate;
-use function is_array;
 use function is_string;
 use function str_replace;
-use function str_starts_with;
-use function time;
 
 final class Habu extends PluginBase {
     use SingletonTrait {
@@ -57,8 +49,12 @@ final class Habu extends PluginBase {
         reset as private;
     }
 
-    /** @var array<string, array<string, string>> */
-    private array $scoreboardLines = [];
+    public const LOBBY_SCOREBOARD = 'lobby';
+    public const QUEUE_SCOREBOARD = 'queue';
+    public const MATCH_STARTING_SCOREBOARD = 'match-starting';
+    public const MATCH_STARTING_PARTY_SCOREBOARD = 'match-starting-party';
+    public const MATCH_PLAYING_SCOREBOARD = 'match-playing';
+    public const MATCH_ENDING_SCOREBOARD = 'match-ending';
 
     private ?Config $messagesConfig = null;
 
@@ -76,12 +72,8 @@ final class Habu extends PluginBase {
         $this->saveResource('scoreboard.yml', true);
         $this->saveResource('messages.yml', true);
 
-        $config = new Config($this->getDataFolder() . 'scoreboard.yml');
-        if (!is_array($scoreboardLine = $config->get('lines'))) {
-            throw new RuntimeException('Invalid scoreboard.yml');
-        }
-
-        $this->scoreboardLines = $scoreboardLine;
+        ScoreboardRegistry::getInstance()->load(new Config($this->getDataFolder() . 'scoreboard.yml'));
+        ScoreboardRegistry::getInstance()->setScoreboardPlaceholders(new DefaultScoreboardPlaceholders());
 
         try {
             KitRegistry::getInstance()->loadAll();
@@ -114,12 +106,12 @@ final class Habu extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new PartyTransferListener(), $this);
 
         $this->getServer()->getCommandMap()->registerAll('bitrule', [
-            new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
-            new LeaveQueueCommand('leavequeue', 'Leave from the queue.', '/leavequeue'),
-            new DurabilityCommand('durability'),
-            new KnockbackProfileCommand(),
-            new EventsMainCommand(),
-            new ArenaMainCommand()
+        	new JoinQueueCommand('joinqueue', 'Join a queue for a kit.', '/joinqueue <kit>'),
+        	new LeaveQueueCommand('leavequeue', 'Leave from the queue.', '/leavequeue'),
+        	new DurabilityCommand('durability'),
+        	new KnockbackProfileCommand(),
+        	new EventsMainCommand(),
+        	new ArenaMainCommand()
         ]);
 
         $this->getScheduler()->scheduleRepeatingTask(
@@ -162,62 +154,6 @@ final class Habu extends PluginBase {
      */
     public static function getString(string $key): string {
         return is_string($string = self::getInstance()->getConfig()->getNested($key)) ? $string : '';
-    }
-
-    /**
-     * @param Player $player
-     * @param string $identifier
-     */
-    public static function applyScoreboard(Player $player, string $identifier): void {
-        $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
-        if ($profile === null) {
-            throw new RuntimeException('Local profile not found for player: ' . $player->getName());
-        }
-
-        if (($scoreboard = $profile->getScoreboard()) !== null) {
-            $scoreboard->hide($player); // TODO: Yes ??????
-        }
-
-        $profile->setScoreboard($scoreboard = new Scoreboard());
-
-        // TODO: Please make this more clean :sad:
-        $scoreboard->load(self::getInstance()->scoreboardLines[$identifier] ?? throw new RuntimeException('Scoreboard not found: ' . $identifier));
-        $scoreboard->show($player);
-        $scoreboard->update($player, $profile);
-    }
-
-    /**
-     * Replace placeholders in the text.
-     *
-     * @param Player  $player
-     * @param Profile $profile
-     * @param string  $identifier
-     *
-     * @return string|null
-     */
-    public static function replacePlaceholders(Player $player, Profile $profile, string $identifier): ?string {
-        if ($identifier === 'total-queue-count') return (string) (QueueRegistry::getInstance()->getQueueCount());
-        if ($identifier === 'total-duel-count') return (string) (DuelRegistry::getInstance()->getDuelsCount());
-        if ($identifier === 'online-players') return (string) (count(self::getInstance()->getServer()->getOnlinePlayers()));
-
-        if (str_starts_with($identifier, 'queue-')) {
-            if (($queue = $profile->getQueue()) === null) return null;
-
-            if ($identifier === 'queue-type') return $queue->isRanked() ? 'Ranked' : 'Unranked';
-            if ($identifier === 'queue-kit') return $queue->getKitName();
-            if ($identifier === 'queue-duration') return gmdate('i:s', time() - $queue->getTimestamp());
-        }
-
-        $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
-        if ($duel === null) return null;
-
-        $result = $duel->replacePlaceholders($player, $identifier);
-        if ($result !== null) return $result;
-
-        $stage = $duel->getStage();
-        if ($stage instanceof StageScoreboard) return $stage->replacePlaceholders($duel, $player, $profile, $identifier);
-
-        return null;
     }
 
     /**

@@ -7,8 +7,8 @@ namespace bitrule\practice\duel\impl;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
-use bitrule\practice\Habu;
 use bitrule\practice\TranslationKey;
+use bitrule\scoreboard\ScoreboardRegistry;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use RuntimeException;
@@ -45,7 +45,7 @@ final class PartyFFADuelImpl extends Duel {
             $this->kit->getName()
         ));
 
-        Habu::applyScoreboard($player, 'match-starting-party');
+        ScoreboardRegistry::getInstance()->apply($player, 'match-starting-party');
     }
 
     /**

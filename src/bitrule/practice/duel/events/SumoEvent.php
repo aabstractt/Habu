@@ -7,9 +7,8 @@ namespace bitrule\practice\duel\events;
 use bitrule\practice\arena\ArenaProperties;
 use bitrule\practice\arena\impl\EventArenaProperties;
 use bitrule\practice\duel\events\stage\EventStage;
-use bitrule\practice\duel\events\stage\StartingEventStage;
 use bitrule\practice\duel\events\stage\StartedEventStage;
-use bitrule\practice\Habu;
+use bitrule\practice\duel\events\stage\StartingEventStage;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
 use LogicException;
@@ -21,6 +20,11 @@ use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
+use function array_search;
+use function in_array;
+use function is_int;
+use function max;
+use function min;
 
 final class SumoEvent {
     use SingletonTrait;
@@ -37,13 +41,9 @@ final class SumoEvent {
      * @var int $waitingTime
      */
     private int $waitingTime = 30;
-    /**
-     * @var EventStage|null $stage
-     */
+    /** @var EventStage|null $stage */
     private ?EventStage $stage = null;
-    /**
-     * @var string[] $playersAlive
-     */
+    /** @var string[] $playersAlive */
     private array $playersAlive = [];
     /**
      * The arena properties of the sumo event

@@ -20,6 +20,7 @@ use function array_rand;
 use function count;
 use function is_array;
 use function is_string;
+use function str_contains;
 
 final class ArenaRegistry {
     use SingletonTrait {

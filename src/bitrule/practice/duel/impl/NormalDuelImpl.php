@@ -12,6 +12,7 @@ use bitrule\practice\Habu;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
+use bitrule\scoreboard\ScoreboardRegistry;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -40,7 +41,7 @@ final class NormalDuelImpl extends Duel {
             $this->kit->getName()
         ));
 
-        Habu::applyScoreboard($player, ProfileRegistry::MATCH_STARTING_SCOREBOARD);
+        ScoreboardRegistry::getInstance()->apply($player, Habu::MATCH_STARTING_SCOREBOARD);
     }
 
     /**

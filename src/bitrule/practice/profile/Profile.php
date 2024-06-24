@@ -6,10 +6,8 @@ namespace bitrule\practice\profile;
 
 use bitrule\parties\PartiesPlugin;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
-use bitrule\practice\duel\queue\Queue;
 use bitrule\practice\Habu;
-use bitrule\practice\registry\ProfileRegistry;
-use bitrule\scoreboard\Scoreboard;
+use bitrule\scoreboard\ScoreboardRegistry;
 use InvalidArgumentException;
 use pocketmine\item\Item;
 use pocketmine\item\VanillaItems;
@@ -23,10 +21,6 @@ final class Profile {
 
     /** @var AbstractArenaSetup|null */
     private ?AbstractArenaSetup $arenaSetup = null;
-    /** @var Scoreboard|null */
-    private ?Scoreboard $scoreboard = null;
-    /** @var Queue|null */
-    private ?Queue $queue = null;
     /** @var string The knockback profile of the player. */
     private string $knockbackProfile = 'default';
 
@@ -87,34 +81,6 @@ final class Profile {
     }
 
     /**
-     * @return Scoreboard|null
-     */
-    public function getScoreboard(): ?Scoreboard {
-        return $this->scoreboard;
-    }
-
-    /**
-     * @param Scoreboard|null $scoreboard
-     */
-    public function setScoreboard(?Scoreboard $scoreboard): void {
-        $this->scoreboard = $scoreboard;
-    }
-
-    /**
-     * @return Queue|null
-     */
-    public function getQueue(): ?Queue {
-        return $this->queue;
-    }
-
-    /**
-     * @param Queue|null $queue
-     */
-    public function setQueue(?Queue $queue): void {
-        $this->queue = $queue;
-    }
-
-    /**
      * @param Player $player
      * @param bool   $showScoreboard
      */
@@ -125,7 +91,7 @@ final class Profile {
 
         if (!$showScoreboard) return;
 
-        Habu::applyScoreboard($player, ProfileRegistry::LOBBY_SCOREBOARD);
+        ScoreboardRegistry::getInstance()->apply($player, Habu::LOBBY_SCOREBOARD);
     }
 
     /**

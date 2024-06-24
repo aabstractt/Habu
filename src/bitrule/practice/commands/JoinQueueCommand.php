@@ -6,9 +6,9 @@ namespace bitrule\practice\commands;
 
 use bitrule\practice\Habu;
 use bitrule\practice\registry\KitRegistry;
-use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\registry\QueueRegistry;
 use bitrule\practice\TranslationKey;
+use bitrule\scoreboard\ScoreboardRegistry;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
@@ -41,14 +41,7 @@ final class JoinQueueCommand extends Command {
             return;
         }
 
-        $profile = ProfileRegistry::getInstance()->getProfile($sender->getXuid());
-        if ($profile === null) {
-            $sender->sendMessage(TextFormat::RED . 'Your profile has not loaded yet.');
-
-            return;
-        }
-
-        if ($profile->getQueue() !== null) {
+        if (QueueRegistry::getInstance()->getQueueByPlayer($sender) !== null) {
             $sender->sendMessage(TextFormat::RED . 'You are already in a queue.');
 
             return;
@@ -61,7 +54,7 @@ final class JoinQueueCommand extends Command {
             return;
         }
 
-        $queue = QueueRegistry::getInstance()->createQueue($profile, $kit->getName(), isset($args[1]) && $args[1] === 'ranked');
+        $queue = QueueRegistry::getInstance()->createQueue($sender->getXuid(), $kit->getName(), isset($args[1]) && $args[1] === 'ranked');
         if ($queue === null) return;
 
         $sender->sendMessage(TranslationKey::QUEUE_PLAYER_JOINED()->build(
@@ -69,8 +62,6 @@ final class JoinQueueCommand extends Command {
             $queue->isRanked() ? 'Ranked' : 'Unranked'
         ));
 
-        $profile->setQueue($queue);
-
-        Habu::applyScoreboard($sender, ProfileRegistry::QUEUE_SCOREBOARD);
+        ScoreboardRegistry::getInstance()->apply($sender, Habu::QUEUE_SCOREBOARD);
     }
 }

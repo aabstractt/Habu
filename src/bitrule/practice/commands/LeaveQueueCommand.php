@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace bitrule\practice\commands;
 
 use bitrule\practice\Habu;
-use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\registry\QueueRegistry;
 use bitrule\practice\TranslationKey;
+use bitrule\scoreboard\ScoreboardRegistry;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
@@ -33,26 +33,19 @@ final class LeaveQueueCommand extends Command {
             return;
         }
 
-        $profile = ProfileRegistry::getInstance()->getProfile($sender->getXuid());
-        if ($profile === null) {
-            $sender->sendMessage(TextFormat::RED . 'Your profile has not loaded yet.');
-
-            return;
-        }
-
-        if (($queue = $profile->getQueue()) === null) {
+        if (($queue = QueueRegistry::getInstance()->getQueueByPlayer($sender)) === null) {
             $sender->sendMessage(TextFormat::RED . 'You are not in a queue.');
 
             return;
         }
 
-        QueueRegistry::getInstance()->removeQueue($profile);
+        QueueRegistry::getInstance()->removeQueue($sender);
 
         $sender->sendMessage(TranslationKey::QUEUE_PLAYER_LEAVED()->build(
             $queue->getKitName(),
             $queue->isRanked() ? 'Ranked' : 'Unranked'
         ));
 
-        Habu::applyScoreboard($sender, ProfileRegistry::LOBBY_SCOREBOARD);
+        ScoreboardRegistry::getInstance()->apply($sender, Habu::LOBBY_SCOREBOARD);
     }
 }

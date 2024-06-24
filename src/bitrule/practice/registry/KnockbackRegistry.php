@@ -8,7 +8,6 @@ use bitrule\practice\Habu;
 use bitrule\practice\kit\KnockbackProfile;
 use Exception;
 use InvalidArgumentException;
-use pocketmine\player\Player;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;

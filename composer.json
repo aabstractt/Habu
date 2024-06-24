@@ -5,7 +5,8 @@
   "license": "Apache-2.0",
 
   "require": {
-    "php": "^8.1"
+    "php": "^8.1",
+    "bitrule/forms": "dev-master"
   },
 
   "require-dev": {
@@ -13,12 +14,15 @@
     "phpstan/phpstan": "^1.2.0",
     "phpstan/phpstan-strict-rules": "^1.1.0",
     "pocketmine/pocketmine-mp": "^5.8.2",
+    "bitrule/lib-scoreboard": "dev-master",
     "bitrule/parties": "dev-master"
   },
 
   "repositories": [
     {"type": "vcs", "url": "git@github.com:Abstract-Resources/command-framework"},
-    {"type": "vcs", "url": "git@github.com:aabstractt/Parties"}
+    {"type": "vcs", "url": "git@github.com:aabstractt/PMMP-Forms"},
+    {"type": "vcs", "url": "git@github.com:aabstractt/Parties"},
+    {"type": "vcs", "url": "git@github.com:aabstractt/libScoreboard"}
   ],
 
   "autoload": {
