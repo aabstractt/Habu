@@ -12,7 +12,7 @@ use bitrule\practice\commands\KnockbackProfileCommand;
 use bitrule\practice\commands\LeaveQueueCommand;
 use bitrule\practice\duel\events\SumoEvent;
 use bitrule\practice\listener\defaults\PlayerExhaustListener;
-use bitrule\practice\listener\defaults\PlayerInteractListener;
+use bitrule\practice\listener\defaults\PlayerItemUseListener;
 use bitrule\practice\listener\defaults\PlayerJoinListener;
 use bitrule\practice\listener\defaults\PlayerQuitListener;
 use bitrule\practice\listener\entity\EntityDamageListener;
@@ -85,7 +85,7 @@ final class Habu extends PluginBase {
         KnockbackRegistry::getInstance()->loadAll($this);
 
         // Default server listeners
-        $this->getServer()->getPluginManager()->registerEvents(new PlayerInteractListener(), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerItemUseListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerExhaustListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerJoinListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new BlockBreakListener(), $this);

@@ -13,7 +13,7 @@ use pocketmine\event\player\PlayerItemUseEvent;
 use pocketmine\utils\TextFormat;
 use function is_string;
 
-final class PlayerInteractListener implements Listener {
+final class PlayerItemUseListener implements Listener {
 
     /**
      * @param PlayerItemUseEvent $ev
