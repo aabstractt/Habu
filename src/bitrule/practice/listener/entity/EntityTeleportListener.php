@@ -26,10 +26,7 @@ final class EntityTeleportListener implements Listener {
         $from = $ev->getFrom();
         if ($to->getWorld() === $from->getWorld()) return;
 
-        $sumoEvent = SumoEvent::getInstance();
-        if ($sumoEvent->isPlaying($source) && !$sumoEvent->isVectorInside($ev->getTo(), false)) {
-            $sumoEvent->quitPlayer($source, false);
-        }
+        SumoEvent::getInstance()->listenPlayerMove($source, $ev->getTo());
 
         HabuFFA::getInstance()->quitByWorld($source, $from->getWorld()->getFolderName());
 

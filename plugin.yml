@@ -4,8 +4,8 @@ author: bitrule
 version: "2024.505"
 api: 5.0.0
 main: bitrule\practice\Habu
-softdepend:
-- Gorufus
+loadbefore:
+- Parties
 permissions:
   arena.command:
     default: op

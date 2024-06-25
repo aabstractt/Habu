@@ -35,5 +35,7 @@ final class PlayerJoinListener implements Listener {
         DuelRegistry::getInstance()->setPlayerObject($player);
 
         ProfileRegistry::getInstance()->addProfile($player);
+
+        $player->teleport(Server::getInstance()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
     }
 }

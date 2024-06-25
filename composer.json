@@ -8,15 +8,16 @@
     "php": "^8.1",
     "bitrule/forms": "dev-master",
     "bitrule/lib-scoreboard": "dev-master",
-    "bitrule/habu-ffa": "dev-master",
-    "bitrule/parties": "dev-master"
+    "abstract/command-framework": "^0.4",
+    "bitrule/habu-ffa": "dev-master"
   },
 
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^v3.12.0",
     "phpstan/phpstan": "^1.2.0",
     "phpstan/phpstan-strict-rules": "^1.1.0",
-    "pocketmine/pocketmine-mp": "^5.8.2"
+    "pocketmine/pocketmine-mp": "^5.8.2",
+    "bitrule/parties": "dev-master"
   },
 
   "repositories": [

@@ -1,7 +1,15 @@
-titles:
-  - '&9&lPractice'
+title: '&9&lPractice'
 
 lines:
+  event-starting:
+    nothing-0: '&7---------------&d'
+    event-countdown: '&9Starting in: &b'
+    nothing-1: '&d'
+    event-players: '&9Players: &b'
+    nothing-2: '&b&d&c'
+    nothing-3: ' &9play.server.com'
+    nothing-4: '&7---------------&e'
+
   lobby:
     nothing-0: '&7---------------&d'
     nothing-1: '&9&lServer'

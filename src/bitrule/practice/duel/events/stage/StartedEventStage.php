@@ -65,23 +65,26 @@ final class StartedEventStage implements EventStage {
      */
     public function end(SumoEvent $event, ?string $whoDiedXuid): void {
         // TODO: I need know who won the round
-        $firstPlayer = $this->firstPlayerXuid !== null ? DuelRegistry::getInstance()->getPlayerObject($this->firstPlayerXuid) : null;
-        if ($firstPlayer !== null) {
-            Profile::setDefaultAttributes($firstPlayer); // TODO: Change his knockback profile
+        foreach ([$this->firstPlayerXuid, $this->secondPlayerXuid] as $xuid) {
+            if ($xuid === null) continue;
 
-            if ($firstPlayer->getXuid() === $whoDiedXuid) $event->quitPlayer($firstPlayer, true);
-        }
+            $player = DuelRegistry::getInstance()->getPlayerObject($xuid);
+            if ($player === null) continue;
 
-        $secondPlayer = $this->secondPlayerXuid !== null ? DuelRegistry::getInstance()->getPlayerObject($this->secondPlayerXuid) : null;
-        if ($secondPlayer !== null) {
-            Profile::setDefaultAttributes($secondPlayer); // TODO: Change his knockback profile
+            Profile::setDefaultAttributes($player);
 
-            if ($secondPlayer->getXuid() === $whoDiedXuid) $event->quitPlayer($secondPlayer, true);
+            if ($xuid !== $whoDiedXuid) {
+                $player->teleport($player->getWorld()->getSpawnLocation());
+
+                continue;
+            }
+
+            $event->quitPlayer($player, true);
         }
 
         $playersAlive = $event->getPlayersAlive();
-        if (count($playersAlive) === 1) {
-            $event->end($playersAlive[array_key_first($playersAlive)] ?? null);
+        if (count($playersAlive) <= 1) {
+            $event->end(count($playersAlive) === 0 ? null : $playersAlive[array_key_first($playersAlive)] ?? null);
 
             return;
         }

@@ -59,15 +59,17 @@ final class Habu extends PluginBase {
 
     private ?Config $messagesConfig = null;
 
-    protected function onEnable(): void {
-        self::setInstance($this);
-
+    public function onLoad(): void {
         $bootstrap = 'phar://' . $this->getServer()->getPluginPath() . $this->getName() . '.phar/vendor/autoload.php';
         if (!is_file($bootstrap)) {
             throw new RuntimeException('Could not find autoload.php in plugin phar, directory: ' . $bootstrap);
         }
 
         require_once $bootstrap;
+    }
+
+    protected function onEnable(): void {
+        self::setInstance($this);
 
         $this->saveDefaultConfig();
         $this->saveResource('scoreboard.yml', true);

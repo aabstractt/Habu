@@ -8,6 +8,9 @@ use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\DuelMember;
 use bitrule\practice\duel\impl\trait\SpectatingDuelTrait;
 use bitrule\practice\duel\Team;
+use bitrule\practice\Habu;
+use bitrule\practice\TranslationKey;
+use bitrule\scoreboard\ScoreboardRegistry;
 use pocketmine\player\Player;
 use RuntimeException;
 use function ceil;
@@ -16,19 +19,10 @@ use function count;
 final class TeamDuelImpl extends Duel {
     use SpectatingDuelTrait;
 
-    /** @var Team[] */
-    private array $teams = [];
-
     /**
      * @param Player $player
      */
     public function removePlayer(Player $player): void {
-        foreach ($this->teams as $team) {
-            if (!$team->removePlayer($player->getXuid())) continue;
-
-            break;
-        }
-
         if ($this->ending) return;
 
         $duelMember = $this->getMember($player->getXuid());
@@ -53,15 +47,11 @@ final class TeamDuelImpl extends Duel {
         $teamId = 0;
 
         foreach ($totalPlayers as $player) {
-            if (($team = $this->teams[$teamId] ?? null) === null) {
-                $this->teams[$teamId] = $team = new Team($teamId);
+            if (count(array_filter($this->playersSpawn, fn(int $id) => $id === $teamId)) >= $teamSize) {
+                $teamId++;
             }
 
-            $team->addPlayer($player->getXuid());
-
-            if (count($team->getPlayers($this)) < $teamSize) continue;
-
-            $teamId++;
+            $this->playersSpawn[$player->getXuid()] = $teamId;
         }
     }
 
@@ -70,7 +60,7 @@ final class TeamDuelImpl extends Duel {
      * @param DuelMember $duelMember
      */
     public function processPlayerPrepare(Player $player, DuelMember $duelMember): void {
-        // TODO: Implement processPlayerPrepare() method.
+        ScoreboardRegistry::getInstance()->apply($player, Habu::MATCH_STARTING_SCOREBOARD);
     }
 
     /**

@@ -1,2 +1,12 @@
+sumo-waiting-time: 30
+
 duel:
   end-countdown: 5
+
+ffa:
+  build:
+    world: 'BuildFFA'
+    kit: 'BuildFFA'
+  sumo:
+    world: 'SumoFFA'
+    kit: 'SumoFFA'

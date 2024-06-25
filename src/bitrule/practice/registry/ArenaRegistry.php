@@ -56,9 +56,11 @@ final class ArenaRegistry {
             }
         }
 
+        $kit = KitRegistry::getInstance()->getKit('SumoEvent');
+        if ($kit === null) return;
+
         SumoEvent::getInstance()->loadAll(
-            ($arenaProperties = $this->getArena('Sumo Event')) instanceof EventArenaProperties ? $arenaProperties : null,
-            new Config(Habu::getInstance()->getDataFolder() . 'sumo.yml')
+            ($arenaProperties = $this->getRandomArena($kit)) instanceof EventArenaProperties ? $arenaProperties : null
         );
     }
 
@@ -116,7 +118,7 @@ final class ArenaRegistry {
 
         foreach ($this->arenas as $arena) {
             if ($arena->getPrimaryKit() !== $kit->getName()) continue;
-            if (str_contains($arena->getOriginalName(), 'Event')) continue;
+            if (str_contains($arena->getOriginalName(), 'Event') && !str_contains($kit->getName(), 'Event')) continue;
 
             $arenas[] = $arena;
         }

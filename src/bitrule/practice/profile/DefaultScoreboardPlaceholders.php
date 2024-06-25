@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile;
 
+use bitrule\practice\duel\events\stage\StartingEventStage;
+use bitrule\practice\duel\events\SumoEvent;
 use bitrule\practice\duel\stage\StageScoreboard;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
@@ -28,6 +30,13 @@ final class DefaultScoreboardPlaceholders implements ScoreboardPlaceholders {
         if ($identifier === 'total-queue-count') return (string) (QueueRegistry::getInstance()->getQueueCount());
         if ($identifier === 'total-duel-count') return (string) (DuelRegistry::getInstance()->getDuelsCount());
         if ($identifier === 'online-players') return (string) (count(Server::getInstance()->getOnlinePlayers()));
+
+        $sumoEvent = SumoEvent::getInstance();
+        if ($identifier === 'event-countdown') {
+            return $sumoEvent->getStage() instanceof StartingEventStage ? (string) $sumoEvent->getStage()->getCountdown() : null;
+        }
+
+        if ($identifier === 'event-players') return (string) count($sumoEvent->getPlayersAlive());
 
         if (str_starts_with($identifier, 'queue-')) {
             $queue = QueueRegistry::getInstance()->getQueueByPlayer($player);

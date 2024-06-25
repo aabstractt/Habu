@@ -105,11 +105,13 @@ final class PartyFFADuelImpl extends Duel {
             throw new RuntimeException('Player not found in the match.');
         }
 
-        if ($duelMember->isAlive()) {
-            $duelMember->convertAsSpectator($this, false);
-        }
+        if ($duelMember->isAlive()) $duelMember->convertAsSpectator($this, false);
 
-//        $expectedPlayersAlive = $duelMember->isPlaying() > 2 ? 1 : 2;
+        /**
+         * This is documented because maybe I think no longer is necessary to check if the match can end
+         * because we already do this check on {@see DuelMember::convertAsSpectator()}. First change his status to alive = false,
+         * and after we check if alive players is less than 2, we end the match.
+         */
         if (count($this->getAlive()) > 2) return;
 
 //        $this->end();

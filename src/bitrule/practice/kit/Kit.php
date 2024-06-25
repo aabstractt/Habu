@@ -125,6 +125,13 @@ final class Kit {
      * @return bool
      */
     public function hasDuelAvailable(): bool {
-        return !str_ends_with($this->name, 'FFA') && str_ends_with($this->name, 'Event');
+        if (str_ends_with($this->name, 'FFA')) return false;
+
+        if (str_ends_with($this->name, 'Event')) {
+            echo 'Kit name ends with Event';
+            return false;
+        }
+
+        return true;
     }
 }

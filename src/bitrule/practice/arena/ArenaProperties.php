@@ -149,6 +149,7 @@ abstract class ArenaProperties {
             'default' => new DefaultArenaProperties($arenaName),
             strtolower(BedFightArenaProperties::IDENTIFIER) => new BedFightArenaProperties($arenaName),
             strtolower(BridgeArenaProperties::IDENTIFIER) => new BridgeArenaProperties($arenaName),
+            strtolower(EventArenaProperties::IDENTIFIER) => new EventArenaProperties($arenaName),
             default => throw new RuntimeException('Invalid arena type: ' . $type)
         };
     }
@@ -162,7 +163,7 @@ abstract class ArenaProperties {
         return match (strtolower($kitName)) {
             'bridge' => BridgeArenaProperties::IDENTIFIER,
             strtolower(BedFightArenaProperties::IDENTIFIER), 'fireball fight' => BedFightArenaProperties::IDENTIFIER,
-            'sumo event' => EventArenaProperties::IDENTIFIER,
+            'sumoevent' => EventArenaProperties::IDENTIFIER,
             default => 'default'
         };
     }

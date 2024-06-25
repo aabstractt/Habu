@@ -30,10 +30,7 @@ final class SumoPlayerMoveListener implements Listener {
         if (!$player->isOnline()) return;
         if ($player->getLocation()->getFloorY() > self::MIN_Y) return;
 
-        $sumoEvent = SumoEvent::getInstance();
-        if ($sumoEvent->isPlaying($player) && !$sumoEvent->isVectorInside($ev->getTo(), false)) {
-            $sumoEvent->quitPlayer($player, false);
-        }
+        SumoEvent::getInstance()->listenPlayerMove($player, $ev->getTo());
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel === null || !$duel->getStage() instanceof PlayingStage) return;

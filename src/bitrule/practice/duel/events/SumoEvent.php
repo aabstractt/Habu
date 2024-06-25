@@ -9,14 +9,16 @@ use bitrule\practice\arena\impl\EventArenaProperties;
 use bitrule\practice\duel\events\stage\EventStage;
 use bitrule\practice\duel\events\stage\StartedEventStage;
 use bitrule\practice\duel\events\stage\StartingEventStage;
+use bitrule\practice\Habu;
 use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
+use bitrule\scoreboard\ScoreboardRegistry;
 use LogicException;
+use pocketmine\entity\Location;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
-use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
@@ -63,10 +65,9 @@ final class SumoEvent {
 
     /**
      * @param EventArenaProperties|null $arenaProperties
-     * @param Config                    $config
      */
-    public function loadAll(?EventArenaProperties $arenaProperties, Config $config): void {
-        $this->waitingTime = is_int($value = $config->get('waiting-time')) ? $value : 30;
+    public function loadAll(?EventArenaProperties $arenaProperties): void {
+        $this->waitingTime = is_int($value = Habu::getInstance()->getConfig()->get('sumo-waiting-time')) ? $value : 30;
         $this->stage = new StartingEventStage($this->waitingTime);
 
         if ($arenaProperties === null) return;
@@ -119,12 +120,18 @@ final class SumoEvent {
             throw new LogicException('Player is already in the sumo event');
         }
 
-        if ($add) $this->playersAlive[] = $xuid;
-
         $player->teleport($world->getSpawnLocation());
 
         Profile::resetInventory($player);
         $player->setGamemode(GameMode::ADVENTURE);
+
+        ScoreboardRegistry::getInstance()->apply($player, $this->stage instanceof StartingEventStage ? 'event-starting' : 'event-started');
+
+        if ($add) {
+            echo 'Added!' . PHP_EOL;
+
+            $this->playersAlive[] = $xuid;
+        }
     }
 
     /**
@@ -137,6 +144,7 @@ final class SumoEvent {
         $xuid = $player->getXuid();
         if (!in_array($xuid, $this->playersAlive, true)) return;
 
+        echo 'Quit player' . PHP_EOL;
         unset($this->playersAlive[array_search($xuid, $this->playersAlive, true)]);
 
         if ($died) return;
@@ -154,6 +162,34 @@ final class SumoEvent {
 
         $player = $winnerXuid !== null ? DuelRegistry::getInstance()->getPlayerObject($winnerXuid) : null;
         Server::getInstance()->broadcastMessage(TextFormat::GREEN . 'The sumo event has ended. ' . ($player !== null ? $player->getName() : 'Nobody') . ' has won the event');
+    }
+
+    /**
+     * @param Player   $player
+     * @param Location $to
+     */
+    public function listenPlayerMove(Player $player, Position $to): void {
+        if (!$this->isPlaying($player)) return;
+
+        if ($this->arenaCuboid === null) {
+            throw new LogicException('Sumo event arena cuboid is not set');
+        }
+
+        if (!$this->arenaCuboid->isVectorInside($to)) {
+            $player->teleport($to->getWorld()->getSpawnLocation());
+
+            return;
+        }
+
+        if (!$this->stage instanceof StartedEventStage || !$this->stage->isOpponent($player->getXuid())) return;
+
+        if ($this->fightCuboid === null) {
+            throw new LogicException('Sumo event fight cuboid is not set');
+        }
+
+        if ($this->fightCuboid->isVectorInside($to)) return;
+
+        $this->quitPlayer($player, false);
     }
 
     public function update(): void {
@@ -191,9 +227,18 @@ final class SumoEvent {
     }
 
     /**
+     * @return EventStage|null
+     */
+    public function getStage(): ?EventStage {
+        return $this->stage;
+    }
+
+    /**
      * @param string $message
      */
     public function broadcast(string $message): void {
+        echo 'Broadcast to ' . count($this->playersAlive) . ' players' . PHP_EOL;
+
         foreach ($this->playersAlive as $playerXuid) {
             $player = DuelRegistry::getInstance()->getPlayerObject($playerXuid);
             if ($player === null || !$player->isOnline()) continue;
@@ -234,6 +279,25 @@ final class SumoEvent {
     public function disable(): void {
         if (!$this->enabled) {
             throw new LogicException('Sumo event is not enabled');
+        }
+
+        $defaultWorld = Server::getInstance()->getWorldManager()->getDefaultWorld();
+        if ($defaultWorld === null) {
+            throw new LogicException('Default world is not loaded');
+        }
+
+        foreach ($this->playersAlive as $xuid) {
+            $player = DuelRegistry::getInstance()->getPlayerObject($xuid);
+            if ($player === null || !$player->isOnline()) continue;
+
+            Profile::resetInventory($player);
+            Profile::setDefaultAttributes($player);
+
+            ScoreboardRegistry::getInstance()->apply($player, Habu::LOBBY_SCOREBOARD);
+
+            $player->teleport($defaultWorld->getSpawnLocation());
+
+            unset($this->playersAlive[array_search($xuid, $this->playersAlive, true)]);
         }
 
         $this->enabled = false;
