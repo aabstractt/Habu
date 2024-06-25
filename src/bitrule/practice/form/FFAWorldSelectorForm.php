@@ -28,7 +28,7 @@ final class FFAWorldSelectorForm extends SimpleForm {
                 function (Player $source, ?int $index) use ($world): void {
                     if ($index === null) return;
 
-                    HabuFFA::getInstance()->joinByWorld($source, $world);
+                    HabuFFA::getInstance()->join($source, $world->getFolderName(), true);
                 }
             );
         }

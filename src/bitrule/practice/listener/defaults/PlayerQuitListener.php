@@ -23,9 +23,16 @@ final class PlayerQuitListener implements Listener {
     public function onPlayerQuitEvent(PlayerQuitEvent $ev): void {
         $player = $ev->getPlayer();
 
+        /**
+         * Everything here was tryhardcoded so this is a shit
+         * This is an old version, so after give this I'm going to start the development of Habu v2
+         * for a better performance and code cleanup
+         */
+
         $ev->setQuitMessage(TranslationKey::PLAYER_LEFT_MESSAGE()->build($player->getName()));
 
-        HabuFFA::getInstance()->quitByWorld($player, $player->getWorld()->getFolderName());
+        HabuFFA::getInstance()->killPlayer($player, $player->getWorld());
+        HabuFFA::getInstance()->quitByWorld($player);
 
         DuelRegistry::getInstance()->quitPlayer($player);
         DuelRegistry::getInstance()->disconnectPlayer($player->getXuid());

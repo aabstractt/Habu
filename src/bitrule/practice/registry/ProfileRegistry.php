@@ -79,6 +79,9 @@ final class ProfileRegistry {
 
             $duelMember = $duel->getMember($player->getXuid());
             if ($duelMember === null) continue;
+
+            $duelMember->clearEverything(false);
+
             if ($duelMember->getEnderPearlCountdown() <= 0.0) continue;
 
             $remainingCountdown = $duelMember->getRemainingEnderPearlCountdown();

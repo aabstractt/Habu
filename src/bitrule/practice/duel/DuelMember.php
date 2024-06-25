@@ -6,8 +6,10 @@ namespace bitrule\practice\duel;
 
 use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
+use pocketmine\world\Position;
 use function count;
 use function microtime;
 use function round;
@@ -26,6 +28,10 @@ final class DuelMember {
      * @var int The last time the player was attacked.
      */
     private int $lastAttackerTime = 0;
+    /**
+     * @var array<int, array{0: Position, 1: int}> The blocks placed by the player.
+     */
+    private array $blocksPlaced = [];
 
     /**
      * @param string         $xuid
@@ -163,6 +169,26 @@ final class DuelMember {
     public function listenAttack(Player $attacker): void {
         $this->lastAttackerXuid = $attacker->getXuid();
         $this->lastAttackerTime = time();
+    }
+
+    /**
+     * @param Position $position
+     */
+    public function addBlockPlaced(Position $position): void {
+        $this->blocksPlaced[] = [$position, time() + 10];
+    }
+
+    /**
+     * @param bool $force
+     */
+    public function clearEverything(bool $force): void {
+        foreach ($this->blocksPlaced as $index => [$position, $time]) {
+            if (!$force && $time > time()) continue;
+
+            $position->getWorld()->setBlock($position, VanillaBlocks::AIR());
+
+            unset($this->blocksPlaced[$index]);
+        }
     }
 
     /**
