@@ -171,25 +171,37 @@ final class SumoEvent {
     public function listenPlayerMove(Player $player, Position $to): void {
         if (!$this->isPlaying($player)) return;
 
-        if ($this->arenaCuboid === null) {
+        if ($this->arenaCuboid === null || $this->arenaProperties === null) {
             throw new LogicException('Sumo event arena cuboid is not set');
         }
 
-        if (!$this->arenaCuboid->isVectorInside($to)) {
-            $player->teleport($to->getWorld()->getSpawnLocation());
+        if ($to->getWorld()->getFolderName() === $this->arenaProperties->getOriginalName()) {
+            if (!$this->arenaCuboid->isVectorInside($to)) {
+                $player->teleport($to->getWorld()->getSpawnLocation());
 
-            return;
+                return;
+            }
+
+            if (!$this->stage instanceof StartedEventStage || !$this->stage->isOpponent($player->getXuid())) return;
+
+            if ($this->fightCuboid === null) {
+                throw new LogicException('Sumo event fight cuboid is not set');
+            }
+
+            if ($this->fightCuboid->isVectorInside($to)) return;
         }
-
-        if (!$this->stage instanceof StartedEventStage || !$this->stage->isOpponent($player->getXuid())) return;
-
-        if ($this->fightCuboid === null) {
-            throw new LogicException('Sumo event fight cuboid is not set');
-        }
-
-        if ($this->fightCuboid->isVectorInside($to)) return;
 
         $this->quitPlayer($player, false);
+
+        $defaultWorld = Server::getInstance()->getWorldManager()->getDefaultWorld();
+        if ($defaultWorld === null) {
+            throw new LogicException('Default world is not loaded');
+        }
+
+        $player->teleport($defaultWorld->getSpawnLocation());
+
+        Profile::setDefaultAttributes($player);
+        ScoreboardRegistry::getInstance()->apply($player, Habu::LOBBY_SCOREBOARD);
     }
 
     public function update(): void {

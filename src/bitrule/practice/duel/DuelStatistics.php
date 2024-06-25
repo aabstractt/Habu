@@ -21,6 +21,14 @@ final class DuelStatistics {
     /** @var int */
     private int $kills = 0;
     /**
+     * @var int The current kill streak of the player.
+     */
+    private int $currentKillStreak = 0;
+    /**
+     * @var int The highest kill streak achieved by the player.
+     */
+    private int $highestKillStreak = 0;
+    /**
      * Total hits given to other players.
      * @var int
      */
@@ -95,6 +103,34 @@ final class DuelStatistics {
      */
     public function setKills(int $kills): void {
         $this->kills = $kills;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCurrentKillStreak(): int {
+        return $this->currentKillStreak;
+    }
+
+    /**
+     * @param int $currentKillStreak
+     */
+    public function setCurrentKillStreak(int $currentKillStreak): void {
+        $this->currentKillStreak = $currentKillStreak;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHighestKillStreak(): int {
+        return $this->highestKillStreak;
+    }
+
+    /**
+     * @param int $highestKillStreak
+     */
+    public function setHighestKillStreak(int $highestKillStreak): void {
+        $this->highestKillStreak = $highestKillStreak;
     }
 
     /**
