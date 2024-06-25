@@ -88,8 +88,10 @@ final class EntityDamageListener implements Listener {
         $attackerDuelStatistics->increaseDamageDealt($ev->getFinalDamage());
         $attackerDuelStatistics->increaseTotalHits();
 
-        if ($stage instanceof AttackDamageStageListener) {
-            $stage->onEntityDamageByEntityEvent($duel, $victim, $ev);
-        }
+        if (!$stage instanceof AttackDamageStageListener) return;
+
+        $victimProfile->listenAttack($attacker);
+
+        $stage->onEntityDamageByEntityEvent($duel, $victim, $ev);
     }
 }

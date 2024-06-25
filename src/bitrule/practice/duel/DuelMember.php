@@ -18,6 +18,14 @@ final class DuelMember {
     private bool $alive = true;
     /** @var float The last time the player used an ender pearl. */
     private float $enderPearlCountdown = 0.0;
+    /**
+     * @var string|null The last attacker xuid.
+     */
+    private ?string $lastAttackerXuid = null;
+    /**
+     * @var int The last time the player was attacked.
+     */
+    private int $lastAttackerTime = 0;
 
     /**
      * @param string         $xuid
@@ -105,6 +113,15 @@ final class DuelMember {
     }
 
     /**
+     * @return string|null
+     */
+    public function getLastAttackerXuid(): ?string {
+        if (time() - $this->lastAttackerTime > 5) return null;
+
+        return $this->lastAttackerXuid;
+    }
+
+    /**
      * @param string $message
      */
     public function sendMessage(string $message): void {
@@ -138,6 +155,14 @@ final class DuelMember {
         $player->setFlying(true);
 
         $player->teleport($duel->getWorld()->getSpawnLocation());
+    }
+
+    /**
+     * @param Player $attacker
+     */
+    public function listenAttack(Player $attacker): void {
+        $this->lastAttackerXuid = $attacker->getXuid();
+        $this->lastAttackerTime = time();
     }
 
     /**

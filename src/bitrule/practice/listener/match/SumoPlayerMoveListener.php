@@ -53,19 +53,24 @@ final class SumoPlayerMoveListener implements Listener {
             return;
         }
 
-        $stage = $duel->getStage();
-        if ($stage instanceof KillablePlayingStage) {
-            // TODO: Get the last attacker to give the kill to him
-            $stage->killPlayer($duel, $player, null, EntityDamageEvent::CAUSE_VOID);
-
-            return;
-        }
-
         $duelMember = $duel->getMember($player->getXuid());
         if ($duelMember === null) {
             throw new RuntimeException('Error code 2');
         }
 
-        $duelMember->convertAsSpectator($duel, false);
+        $stage = $duel->getStage();
+        if (!$stage instanceof KillablePlayingStage) {
+            $duelMember->convertAsSpectator($duel, false);
+
+            return;
+        }
+
+        $lastAttackerXuid = $duelMember->getLastAttackerXuid();
+        $stage->killPlayer(
+            $duel,
+            $player,
+            $lastAttackerXuid !== null ? DuelRegistry::getInstance()->getPlayerObject($lastAttackerXuid) : null,
+            EntityDamageEvent::CAUSE_VOID
+        );
     }
 }
