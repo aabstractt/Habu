@@ -117,4 +117,14 @@ final class Kit {
 
         (new PlayerKitAppliedEvent($player, $this))->call();
     }
+
+    /**
+     * If the name ends with 'Event' or 'FFA' then the kit is not duel available
+     * This is used to prevent show this kit in the duel selector if it's not duel available
+     *
+     * @return bool
+     */
+    public function hasDuelAvailable(): bool {
+        return !str_ends_with($this->name, 'FFA') && str_ends_with($this->name, 'Event');
+    }
 }

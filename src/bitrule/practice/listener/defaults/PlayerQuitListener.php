@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\listener\defaults;
 
+use bitrule\habu\ffa\HabuFFA;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
@@ -23,6 +24,8 @@ final class PlayerQuitListener implements Listener {
         $player = $ev->getPlayer();
 
         $ev->setQuitMessage(TranslationKey::PLAYER_LEFT_MESSAGE()->build($player->getName()));
+
+        HabuFFA::getInstance()->quitByWorld($player, $player->getWorld()->getFolderName());
 
         DuelRegistry::getInstance()->quitPlayer($player);
         DuelRegistry::getInstance()->disconnectPlayer($player->getXuid());

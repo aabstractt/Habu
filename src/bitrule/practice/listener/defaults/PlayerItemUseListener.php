@@ -7,6 +7,7 @@ namespace bitrule\practice\listener\defaults;
 use bitrule\parties\PartiesPlugin;
 use bitrule\practice\form\duel\NormalDuelSelector;
 use bitrule\practice\form\duel\PartyDuelForm;
+use bitrule\practice\form\FFAWorldSelectorForm;
 use bitrule\practice\registry\DuelRegistry;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerItemUseEvent;
@@ -67,6 +68,15 @@ final class PlayerItemUseListener implements Listener {
 
             $form = new PartyDuelForm('§u' . TextFormat::BOLD . ($type === 'party-ffa' ? 'Party FFA' : 'Party Split'));
             $form->setup($party, $type === 'party-split');
+
+            $player->sendForm($form);
+
+            return;
+        }
+
+        if ($type === 'ffa-selector') {
+            $form = new FFAWorldSelectorForm(TextFormat::BOLD . TextFormat::BLUE . 'FFA Selector');
+            $form->setup();
 
             $player->sendForm($form);
         }

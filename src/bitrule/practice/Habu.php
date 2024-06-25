@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice;
 
+use bitrule\habu\ffa\HabuFFA;
 use bitrule\practice\commands\ArenaMainCommand;
 use bitrule\practice\commands\DurabilityCommand;
 use bitrule\practice\commands\EventsMainCommand;
@@ -52,8 +53,6 @@ final class Habu extends PluginBase {
     public const LOBBY_SCOREBOARD = 'lobby';
     public const QUEUE_SCOREBOARD = 'queue';
     public const MATCH_STARTING_SCOREBOARD = 'match-starting';
-    public const MATCH_STARTING_PARTY_SCOREBOARD = 'match-starting-party';
-    public const MATCH_PLAYING_SCOREBOARD = 'match-playing';
     public const MATCH_ENDING_SCOREBOARD = 'match-ending';
 
     private ?Config $messagesConfig = null;
@@ -61,12 +60,12 @@ final class Habu extends PluginBase {
     protected function onEnable(): void {
         self::setInstance($this);
 
-//        $bootstrap = 'phar://' . $this->getServer()->getPluginPath() . $this->getName() . '.phar/vendor/autoload.php';
-//        if (!is_file($bootstrap)) {
-//            throw new RuntimeException('Could not find autoload.php in plugin phar, directory: ' . $bootstrap);
-//        }
-//
-//        require_once $bootstrap;
+        $bootstrap = 'phar://' . $this->getServer()->getPluginPath() . $this->getName() . '.phar/vendor/autoload.php';
+        if (!is_file($bootstrap)) {
+            throw new RuntimeException('Could not find autoload.php in plugin phar, directory: ' . $bootstrap);
+        }
+
+        require_once $bootstrap;
 
         $this->saveDefaultConfig();
         $this->saveResource('scoreboard.yml', true);
@@ -83,6 +82,8 @@ final class Habu extends PluginBase {
 
         ArenaRegistry::getInstance()->loadAll();
         KnockbackRegistry::getInstance()->loadAll($this);
+
+        HabuFFA::getInstance()->load($this);
 
         // Default server listeners
         $this->getServer()->getPluginManager()->registerEvents(new PlayerItemUseListener(), $this);

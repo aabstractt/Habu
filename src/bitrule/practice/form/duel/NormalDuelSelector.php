@@ -20,6 +20,8 @@ final class NormalDuelSelector extends SimpleForm {
      */
     public function setup(bool $ranked): void {
         foreach (KitRegistry::getInstance()->getKits() as $kit) {
+            if (!$kit->hasDuelAvailable()) continue;
+
             $this->addButton(
                 new Button(
                     TranslationKey::QUEUE_LADDER_SELECTOR()->build(

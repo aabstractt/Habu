@@ -26,7 +26,7 @@ final class PartyDuelForm extends SimpleForm {
      */
     public function setup(Party $party, bool $team): void {
         foreach (KitRegistry::getInstance()->getKits() as $kit) {
-            if (!$kit->isPartyPlayable()) continue;
+            if (!$kit->isPartyPlayable() || !$kit->hasDuelAvailable()) continue;
 
             $this->addButton(
                 new Button('§u' . TextFormat::BOLD . $kit->getName() . "\n" . TextFormat::RESET . TextFormat::DARK_GRAY . 'Click to select!'),

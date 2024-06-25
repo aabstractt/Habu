@@ -140,7 +140,7 @@ final class Profile {
             	1 => ['party-ffa', VanillaItems::GOLDEN_SWORD()],
             	4 => ['parties-duel', VanillaItems::CLOCK()],
             	7 => ['parties', VanillaItems::PAPER()],
-            	8 => ['settings', VanillaItems::COMPASS()]
+            	8 => ['ffa-selector', VanillaItems::COMPASS()]
             ];
         } else {
             /** @var array<int, array<int, string|Item>> $items */
@@ -149,7 +149,7 @@ final class Profile {
             	1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
             	4 => ['spectate', VanillaItems::CLOCK()],
             	7 => ['parties', VanillaItems::PAPER()],
-            	8 => ['settings', VanillaItems::COMPASS()]
+            	8 => ['ffa-selector', VanillaItems::COMPASS()]
             ];
         }
 

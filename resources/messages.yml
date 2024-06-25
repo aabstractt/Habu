@@ -11,6 +11,8 @@ duel:
   opponent-found: '&bPractice &8> &7Found a &f<type> <kit>&7 match against &c<player>'
   winner-broadcast: '&a<winner>&7 has won a &e<kit>&7 duel against &c<loser>.'
 
+  starting-countdown: '&7Starting in &e<countdown> &7second(s)...'
+
   party-ffa-end: |-
     &b&lParty FFA Statistics&r
       &7Winner: &a<winner>
@@ -75,11 +77,10 @@ items:
     lore: |-
       &7Right-click to open the parties menu.
       &7You can create or join a party here.
-  settings:
-    custom-name: "&r§sProfile Settings &7[Use]"
+  ffa-selector:
+    custom-name: "&r§sFFA Selector &7[Use]"
     lore: |-
-      &7Right-click to open the profile settings menu.
-      &7You can change your settings here.
+      &7Right-click to open the ffa list menu.
 
   party-split:
     custom-name: "&r&9Party Split &7[Use]"

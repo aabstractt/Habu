@@ -8,6 +8,7 @@ use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\impl\PartyFFADuelImpl;
 use bitrule\practice\event\duel\DuelStartedEvent;
 use bitrule\practice\registry\ProfileRegistry;
+use bitrule\practice\TranslationKey;
 use bitrule\scoreboard\ScoreboardRegistry;
 use function count;
 
@@ -32,7 +33,7 @@ final class StartingStage implements AbstractStage {
 
         $this->countdown--;
 
-        $duel->broadcastMessage('Match starting in ' . $this->countdown . ' seconds.');
+        $duel->broadcastMessage(TranslationKey::DUEL_STARTING_COUNTDOWN()->build($this->countdown));
 
         if ($this->countdown > 1) return;
 

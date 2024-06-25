@@ -17,6 +17,7 @@ use function ucwords;
  * @method static self DUEL_ELO_CHANGES_LOST()
  * @method static self DUEL_ELO_CHANGES_WIN()
  *
+ * @method static self DUEL_STARTING_COUNTDOWN()
  * @method static self PARTY_DUEL_FFA_END()
  *
  * @method static self DUEL_OPPONENT_FOUND()
@@ -41,6 +42,8 @@ use function ucwords;
  * @method static self QUEUE_PLAYER_LEAVED()
  *
  * @method static self QUEUE_LADDER_SELECTOR()
+ *
+ * @method static self FFA_WORLD_SELECTOR_TEXT()
  */
 final class TranslationKey {
     use EnumTrait;
@@ -96,6 +99,11 @@ final class TranslationKey {
                 [
                 	'amount'
                 ]
+            ),
+            self::create(
+                'DUEL_STARTING_COUNTDOWN',
+                'duel.starting-countdown',
+                ['countdown']
             ),
             self::create(
                 'PARTY_DUEL_FFA_END',
@@ -237,6 +245,14 @@ final class TranslationKey {
                 	'name',
                 	'queueing-count',
                 	'fighting-count',
+                ]
+            ),
+            self::create(
+                'FFA_WORLD_SELECTOR_TEXT',
+                'ffa.world-selector-text',
+                [
+                	'world',
+                	'player-count'
                 ]
             )
         );
