@@ -11,6 +11,7 @@ use bitrule\scoreboard\ScoreboardRegistry;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 final class LeaveQueueCommand extends Command {
@@ -29,6 +30,12 @@ final class LeaveQueueCommand extends Command {
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{
         if (!$sender instanceof Player) {
             $sender->sendMessage(TextFormat::RED . 'This command can only be used in-game.');
+
+            return;
+        }
+
+        if ($sender->getWorld() !== Server::getInstance()->getWorldManager()->getDefaultWorld()) {
+            $sender->sendMessage(TextFormat::RED . 'You can only do this in the lobby');
 
             return;
         }

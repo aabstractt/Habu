@@ -29,6 +29,10 @@ permissions:
     default: op
   practice.command.events.start:
     default: op
+  practice.command.duel:
+    default: true
+  practice.command.accept:
+    default: true
   practice.command.joinqueue:
     default: true
   practice.command.leavequeue:

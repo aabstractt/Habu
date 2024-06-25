@@ -42,8 +42,10 @@ use function ucwords;
  * @method static self QUEUE_PLAYER_LEAVED()
  *
  * @method static self QUEUE_LADDER_SELECTOR()
- *
  * @method static self FFA_WORLD_SELECTOR_TEXT()
+ *
+ * @method static self DUEL_SENT()
+ * @method static self DUEL_RECEIVED()
  */
 final class TranslationKey {
     use EnumTrait;
@@ -253,6 +255,22 @@ final class TranslationKey {
                 [
                 	'world',
                 	'player-count'
+                ]
+            ),
+            self::create(
+                'DUEL_SENT',
+                'duel.sent',
+                [
+                	'player',
+                    'kit'
+                ]
+            ),
+            self::create(
+                'DUEL_RECEIVED',
+                'duel.received',
+                [
+                	'player',
+                    'kit'
                 ]
             )
         );

@@ -30,5 +30,7 @@ final class PlayerQuitListener implements Listener {
         DuelRegistry::getInstance()->quitPlayer($player);
         DuelRegistry::getInstance()->disconnectPlayer($player->getXuid());
         ProfileRegistry::getInstance()->quitPlayer($player);
+
+        DuelRegistry::getInstance()->clearDuelInvites($player->getXuid());
     }
 }

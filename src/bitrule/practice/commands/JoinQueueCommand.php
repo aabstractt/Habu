@@ -12,6 +12,7 @@ use bitrule\scoreboard\ScoreboardRegistry;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use function count;
 
@@ -37,6 +38,12 @@ final class JoinQueueCommand extends Command {
 
         if (count($args) < 1) {
             $sender->sendMessage(TextFormat::RED . 'Usage: /joinqueue <kit>');
+
+            return;
+        }
+
+        if ($sender->getWorld() !== Server::getInstance()->getWorldManager()->getDefaultWorld()) {
+            $sender->sendMessage(TextFormat::RED . 'You can only do this in the lobby');
 
             return;
         }

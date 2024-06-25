@@ -8,6 +8,7 @@ use bitrule\practice\arena\asyncio\FileDeleteAsyncTask;
 use bitrule\practice\duel\Duel;
 use bitrule\practice\duel\impl\round\RoundingDuel;
 use bitrule\practice\Habu;
+use bitrule\practice\profile\DuelInvite;
 use Closure;
 use Exception;
 use pocketmine\player\Player;
@@ -27,6 +28,19 @@ final class DuelRegistry {
     private array $playersDuel = [];
     /** @var array<string, Player> */
     private array $playerObject = [];
+    /**
+     * This array is used to store the duel invites
+     * Received by the player
+     * @var array<string, DuelInvite[]>>
+     */
+    private array $duelInvites = [];
+    /**
+     * This array is used to store the duel invites
+     * Sent by the player
+     *
+     * @var array<string, string[]> $duelInvitesSent
+     */
+    private array $duelInvitesSent = [];
 
     /**
      * @param Player[]        $totalPlayers
@@ -133,6 +147,47 @@ final class DuelRegistry {
      */
     public function setPlayerObject(Player $player): void {
         $this->playerObject[$player->getXuid()] = $player;
+    }
+
+    /**
+     * @param string $sourceXuid Who sent the invite
+     * @param string $targetXuid Who received the invite
+     */
+    public function addDuelInvite(string $sourceXuid, string $targetXuid, string $kitName): void {
+        $this->duelInvites[$targetXuid][$sourceXuid] = new DuelInvite($sourceXuid, $kitName, time());
+        $this->duelInvitesSent[$sourceXuid][] = $targetXuid;
+    }
+
+    /**
+     * @param string $sourceXuid Who sent the invite
+     * @param string $targetXuid Who received the invite
+     */
+    public function removeDuelInvite(string $sourceXuid, string $targetXuid): void {
+        $duelInvites = $this->duelInvites[$targetXuid] ?? [];
+        if (!isset($duelInvites[$sourceXuid])) return;
+
+        unset($duelInvites[$sourceXuid]);
+    }
+
+    /**
+     * @param string $xuid
+     *
+     * @return DuelInvite[]
+     */
+    public function getDuelInvites(string $xuid): array {
+        return $this->duelInvites[$xuid] ?? [];
+    }
+
+    /**
+     * @param string $xuid
+     */
+    public function clearDuelInvites(string $xuid): void {
+        unset($this->duelInvites[$xuid]);
+
+        $xuids = $this->duelInvitesSent[$xuid] ?? [];
+        foreach ($xuids as $targetXuid) {
+            $this->removeDuelInvite($xuid, $targetXuid);
+        }
     }
 
     /**

@@ -13,6 +13,9 @@ duel:
 
   starting-countdown: '&7Starting in &e<countdown> &7second(s)...'
 
+  received: "&7You have received a duel request from &c<player> &e(&b<kit>&e)&7. &7Use &a/accept&7 to accept it."
+  sent: "&7You have sent a duel request to &c<player> &e(&b<kit>&e)&7."
+
   party-ffa-end: |-
     &b&lParty FFA Statistics&r
       &7Winner: &a<winner>

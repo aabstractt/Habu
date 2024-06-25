@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace bitrule\practice;
 
 use bitrule\habu\ffa\HabuFFA;
+use bitrule\practice\commands\AcceptCommand;
 use bitrule\practice\commands\ArenaMainCommand;
+use bitrule\practice\commands\DuelCommand;
 use bitrule\practice\commands\DurabilityCommand;
 use bitrule\practice\commands\EventsMainCommand;
 use bitrule\practice\commands\JoinQueueCommand;
@@ -112,7 +114,9 @@ final class Habu extends PluginBase {
         	new DurabilityCommand('durability'),
         	new KnockbackProfileCommand(),
         	new EventsMainCommand(),
-        	new ArenaMainCommand()
+        	new ArenaMainCommand(),
+            AcceptCommand::empty(),
+            DuelCommand::empty()
         ]);
 
         $this->getScheduler()->scheduleRepeatingTask(

@@ -147,6 +147,8 @@ abstract class Duel {
                 throw new RuntimeException('Player ' . $player->getName() . ' is not online');
             }
 
+            DuelRegistry::getInstance()->clearDuelInvites($player->getXuid());
+
             $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
             if ($profile === null) {
                 throw new RuntimeException('Local profile not found for player: ' . $player->getName());
