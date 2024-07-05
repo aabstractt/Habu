@@ -101,3 +101,9 @@ items:
     lore: |-
       &7Right-click to queue for a party duel.
       &7You will be teleported to a random duel.
+
+
+ffa:
+  world-selector-text: |-
+    &9<world>
+    &8Playing: &9<player-count>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\registry;
 
+use bitrule\habu\ffa\HabuFFA;
 use bitrule\practice\profile\Profile;
 use bitrule\scoreboard\ScoreboardRegistry;
 use pocketmine\player\Player;
@@ -74,11 +75,14 @@ final class ProfileRegistry {
 
             ScoreboardRegistry::getInstance()->update($player);
 
-            $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
-            if ($duel === null) continue;
+            $duelMember = HabuFFA::getInstance()->getPlayer($player->getXuid());
+            if ($duelMember === null) {
+                $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
+                if ($duel === null) continue;
 
-            $duelMember = $duel->getMember($player->getXuid());
-            if ($duelMember === null) continue;
+                $duelMember = $duel->getMember($player->getXuid());
+                if ($duelMember === null) continue;
+            }
 
             $duelMember->clearEverything(false);
 

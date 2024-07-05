@@ -73,7 +73,7 @@ final class SumoEvent {
         if ($arenaProperties === null) return;
 
         $first = [$arenaProperties->getFirstFightCorner(), $arenaProperties->getSecondFightCorner()];
-        $second = [$arenaProperties->getFirstFightCorner(), $arenaProperties->getSecondFightCorner()];
+        $second = [$arenaProperties->getFirstCorner(), $arenaProperties->getSecondCorner()];
 
         foreach ([$first, $second] as $index => [$firstCorner, $secondCorner]) {
             $cuboid = new AxisAlignedBB(
@@ -85,7 +85,7 @@ final class SumoEvent {
                 max($firstCorner->getZ(), $secondCorner->getZ())
             );
 
-            if ($index === 0) {
+            if ($index === 1) {
                 $this->arenaCuboid = $cuboid;
             } else {
                 $this->fightCuboid = $cuboid;
@@ -127,11 +127,11 @@ final class SumoEvent {
 
         ScoreboardRegistry::getInstance()->apply($player, $this->stage instanceof StartingEventStage ? 'event-starting' : 'event-started');
 
-        if ($add) {
-            echo 'Added!' . PHP_EOL;
+        if (!$add) return;
 
-            $this->playersAlive[] = $xuid;
-        }
+        $this->playersAlive[] = $xuid;
+
+        Server::getInstance()->broadcastMessage(TextFormat::GREEN . $player->getName() . TextFormat::YELLOW . ' has joined the sumo event');
     }
 
     /**
@@ -144,12 +144,10 @@ final class SumoEvent {
         $xuid = $player->getXuid();
         if (!in_array($xuid, $this->playersAlive, true)) return;
 
-        echo 'Quit player' . PHP_EOL;
         unset($this->playersAlive[array_search($xuid, $this->playersAlive, true)]);
 
         if ($died) return;
-        if (!$this->stage instanceof StartedEventStage) return;
-        if (!$this->stage->isOpponent($xuid)) return;
+        if (!$this->stage instanceof StartedEventStage || !$this->stage->isOpponent($xuid)) return;
 
         $this->stage->end($this, $player->getXuid());
     }
@@ -158,6 +156,8 @@ final class SumoEvent {
      * @param string|null $winnerXuid
      */
     public function end(?string $winnerXuid): void {
+        if (!$this->enabled) return;
+
         $this->disable();
 
         $player = $winnerXuid !== null ? DuelRegistry::getInstance()->getPlayerObject($winnerXuid) : null;
@@ -182,7 +182,7 @@ final class SumoEvent {
                 return;
             }
 
-            if (!$this->stage instanceof StartedEventStage || !$this->stage->isOpponent($player->getXuid())) return;
+            if (!$this->isFighting($player)) return;
 
             if ($this->fightCuboid === null) {
                 throw new LogicException('Sumo event fight cuboid is not set');
@@ -249,8 +249,6 @@ final class SumoEvent {
      * @param string $message
      */
     public function broadcast(string $message): void {
-        echo 'Broadcast to ' . count($this->playersAlive) . ' players' . PHP_EOL;
-
         foreach ($this->playersAlive as $playerXuid) {
             $player = DuelRegistry::getInstance()->getPlayerObject($playerXuid);
             if ($player === null || !$player->isOnline()) continue;
@@ -267,19 +265,6 @@ final class SumoEvent {
     }
 
     /**
-     * @param Position $to
-     * @param bool     $fight
-     *
-     * @return bool
-     */
-    public function isVectorInside(Position $to, bool $fight): bool {
-        if ($this->arenaCuboid === null || $this->fightCuboid === null || $this->arenaProperties === null) return false;
-        if ($to->getWorld()->getFolderName() !== $this->arenaProperties->getOriginalName()) return false;
-
-        return ($fight ? $this->fightCuboid : $this->arenaCuboid)->isVectorInside($to);
-    }
-
-    /**
      * @param Player $source
      *
      * @return bool
@@ -288,10 +273,21 @@ final class SumoEvent {
         return $this->enabled && in_array($source->getXuid(), $this->playersAlive, true);
     }
 
+    /**
+     * @param Player $source
+     *
+     * @return bool
+     */
+    public function isFighting(Player $source): bool {
+        return $this->enabled && $this->stage instanceof StartedEventStage && $this->stage->isOpponent($source->getXuid());
+    }
+
     public function disable(): void {
         if (!$this->enabled) {
             throw new LogicException('Sumo event is not enabled');
         }
+
+        $this->enabled = false;
 
         $defaultWorld = Server::getInstance()->getWorldManager()->getDefaultWorld();
         if ($defaultWorld === null) {
@@ -307,12 +303,10 @@ final class SumoEvent {
 
             ScoreboardRegistry::getInstance()->apply($player, Habu::LOBBY_SCOREBOARD);
 
-            $player->teleport($defaultWorld->getSpawnLocation());
-
             unset($this->playersAlive[array_search($xuid, $this->playersAlive, true)]);
-        }
 
-        $this->enabled = false;
+            $player->teleport($defaultWorld->getSpawnLocation());
+        }
 
         $this->stage = new StartingEventStage($this->waitingTime);
     }

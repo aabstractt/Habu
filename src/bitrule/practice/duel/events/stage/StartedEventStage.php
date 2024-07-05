@@ -9,6 +9,8 @@ use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\KitRegistry;
 use LogicException;
+use pocketmine\entity\Location;
+use pocketmine\player\Player;
 use function array_key_first;
 use function array_rand;
 use function count;
@@ -37,13 +39,17 @@ final class StartedEventStage implements EventStage {
      * @param SumoEvent $event
      */
     public function update(SumoEvent $event): void {
-        $this->roundTimeElapsed++;
-
-        if ($this->roundTimeElapsed <= 3) {
+        if ($this->roundTimeElapsed <= 2) {
             $event->broadcast('Round #' . $this->round . ' starting in ' . (3 - $this->roundTimeElapsed) . ' seconds');
-        } elseif ($this->roundTimeElapsed === 4) {
+        } elseif ($this->roundTimeElapsed === 3) {
             $event->broadcast('Round started!');
+
+            foreach ($this->getFightingPlayers() as $player) {
+                $player->setNoClientPredictions(false);
+            }
         }
+
+        $this->roundTimeElapsed++;
 
         if ($this->roundTimeElapsed < 90) return;
 
@@ -60,26 +66,36 @@ final class StartedEventStage implements EventStage {
     }
 
     /**
+     * @return Player[]
+     */
+    public function getFightingPlayers(): array {
+        $players = [];
+        foreach ([$this->firstPlayerXuid, $this->secondPlayerXuid] as $xuid) {
+            if (!is_string($xuid)) continue;
+
+            $player = DuelRegistry::getInstance()->getPlayerObject($xuid);
+            if ($player === null) continue;
+
+            $players[] = $player;
+        }
+
+        return $players;
+    }
+
+    /**
      * @param SumoEvent   $event
      * @param string|null $whoDiedXuid
      */
     public function end(SumoEvent $event, ?string $whoDiedXuid): void {
         // TODO: I need know who won the round
-        foreach ([$this->firstPlayerXuid, $this->secondPlayerXuid] as $xuid) {
-            if ($xuid === null) continue;
-
-            $player = DuelRegistry::getInstance()->getPlayerObject($xuid);
-            if ($player === null) continue;
-
+        foreach ($this->getFightingPlayers() as $player) {
             Profile::setDefaultAttributes($player);
 
-            if ($xuid !== $whoDiedXuid) {
+            if ($player->getXuid() !== $whoDiedXuid) {
                 $player->teleport($player->getWorld()->getSpawnLocation());
-
-                continue;
+            } else {
+                $event->quitPlayer($player, true);
             }
-
-            $event->quitPlayer($player, true);
         }
 
         $playersAlive = $event->getPlayersAlive();
@@ -95,7 +111,7 @@ final class StartedEventStage implements EventStage {
         shuffle($playersAlive);
 
         $firstKey = array_rand($playersAlive);
-        if (!is_string($firstKey)) {
+        if (!is_int($firstKey)) {
             throw new LogicException('Invalid key type');
         }
 
@@ -105,8 +121,14 @@ final class StartedEventStage implements EventStage {
         }
 
         $secondKey = array_rand($playersAlive);
-        if (!is_string($secondKey)) {
+        if (!is_int($secondKey)) {
             throw new LogicException('Invalid key type');
+        }
+
+        if ($firstKey === $secondKey) {
+            $this->end($event, null);
+
+            return;
         }
 
         $secondXuid = $playersAlive[$secondKey] ?? null;
@@ -137,10 +159,17 @@ final class StartedEventStage implements EventStage {
             throw new LogicException('Kit not found');
         }
 
+        /**
+         * @var Player $player
+         */
         foreach ([$firstPlayer, $secondPlayer] as $index => $player) {
-            $player->teleport($index === 0 ? $arenaProperties->getFirstPosition() : $arenaProperties->getSecondPosition());
+            $position = $index === 0 ? $arenaProperties->getFirstPosition() : $arenaProperties->getSecondPosition();
+            $player->teleport(Location::fromObject($position, $player->getWorld(), $position->yaw, $position->pitch));
+            $player->setNoClientPredictions();
 
             $kit->applyOn($player);
         }
+
+        $event->broadcast('Round #' . $this->round . ': ' . $firstPlayer->getName() . ' vs ' . $secondPlayer->getName() . '!');
     }
 }

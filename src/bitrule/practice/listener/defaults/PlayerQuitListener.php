@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\listener\defaults;
 
 use bitrule\habu\ffa\HabuFFA;
+use bitrule\practice\duel\events\SumoEvent;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\practice\TranslationKey;
@@ -33,6 +34,8 @@ final class PlayerQuitListener implements Listener {
 
         HabuFFA::getInstance()->killPlayer($player, $player->getWorld());
         HabuFFA::getInstance()->quitByWorld($player);
+
+        SumoEvent::getInstance()->quitPlayer($player, false);
 
         DuelRegistry::getInstance()->quitPlayer($player);
         DuelRegistry::getInstance()->disconnectPlayer($player->getXuid());

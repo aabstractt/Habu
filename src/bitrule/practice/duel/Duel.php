@@ -15,6 +15,7 @@ use bitrule\practice\profile\Profile;
 use bitrule\practice\registry\DuelRegistry;
 use bitrule\practice\registry\ProfileRegistry;
 use bitrule\scoreboard\ScoreboardRegistry;
+use pocketmine\entity\Location;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -108,13 +109,16 @@ abstract class Duel {
             throw new RuntimeException('Player not found in match.');
         }
 
-        $player->teleport(Position::fromObject(
-            match ($spawnId) {
-                self::FIRST_SPAWN_ID => $this->arenaProperties->getFirstPosition(),
-                self::SECOND_SPAWN_ID => $this->arenaProperties->getSecondPosition(),
-                default => $this->getWorld()->getSpawnLocation()
-            },
-            $this->getWorld()
+        $position = match ($spawnId) {
+            self::FIRST_SPAWN_ID => $this->arenaProperties->getFirstPosition(),
+            self::SECOND_SPAWN_ID => $this->arenaProperties->getSecondPosition(),
+            default => $this->getWorld()->getSpawnLocation()
+        };
+        $player->teleport(Location::fromObject(
+            $position,
+            $this->getWorld(),
+            $position->yaw,
+            $position->pitch
         ));
     }
 

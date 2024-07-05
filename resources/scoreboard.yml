@@ -1,6 +1,14 @@
 title: '&9&lPractice'
 
 lines:
+  ffa-buildffa:
+    nothing-0: '&7---------------&d'
+    nothing-1: '&9&lFFA'
+    ffa-online-players: ' &fOnline: &b'
+    nothing-2: '&b&d&c'
+    nothing-3: ' &9play.server.com'
+    nothing-4: '&7---------------&e'
+
   event-starting:
     nothing-0: '&7---------------&d'
     event-countdown: '&9Starting in: &b'

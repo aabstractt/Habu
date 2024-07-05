@@ -7,6 +7,7 @@ namespace bitrule\practice\profile;
 use bitrule\parties\PartiesPlugin;
 use bitrule\practice\arena\setup\AbstractArenaSetup;
 use bitrule\practice\Habu;
+use bitrule\practice\registry\ProfileRegistry;
 use bitrule\scoreboard\ScoreboardRegistry;
 use InvalidArgumentException;
 use pocketmine\item\Item;
@@ -114,6 +115,19 @@ final class Profile {
      */
     public function getKnockbackProfile(): string {
         return $this->knockbackProfile;
+    }
+
+    /**
+     * @param Player $player
+     * @param string $knockbackName
+     */
+    public static function applyKnockback(Player $player, string $knockbackName): void {
+        $profile = ProfileRegistry::getInstance()->getProfile($player->getXuid());
+        if ($profile === null) {
+            throw new InvalidArgumentException('Profile not found');
+        }
+
+        $profile->setKnockbackProfile($knockbackName);
     }
 
     public static function setDefaultAttributes(Player $player): void {

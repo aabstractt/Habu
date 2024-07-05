@@ -17,9 +17,6 @@ use RuntimeException;
 
 final class SumoPlayerMoveListener implements Listener {
 
-    /** @var int */
-    final public const MIN_Y = 7;
-
     /**
      * @param PlayerMoveEvent $ev
      *
@@ -28,7 +25,6 @@ final class SumoPlayerMoveListener implements Listener {
     public function onPlayerMoveEvent(PlayerMoveEvent $ev): void {
         $player = $ev->getPlayer();
         if (!$player->isOnline()) return;
-        if ($player->getLocation()->getFloorY() > self::MIN_Y) return;
 
         SumoEvent::getInstance()->listenPlayerMove($player, $ev->getTo());
 
@@ -39,7 +35,6 @@ final class SumoPlayerMoveListener implements Listener {
         if ($cuboid === null) {
             throw new RuntimeException('Error code 1');
         }
-
         if ($cuboid->isVectorInside($player->getLocation())) return;
 
         if ($player->getGamemode() === GameMode::SPECTATOR) {

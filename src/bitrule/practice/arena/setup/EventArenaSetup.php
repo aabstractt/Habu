@@ -55,8 +55,8 @@ final class EventArenaSetup extends AbstractArenaSetup {
         }
 
         $properties = parent::getProperties();
-        $properties['first-fight-position'] = $this->firstFightCorner;
-        $properties['second-fight-position'] = $this->secondFightCorner;
+        $properties['first-fight-corner'] = $this->firstFightCorner;
+        $properties['second-fight-corner'] = $this->secondFightCorner;
 
         return $properties;
     }

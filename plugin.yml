@@ -26,7 +26,7 @@ permissions:
   arena.command.corner:
     default: op
   practice.command.events:
-    default: op
+    default: true
   practice.command.events.start:
     default: op
   practice.command.duel:
