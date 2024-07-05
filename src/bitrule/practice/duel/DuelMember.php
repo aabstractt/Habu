@@ -122,9 +122,16 @@ final class DuelMember {
      * @return string|null
      */
     public function getLastAttackerXuid(): ?string {
-        if (time() - $this->lastAttackerTime > 5) return null;
+        if (time() - $this->lastAttackerTime > 20) return null;
 
         return $this->lastAttackerXuid;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCombatRemaining(): int {
+        return 20 - (time() - $this->lastAttackerTime);
     }
 
     /**

@@ -41,6 +41,13 @@ final class ArenaCreateArgument extends Argument {
             return;
         }
 
+        $worldManager = Server::getInstance()->getWorldManager();
+        if (!$worldManager->loadWorld($args[0])) {
+            $sender->sendMessage(TextFormat::RED . 'World not generated');
+
+            return;
+        }
+
         $world = Server::getInstance()->getWorldManager()->getWorldByName($args[0]);
         if ($world === null) {
             $sender->sendMessage(TextFormat::RED . 'World not found');

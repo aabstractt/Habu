@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bitrule\practice\profile;
 
+use bitrule\habu\ffa\HabuFFA;
 use bitrule\practice\duel\events\stage\StartingEventStage;
 use bitrule\practice\duel\events\SumoEvent;
 use bitrule\practice\duel\stage\StageScoreboard;
@@ -45,6 +46,28 @@ final class DefaultScoreboardPlaceholders implements ScoreboardPlaceholders {
             if ($identifier === 'queue-type') return $queue->isRanked() ? 'Ranked' : 'Unranked';
             if ($identifier === 'queue-kit') return $queue->getKitName();
             if ($identifier === 'queue-duration') return gmdate('i:s', time() - $queue->getTimestamp());
+        }
+
+        $duelMember = HabuFFA::getInstance()->getPlayer($player->getXuid());
+        if ($duelMember !== null) {
+            if ($identifier === 'ffa-online-players') return (string) count($player->getWorld()->getPlayers());
+
+            $duelStatistics = $duelMember->getDuelStatistics();
+            if ($identifier === 'ffa-kills') return (string) $duelStatistics->getKills();
+            if ($identifier === 'ffa-streak') return (string) $duelStatistics->getCurrentKillStreak();
+            if ($identifier === 'ffa-highest-streak') return (string) $duelStatistics->getHighestKillStreak();
+            if (str_starts_with($identifier, 'ffa-combat')) {
+                $lastAttackerXuid = $duelMember->getLastAttackerXuid();
+                if ($lastAttackerXuid === null) return null;
+
+                $lastAttacker = DuelRegistry::getInstance()->getPlayerObject($lastAttackerXuid);
+                if ($lastAttacker === null) return null;
+
+                if ($identifier === 'ffa-combat-time') return gmdate('i:s', $duelMember->getCombatRemaining());
+                if ($identifier === 'ffa-combat-ping') {
+                    return $player->getNetworkSession()->getPing() . ' (' . $lastAttacker->getNetworkSession()->getPing() . ')';
+                }
+            }
         }
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());

@@ -10,3 +10,4 @@ ffa:
   sumo:
     world: 'SumoFFA'
     kit: 'SumoFFA'
+    anti_clean: true # Enable the anti-clean feature

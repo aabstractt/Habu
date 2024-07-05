@@ -10,10 +10,13 @@ use bitrule\practice\registry\DuelRegistry;
 use pocketmine\block\utils\DyeColor;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\block\Wool;
+use pocketmine\entity\effect\EffectInstance;
+use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\event\Listener;
 use pocketmine\item\Armor;
 use pocketmine\item\ItemBlock;
 use pocketmine\player\GameMode;
+use pocketmine\utils\Limits;
 use RuntimeException;
 
 final class PlayerKitAppliedListener implements Listener {
@@ -29,6 +32,12 @@ final class PlayerKitAppliedListener implements Listener {
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         if ($duel === null) return;
+
+        $kitName = $duel->getKit()->getName();
+        if (str_contains($kitName, 'Sumo') || str_contains($kitName, 'Spleef') || str_contains($kitName, 'Resistance')) {
+            $player->getEffects()->add(new EffectInstance(VanillaEffects::RESISTANCE(), Limits::INT32_MAX, 3, false));
+        }
+
         if (!$duel->getArenaProperties() instanceof BedFightArenaProperties) return;
 
         $spawnId = $duel->getSpawnId($player->getXuid());

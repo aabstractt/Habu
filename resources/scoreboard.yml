@@ -3,7 +3,10 @@ title: '&9&lPractice'
 lines:
   ffa-buildffa:
     nothing-0: '&7---------------&d'
-    nothing-1: '&9&lFFA'
+    nothing-1: '&9&l'
+    ffa-kills: ' &fKills: &b'
+    ffa-streak: ' &fStreak: &b'
+    ffa-highest-streak: ' &fHighest Streak: &b'
     ffa-online-players: ' &fOnline: &b'
     nothing-2: '&b&d&c'
     nothing-3: ' &9play.server.com'
