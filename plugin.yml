@@ -27,6 +27,8 @@ permissions:
     default: op
   practice.command.events:
     default: true
+  practice.command.spawn:
+    default: true
   practice.command.events.start:
     default: op
   practice.command.duel:

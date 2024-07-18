@@ -13,6 +13,7 @@ use bitrule\practice\commands\EventsMainCommand;
 use bitrule\practice\commands\JoinQueueCommand;
 use bitrule\practice\commands\KnockbackProfileCommand;
 use bitrule\practice\commands\LeaveQueueCommand;
+use bitrule\practice\commands\SpawnCommand;
 use bitrule\practice\duel\events\SumoEvent;
 use bitrule\practice\listener\defaults\PlayerExhaustListener;
 use bitrule\practice\listener\defaults\PlayerItemUseListener;
@@ -72,8 +73,8 @@ final class Habu extends PluginBase {
         self::setInstance($this);
 
         $this->saveDefaultConfig();
-        $this->saveResource('scoreboard.yml', true);
-        $this->saveResource('messages.yml', true);
+        $this->saveResource('scoreboard.yml');
+        $this->saveResource('messages.yml');
 
         ScoreboardRegistry::getInstance()->load(new Config($this->getDataFolder() . 'scoreboard.yml'));
         ScoreboardRegistry::getInstance()->setScoreboardPlaceholders(new DefaultScoreboardPlaceholders());
@@ -117,6 +118,7 @@ final class Habu extends PluginBase {
         	new KnockbackProfileCommand(),
         	new EventsMainCommand(),
         	new ArenaMainCommand(),
+            new SpawnCommand('spawn', 'Teleport to the spawn.', '/spawn', ['leave']),
             AcceptCommand::empty(),
             DuelCommand::empty()
         ]);

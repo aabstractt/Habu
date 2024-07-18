@@ -79,6 +79,25 @@ final class PlayerItemUseListener implements Listener {
             $form->setup();
 
             $player->sendForm($form);
+
+            return;
+        }
+
+        if ($type === 'parties') {
+            $partyAdapter = PartiesPlugin::getInstance()->getPartyAdapter();
+            if ($partyAdapter === null) {
+                $player->sendMessage(TextFormat::RED . 'Parties plugin is not enabled.');
+
+                return;
+            }
+
+            if ($partyAdapter->getPartyByPlayer($player->getXuid()) !== null) {
+                $player->sendMessage(TextFormat::RED . 'You are already in a party.');
+
+                return;
+            }
+
+            $partyAdapter->createParty($player);
         }
     }
 }

@@ -12,6 +12,7 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use pocketmine\item\ItemTypeIds;
 use pocketmine\utils\TextFormat;
+use pocketmine\Server;
 
 final class BlockBreakListener implements Listener {
 
@@ -25,6 +26,12 @@ final class BlockBreakListener implements Listener {
 
         // Prevent handle event if the player not is online
         if (!$player->isOnline()) return;
+
+        if ($player->getWorld() === Server::getInstance()->getWorldManager()->getDefaultWorld()) {
+            $ev->cancel();
+
+            return;
+        }
 
         $duel = DuelRegistry::getInstance()->getDuelByPlayer($player->getXuid());
         $stage = $duel?->getStage();

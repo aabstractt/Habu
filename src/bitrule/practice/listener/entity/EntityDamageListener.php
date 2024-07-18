@@ -14,6 +14,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use RuntimeException;
 
 final class EntityDamageListener implements Listener {
@@ -26,6 +27,12 @@ final class EntityDamageListener implements Listener {
     public function onEntityDamageEvent(EntityDamageEvent $ev): void {
         $victim = $ev->getEntity();
         if (!$victim instanceof Player) return;
+
+        if ($victim->getWorld() === Server::getInstance()->getWorldManager()->getDefaultWorld()) {
+            $ev->cancel();
+
+            return;
+        }
 
         $profile = ProfileRegistry::getInstance()->getProfile($victim->getXuid());
         if ($profile === null) {

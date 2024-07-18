@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bitrule\practice\commands;
 
 use abstractplugin\command\BaseCommand;
+use bitrule\practice\commands\arena\ArenaCancelArgument;
 use bitrule\practice\commands\arena\ArenaCornerArgument;
 use bitrule\practice\commands\arena\ArenaCreateArgument;
 use bitrule\practice\commands\arena\ArenaEditArgument;
@@ -28,7 +29,8 @@ final class ArenaMainCommand extends BaseCommand {
             new ArenaEditArgument('edit', 'arena.command.edit'),
             new KitCreateArgument('createkit', 'arena.command.createkit'),
             new KitCreateArgument('toggleparty', 'arena.command.toggleparty'),
-            new KitKnockbackArgument('knockback', 'arena.command.knockback')
+            new KitKnockbackArgument('knockback', 'arena.command.knockback'),
+            new ArenaCancelArgument('cancel', 'arena.command.save')
         );
     }
 

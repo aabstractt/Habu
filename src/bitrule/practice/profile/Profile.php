@@ -161,7 +161,6 @@ final class Profile {
             $items = [
             	0 => ['competitive-duel', VanillaItems::DIAMOND_SWORD()],
             	1 => ['unranked-duel', VanillaItems::GOLDEN_SWORD()],
-            	4 => ['spectate', VanillaItems::CLOCK()],
             	7 => ['parties', VanillaItems::PAPER()],
             	8 => ['ffa-selector', VanillaItems::COMPASS()]
             ];
